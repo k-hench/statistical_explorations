@@ -1,0 +1,680 @@
+---
+title: "Mixed Models with R"
+author: "Kosmas Hench"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    theme: yeti
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+# Mixed Models with R
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      dev = "svg",         # for html rendering
+                      # dev = "cairo_pdf", # for pdf rendering
+                      fig.asp = .5, 
+                      fig.align = "center",
+                      message = FALSE,
+                      warning = FALSE
+                      )
+source("bayesian_settings.R")
+library(lme4)
+
+summarise_model <- function(data){
+  data$mod %>%
+    purrr::map_dfr(broom::glance) %>% 
+    bind_cols(., data$mod %>% 
+                purrr::map_dfr(broom::tidy) %>% 
+                mutate(grp = (row_number()+1)%/%2) %>% 
+                dplyr::select(grp,term,estimate) %>%
+                pivot_wider(names_from = 'term',values_from = 'estimate') %>% 
+                dplyr::select(-grp) %>% 
+                purrr::set_names(nm = c('intercept', 'slope')))
+}
+```
+
+by [Michael Clark](https://m-clark.github.io/mixed-models-with-R/)
+
+```{r}
+load("data/gpa.RData")
+gpa <- gpa %>% as_tibble()
+```
+
+## Standard regregression model
+
+$$
+gpa = b_{intercept} + b_{occ} \times occasion + \epsilon 
+$$
+
+Coefficients $b$ for intercept and effect of time. 
+
+The error $\epsilon$ is assumed to be normally distributed with $\mu = 0$ and some standard deviation $\sigma$.
+
+$$
+\epsilon \sim \mathscr{N}(0, \sigma)
+$$
+
+alternate notation, with emphasis on the data generating process:
+
+$$
+gpa ~ \sim \mathscr{N}(\mu, \sigma)\\
+\mu = b_{intercept} + b_{occ} \times occasion
+$$
+
+## mixed nodel
+
+### student specific effect (initial depiction)
+
+$$
+gpa = b_{intercept} + b_{occ} \times occasion + ( \textit{effect}_{student} + \epsilon )\\
+\textit{effect}_{student} \sim \mathscr{N}(0, \tau)
+$$
+
+focusing on the coefficients (rather than on sources of error):
+
+$$
+gpa = ( b_{intercept} + \textit{effect}_{student} ) + b_{occ} \times occasion + \epsilon
+$$
+
+or (shorter)
+
+$$
+gpa = b_{int\_student} + b_{occ} \times occasion + \epsilon
+$$
+
+$\rightarrow$ this means student specific intercepts...
+
+$$
+b_{int\_student} \sim \mathscr{N}(b_{intercept}, \tau)
+$$
+
+...that are normally distributed with the mean of the overall intercept (*random intercepts model*)
+
+### as multi-level model
+
+two-part regression model (one at observation level, one at student level) (this is the same as above, just needs 'plugging in')
+
+$$
+gpa = b_{int\_student} + b_{occ} \times occasion + \epsilon\\
+b_{int\_student} = b_{intercept} + \textit{effect}_{student}
+$$
+
+! There is no student-specific effect for $occasion$ (which is termed *fixed effect*), and there is no random component
+
+```{r}
+gpa_lm <- lm(gpa ~ occasion, data = gpa)
+
+gpa %>% 
+  ggplot(aes(x = year - 1  + as.numeric(semester)/2, y = gpa, group = student)) +
+  geom_line(alpha = .2) +
+  geom_abline(slope = gpa_lm$coefficients[[2]],
+              intercept =  gpa_lm$coefficients[[1]],
+              color = clr2, size = 1) +
+  labs(x = "semester") +
+  coord_cartesian(ylim = c(1,4), expand = 0)
+
+pander::pander(summary(gpa_lm), round = 3)
+```
+
+Student effect not taken into account.
+
+### Mixed Model
+
+```{r}
+gpa_mixed <- lmer(gpa ~ occasion + (1 | student), data = gpa)
+```
+
+(Test automatic equation creation)
+
+```{r}
+library(equatiomatic)
+# Give the results to extract_eq
+extract_eq(gpa_mixed,)
+```
+
+
+```{r, echo = FALSE}
+mm_fixed <- mixedup::extract_fixef(gpa_mixed)
+mm_fixed %>% pander::pander()
+mixedup::extract_vc(gpa_mixed, ci_level = 0) %>% pander::pander()
+```
+
+Coefficients (*fixed effects*) for `time` and `intercept` are the same as `lm()`
+
+Getting confidence intervals from a mixed model (since $p$ values are not given (`== 0` ?))
+
+```{r}
+confint(gpa_mixed)
+```
+
+```{r}
+mm_cinf <- mixedup::extract_vc(gpa_mixed)
+mm_cinf %>% pander::pander()
+```
+
+student effect $\tau$ = `r mm_cinf$sd[[1]]` / `r mm_cinf$variance[[1]]` (sd / var)
+
+Percentage of student variation as share of the total variation (*intraclass correlation*): `r mm_cinf$variance[[1]]` / `r sum(mm_cinf$variance)` = `r mm_cinf$variance[[1]] / round(sum(mm_cinf$variance), digits = 3)` 
+
+### Estimation of random effects
+
+Random effect
+
+```{r}
+mixedup::extract_random_effects(gpa_mixed) %>%  head(5) %>% knitr::kable()
+```
+
+Random intercept (intercept + random effect)
+
+```{r}
+mm_coefs <- mixedup::extract_coef(gpa_mixed)
+mm_coefs %>%  head(5) %>% knitr::kable()
+```
+
+```{r}
+library(merTools)
+mm_intervals <- predictInterval(gpa_mixed) %>% as_tibble()
+mm_mean_sd <- REsim(gpa_mixed) %>% as_tibble()
+
+sd_level <- .95
+
+mm_mean_sd %>%
+  mutate(sd_leveled = sd * qnorm(1 - ((1 - sd_level)/2)),
+         sig = (median + sd_leveled) >= 0 & (median - sd_leveled) <= 0) %>% 
+  arrange(median) %>% 
+  mutate(rank = row_number()) %>% 
+  arrange(groupID) %>% 
+  ggplot(aes(x = rank)) +
+  geom_segment(aes(xend = rank, y = median - sd_leveled, yend = median +  sd_leveled, color = sig)) +
+  geom_point(aes(y = median), size = .3, alpha = .5) +
+  geom_hline(yintercept = 0, size = .4, linetype = 3) +
+  scale_color_manual(values = c(`TRUE` = clr2, `FALSE` = clr0d), guide = "none") +
+  labs(x = "Student", y = "Coefficient", caption = "interval estimates of random effects")
+```
+
+### Prediction
+
+```{r}
+gpa_predictions <- tibble(lm = predict(gpa_lm),
+                            lmm_no_random_effects = predict(gpa_mixed, re.form = NA),
+                            lmm_with_random_effects = predict(gpa_mixed)) %>% 
+  bind_cols(gpa, .)
+
+gpa_predictions %>% 
+  ggplot(aes(x = lm)) +
+  geom_point(aes(y = lmm_with_random_effects, color = "with_re")) +
+  geom_point(aes(y = lmm_no_random_effects, color = "no_re")) +
+  scale_color_manual(values = c(no_re = clr2, with_re = clr0d)) 
+
+student_select <- 1:2
+gpa_predictions %>%
+  filter(student %in% student_select) %>% 
+  ggplot(aes(x = occasion)) +
+  geom_point(aes(y = gpa, color = student))+
+  geom_abline(data = tibble(slope = c(gpa_lm$coefficients[[2]], mm_fixed$value[c(2,2)]), 
+                             intercept =  c(gpa_lm$coefficients[[1]], mm_coefs$value[as.numeric(as.character(mm_coefs$group)) %in% student_select]),
+                             model = c("lm", as.character(mm_coefs$group[as.numeric(as.character(mm_coefs$group)) %in% student_select]))),
+              aes(slope = slope, intercept = intercept, color = model), size = .6) +
+  scale_color_manual(values = c(lm = clr2, `1` = clr1, `2` = clr0d), 
+                     labels = c( "lm", "lmm (student1)", "lmm (student2)"))
+
+```
+
+### Cluster Level Covariates
+
+If a cluster level covariate is added (eg. sex), $b_{int\_student}$ turns into:
+
+$$
+b_{int\_student} = b_{intercept} + b_{sex} \times \textit{sex} + \textit{effect}_{student}
+$$
+
+plugging this into the model will result in
+
+$$
+gpa = b_{intercept} + b_{occ} \times \textit{occasion} + b_{sex} \times \textit{sex} + ( \textit{effect}_{student} + \epsilon)
+$$
+
+## Add random slope
+
+```{r}
+gpa_mixed2 <- lmer(gpa ~ occasion + (1 + occasion | student), data = gpa)
+
+mixedup::extract_fixed_effects(gpa_mixed2) %>% knitr::kable()
+mixedup::extract_vc(gpa_mixed2, ci_level = 0) %>% knitr::kable()
+gpa_mixed2_rc <- mixedup::extract_random_coefs(gpa_mixed2)
+```
+
+correlation of the intercepts and slopes (negative, so students with a low starting score tend to increase a little more)
+
+```{r}
+VarCorr(gpa_mixed2) %>% as_tibble() %>% knitr::kable() 
+```
+
+```{r}
+gpa_lm_separate <- gpa %>% 
+  group_by(student) %>% 
+  nest() %>% 
+  mutate(mod = map(data,function(data){lm(gpa ~ occasion, data = data)})) %>% 
+  bind_cols(., summarise_model(.)) 
+  
+p_intercepts <- ggplot()  +
+  geom_density(data = gpa_mixed2_rc %>% filter(effect == "Intercept"),
+               aes(x = value, color = "mixed", fill = after_scale(clr_alpha(color)))) +
+  geom_density(data = gpa_lm_separate,
+               aes(x = intercept, color = "separate", fill = after_scale(clr_alpha(color)))) +
+  labs(x = "intercept") +
+  xlim(1.5, 4)
+
+p_slopes <- ggplot()  +
+  geom_density(data = gpa_mixed2_rc %>% filter(effect == "occasion"),
+               aes(x = value, color = "mixed", fill = after_scale(clr_alpha(color)))) +
+  geom_density(data = gpa_lm_separate, 
+               aes(x = slope, color = "separate", fill = after_scale(clr_alpha(color)))) +
+  labs(x = "slope")  +
+  xlim(-.2, .4) 
+
+p_intercepts + p_slopes +
+  plot_layout(guides = "collect") &
+  scale_color_manual("model", values = c(separate = clr0d, mixed = clr2)) &
+  theme(legend.position = "bottom")
+```
+
+
+$\rightarrow$ mixed model intercepts and slopes are less extreme
+
+> In both cases the mixed model shrinks what would have been the by-group estimate, which would otherwise overfit in this scenario. This regularizing effect is yet another bonus when using mixed models.
+
+```{r}
+gpa_predictions <- tibble(lmm_with_random_slope = predict(gpa_mixed2)) %>% 
+  bind_cols(gpa_predictions, .)
+
+gpa_mixed2_rc_wide <- gpa_mixed2_rc %>% 
+  dplyr::select(group_var, group, effect, value) %>% 
+  pivot_wider(names_from = effect, values_from = value)
+
+student_select <- 1:2
+p_two_students <- gpa_predictions %>%
+  filter(student %in% student_select) %>% 
+  ggplot(aes(x = occasion)) +
+  geom_point(aes(y = gpa, color = student))+
+  geom_abline(data = tibble(slope = c(gpa_lm$coefficients[[2]], 
+                                            gpa_mixed2_rc_wide$occasion[as.numeric(as.character(gpa_mixed2_rc_wide$group)) %in% student_select]), 
+                             intercept =  c(gpa_lm$coefficients[[1]], 
+                                            gpa_mixed2_rc_wide$Intercept[as.numeric(as.character(gpa_mixed2_rc_wide$group)) %in% student_select]),
+                             model = c("lm", as.character(gpa_mixed2_rc_wide$group[as.numeric(as.character(gpa_mixed2_rc_wide$group)) %in% student_select]))),
+              aes(slope = slope, intercept = intercept, color = model), size = .6) +
+  scale_color_manual(values = c(lm = clr2, `1` = clr1, `2` = clr0d), 
+                     labels = c( "lm", "lmm (student1)", "lmm (student2)"))
+
+p_all_mod <- ggplot(data = gpa_predictions, aes(x = occasion, y = gpa)) +
+  geom_abline(data = tibble(slope = c(gpa_mixed2_rc_wide$occasion, gpa_lm$coefficients[[2]]),
+                            intercept = c(gpa_mixed2_rc_wide$Intercept, gpa_lm$coefficients[[1]]),
+                            modeltype = c(rep("lmm (random slope)", length(gpa_mixed2_rc_wide$Intercept)), "lm")),
+              aes(slope = slope, intercept = intercept, color = modeltype), size = .6) +
+  scale_color_manual(values = c(`lmm (random slope)` = clr_alpha(clr0d ,.6), lm = clr2))
+
+p_two_students + p_all_mod +
+  plot_layout(guides = "collect") &
+  xlim(0,5) & ylim(2.2, 4) &
+  theme(legend.position = "bottom")
+```
+
+## Cross Classified models
+
+Setups where data are grouped by several factors but these are not nested (*all* participants get to see *all* images).
+These are *crossed* random effects.
+
+```{r}
+load("data/pupils.RData")
+
+pupils %>%  head() %>% knitr::kable()
+```
+
+```{r}
+pupils_crossed <- lmer(
+  achievement ~ sex + ses +
+    ( 1 | primary_school_id ) + ( 1 | secondary_school_id ),
+  data = pupils
+)
+
+mixedup::extract_fixed_effects(pupils_crossed) %>% knitr::kable()
+mixedup::extract_vc(pupils_crossed, ci_level = 0) %>% knitr::kable()
+```
+
+```{r}
+pupils_varicance_components_random_effects <- REsim(pupils_crossed) %>% as_tibble()
+
+pupils_varicance_components_random_effects %>%
+ mutate(sd_leveled = sd * qnorm(1 - ((1 - sd_level)/2)),
+         sig = (median + sd_leveled) >= 0 & (median - sd_leveled) <= 0) %>% 
+  group_by(groupFctr) %>% 
+  arrange(groupFctr, median) %>% 
+  mutate(rank = row_number()) %>% 
+  arrange(groupFctr, groupID) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = rank)) +
+  geom_segment(aes(xend = rank, y = median - sd_leveled, yend = median +  sd_leveled, color = sig)) +
+  geom_point(aes(y = median), size = .3, alpha = .5) +
+  geom_hline(yintercept = 0, size = .4, linetype = 3) +
+  facet_wrap(groupFctr ~ ., scales = "free_x") +
+  scale_color_manual(values = c(`TRUE` = clr2, `FALSE` = clr0d), guide = "none") +
+  labs(x = "Group", y = "Effect Range", caption = "interval estimates of random effects")
+```
+
+> Note that we have the usual extensions here if desired. As an example, we could also do random slopes for student level characteristics.
+
+## Hierachical structure
+
+These are setups, where different grouping factors are *nested* within each other (eg. cities, counties, states).
+
+```{r}
+load("data/nurses.RData")
+nurses %>% head() %>% knitr::kable()
+```
+
+```{r}
+nurses_hierach <- lmer(
+  stress ~ age + sex + experience + treatment + wardtype + hospsize +
+    ( 1 | hospital) + ( 1 | hospital:ward), # together same as ( 1 | hospital / ward)
+  data = nurses
+)
+
+mixedup::extract_fixed_effects(nurses_hierach) %>% knitr::kable()
+mixedup::extract_vc(nurses_hierach, ci_level = 0) %>% knitr::kable()
+```
+
+```{r}
+nurses_varicance_components_random_effects <- REsim(nurses_hierach) %>% as_tibble()
+
+nurses_varicance_components_random_effects %>%
+  mutate(sd_leveled = sd * qnorm(1 - ((1 - sd_level)/2)),
+         sig = (median + sd_leveled) >= 0 & (median - sd_leveled) <= 0) %>% 
+  group_by(groupFctr) %>% 
+  arrange(groupFctr, median) %>% 
+  mutate(rank = row_number()) %>% 
+  arrange(groupFctr, groupID) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = rank)) +
+  geom_segment(aes(xend = rank, y = median - sd_leveled, yend = median +  sd_leveled, color = sig)) +
+  geom_point(aes(y = median), size = .3, alpha = .5) +
+  geom_hline(yintercept = 0, size = .4, linetype = 3) +
+  facet_wrap(groupFctr ~ ., scales = "free_x") +
+  scale_color_manual(values = c(`TRUE` = clr2, `FALSE` = clr0d), guide = "none") +
+  ylim(-2,2) +
+  labs(x = "Group", y = "Effect Range", caption = "interval estimates of random effects")
+```
+
+### Crossed vs. nested
+
+```{r}
+nurses_hierach2 <- lmer(
+  stress ~ age + sex + experience + treatment + wardtype + hospsize +
+    ( 1 | hospital ) + ( 1 | hospital:wardid ), # needs to be wardid now because ward is duplicated over hospitals (not unique)
+  data = nurses
+)
+
+nurses_nested <- lmer(
+  stress ~ age + sex + experience + treatment + wardtype + hospsize +
+    ( 1 | hospital ) + ( 1 | wardid ),
+  data = nurses
+)
+```
+
+Nested:
+
+```{r}
+mixedup::extract_fixed_effects(nurses_hierach2) %>% knitr::kable()
+mixedup::extract_vc(nurses_hierach2, ci_level = 0) %>% knitr::kable()
+```
+
+Crossed:
+```{r}
+mixedup::extract_fixed_effects(nurses_nested) %>% knitr::kable()
+mixedup::extract_vc(nurses_nested, ci_level = 0) %>% knitr::kable()
+```
+
+## Residual Structure
+
+```{r}
+rescov <- function(model, data) {
+  var.d <- crossprod(getME(model,"Lambdat"))
+  Zt <- getME(model,"Zt")
+  vr <- sigma(model)^2
+  var.b <- vr*(t(Zt) %*% var.d %*% Zt)
+  sI <- vr * Diagonal(nrow(data))
+  var.y <- var.b + sI
+  var.y  %>%
+    as.matrix() %>%
+    as_tibble() %>% 
+    mutate(row = row_number()) %>% 
+    pivot_longer(cols = -row, names_to = "column")
+}
+
+rescov(gpa_mixed, gpa) %>%
+  mutate(x = as.numeric(column),
+             y = as.numeric(row)) %>% 
+  filter(between(x,0,30),
+         between(y,0,30)) %>% 
+  ggplot(aes(x = x,
+             y = y,
+             fill = value)) +
+  geom_tile(aes(color = after_scale(clr_darken(fill))), size = .3, width = .9, height = .9) +
+  scale_fill_gradientn(colours = c(clr0, clr_lighten(clr1), clr_lighten(clr2))) +
+  scale_y_reverse() +
+  coord_equal()
+```
+
+covariance matrix for a cluster (compound symmetry):
+
+$$
+\Sigma = 
+\left[
+\begin{array}{ccc} 
+\color{`r clr2`}{\sigma^2 + \tau^2} & \tau^2   & \tau^2  & \tau^2 & \tau^2 & \tau^2   \\
+\tau^2   & \color{`r clr2`}{\sigma^2 + \tau^2} & \tau^2 & \tau^2 & \tau^2 & \tau^2    \\
+\tau^2   & \tau^2   & \color{`r clr2`}{\sigma^2 + \tau^2} & \tau^2 & \tau^2 & \tau^2  \\
+\tau^2   & \tau^2   & \tau^2 & \color{`r clr2`}{\sigma^2 + \tau^2} & \tau^2 & \tau^2\\
+\tau^2   & \tau^2   & \tau^2  & \tau^2 & \color{`r clr2`}{\sigma^2 + \tau^2}  & \tau^2 \\
+\tau^2   & \tau^2   & \tau^2  & \tau^2   & \tau^2  & \color{`r clr2`}{\sigma^2 + \tau^2} \\
+\end{array}\right]
+$$
+
+Types of covariance structures:
+
+> in a standard linear regression model, we have constant variance and no covariance:
+
+$$
+\Sigma = 
+\left[
+\begin{array}{ccc} 
+\sigma^2 & 0   & 0   \\
+0   & \sigma^2 & 0   \\
+0   & 0   & \sigma^2 \\
+\end{array}\right]
+$$
+
+> next, relax the assumption of equal variances, and estimate each separately.
+> In this case of heterogeneous variances, we might see more or less variance over time, for example.
+
+$$
+\Sigma = 
+\left[
+\begin{array}{ccc} 
+\sigma_1^2 & 0   & 0   \\
+0   & \sigma_2^2 & 0   \\
+0   & 0   & \sigma_3^2 \\
+\end{array}\right]
+$$
+
+> we actually want to get at the underlying covariance/correlation.
+> I'll switch to the correlation representation, but you can still think of the variances as constant or separately estimated.
+> So now we have something like this, where $\rho$ represents the residual correlation among observations.
+
+$$
+\Sigma = \sigma^2
+\left[
+\begin{array}{ccc} 
+1 & \rho_1   & \rho_2   \\
+\rho_1   & 1 & \rho_3   \\
+\rho_2   & \rho_3   & 1 \\
+\end{array}\right]
+$$
+
+$\rightarrow$  *unstructured* / *symmetric* correlation structure (*compound symmetry*)
+
+**Autocorrelation** (lag of order one for residuals):
+
+$$
+\Sigma = \sigma^2
+\left[
+\begin{array}{cccc} 
+1 & \rho     & \rho^2   & \rho^3   \\
+\rho     & 1 & \rho     & \rho^2   \\
+\rho^2   & \rho     & 1 & \rho     \\
+\rho^3   & \rho^2   & \rho     & 1 \\
+\end{array}\right]
+$$
+
+### Heterogeneous variance
+
+```{r, message = FALSE, warning = FALSE}
+library(nlme)
+
+gpa_hetero_res <- lme(
+  gpa ~ occasion,
+  data = gpa,
+  random = ~ 1 | student,
+  weights = varIdent(form = ~ 1 | occasion)
+)
+
+mixedup::extract_fixed_effects(gpa_hetero_res) %>% knitr::kable()
+mixedup::extract_vc(gpa_hetero_res, ci_level = 0) %>% knitr::kable()
+```
+
+alternative approach to heterogeneous variance models:
+
+```{r}
+library(glmmTMB)
+
+gpa_hetero_res2 <- glmmTMB(
+  gpa ~ occasion + ( 1 | student ) + diag( 0 + occas | student ),
+  data = gpa
+)
+```
+
+Comparing results of {nlme} and {glmmTMB} 
+
+```{r}
+tibble(relative_val = c(1, coef(gpa_hetero_res$modelStruct$varStruct, unconstrained = FALSE))) %>% 
+  mutate(absolute_val = (relative_val * gpa_hetero_res$sigma) ^ 2,
+         `hetero_res (nlme)` = mixedup::extract_het_var(gpa_hetero_res, scale = 'var', digits = 5) %>%
+           unname() %>% as.vector() %>% t() %>% .[,1],
+         `hetero_res (glmmTMB)` = mixedup::extract_het_var(gpa_hetero_res2, scale = 'var', digits = 5) %>%
+           dplyr::select(-group) %>% unname() %>% as.vector() %>% t() %>% .[,1]) %>% 
+  knitr::kable()
+```
+
+### Autocorrelation
+
+```{r, warning = FALSE}
+gpa_autocorr <- lme(
+  gpa ~ occasion,
+  data = gpa,
+  random = ~ 1 | student,
+  correlation = corAR1(form = ~ occasion)
+)
+
+mixedup::extract_fixed_effects(gpa_autocorr) %>% knitr::kable()
+mixedup::extract_vc(gpa_autocorr, ci_level = 0) %>% knitr::kable()
+```
+
+```{r, warning = FALSE}
+gpa_autocorr2 <- glmmTMB(
+  gpa ~ occasion + ar1( 0 + occas | student ) + ( 1 | student ),
+  # occas is cotegorical version of occasion
+  data = gpa
+)
+
+mixedup::extract_fixed_effects(gpa_autocorr2) %>% knitr::kable()
+mixedup::extract_vc(gpa_autocorr2, ci_level = 0) %>% knitr::kable()
+```
+
+## Generalized Linear Mixed Models
+
+```{r}
+load("data/speed_dating.RData")
+
+sdating <- glmer(
+  decision ~ sex + samerace + attractive_sc + sincere_sc + intelligent_sc +
+    ( 1 | iid),
+  data = speed_dating,
+  family = binomial
+)
+
+mixedup::extract_fixed_effects(sdating) %>% knitr::kable()
+mixedup::extract_vc(sdating, ci_level = 0) %>% knitr::kable()
+```
+
+## Issues/ Considderations
+
+- **small number of clusters**: problematic - similar to number of samples to compute variance / mean or similar (to get to the variance component we need enough groups). This also touches whether something should be a *fixed* or a *random* effect (random is always possible when the number of clusters is large enough)
+- **small number of observations within clusters**: no problem, but might prevent random slopes (for `n == 1`)
+- **balanced design / missing data**: not really a requirement, so as long as it is not extreme likely not an issue
+
+### Model comparison
+
+Using AIC *can help*, but should not used to *make* the decision---reasoning about the implications of the used models should.
+
+```{r}
+gpa_1 <- lmer(gpa ~ occasion + (1 + occasion | student), data = gpa)
+gpa_2 <- lmer(gpa ~ occasion + sex + (1 + occasion | student), data = gpa)
+gpa_3 <- lmer(gpa ~ occasion + (1 | student), data = gpa)
+
+list(gpa_1 = gpa_1, gpa_2 = gpa_2, gpa_3 = gpa_3) %>%
+  map_df(function(mod) data.frame(AIC = AIC(mod)), .id = 'model') %>% 
+  arrange(AIC) %>% 
+  mutate(`Δ AIC` = AIC - min(AIC)) %>% 
+  knitr::kable()
+```
+
+## Formula summary
+
+|formula                                                                                                 |meaning                                                                                                                                 |
+|:-------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------|
+|`(1|group)`                                                                                        |random group intercept                                                                                                                  |
+|`(x|group)` = `(1+x|group)`                                                                   |random slope of x within group with correlated intercept                                                                                |
+|`(0+x|group)` = `(-1+x|group)`                                                                |random slope of x within group: no variation in intercept                                                                               |
+|`(1|group) + (0+x|group)`                                                                     |uncorrelated random intercept and random slope within group                                                                             |
+|`(1|site/block)` = `(1|site)+(1|site:block)`                                             |intercept varying among sites and among blocks within sites (nested random effects)                                                     |
+|`site+(1|site:block)`                                                                              |*fixed* effect of sites plus random variation in intercept among blocks within sites                                                    |
+|`(x|site/block)` = `(x|site)+(x|site:block)` = `(1 + x|site)+(1+x|site:block)` |slope and intercept varying among sites and among blocks within sites                                                                   |
+|`(x1|site)+(x2|block)`                                                                        |two different effects, varying at different levels                                                                                      |
+|`x*site+(x|site:block)`                                                                            |fixed effect variation of slope and intercept varying among sites and random variation of slope and intercept among blocks within sites |
+|`(1|group1)+(1|group2)`                                                                       |intercept varying among crossed random effects (e.g. site, year)                                                                        |
+
+
+|equation                                                        |formula                                           |
+|:---------------------------------------------------------------|:-------------------------------------------------|
+|$β_0 + β_{1}X_{i} + e_{si}$                                     |n/a (Not a mixed-effects model)                   |
+|$(β_0 + b_{S,0s}) + β_{1}X_i + e_{si}$                          |`∼ X + (1∣Subject)`                               |
+|$(β_0 + b_{S,0s}) +  (β_{1} + b_{S,1s}) X_i + e_{si}$           |`~ X + (1 + X∣Subject)`                           |
+|$(β_0 + b_{S,0s} + b_{I,0i}) + (β_{1} + b_{S,1s}) X_i + e_{si}$ |`∼ X + (1 + X∣Subject) + (1∣Item)`                |
+|As above, but $S_{0s}$, $S_{1s}$ independent                    |`∼ X + (1∣Subject) + (0 + X∣ Subject) + (1∣Item)` |
+|$(β_0 + b_{S,0s} + b_{I,0i}) + β_{1}X_i + e_{si}$               |`∼ X + (1∣Subject) + (1∣Item)`                    |
+|$(β_0 + b_{I,0i}) +  (β_{1} + b_{S,1s})X_i + e_{si}$            |`∼ X + (0 + X∣Subject) + (1∣Item)`                |
+
+
+---
+
+<div id="myModal" class="modal">
+  <span class="close">&times;</span>
+  <img class="modal-content" id="img01">
+  <div id="caption"></div>
+</div>
+
+<script src="./js/zoom.js"></script>

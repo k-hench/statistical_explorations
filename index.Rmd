@@ -1,0 +1,70 @@
+---
+title: "Statistical Exploration"
+subtitle: "a small notebook to keep track"
+author: "Kosmas Hench"
+date: "`r Sys.Date()`"
+documentclass: book
+bibliography: [book.bib]
+biblio-style: apalike
+link-citations: yes
+github-repo: k-hench/statistical_explorations
+description: "statistical explorations by kh"
+editor_options: 
+  chunk_output_type: console
+---
+
+# Intro
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r htmlTemp3, echo = FALSE, eval = TRUE}
+codejs <- readr::read_lines("./js/codefolding.js")
+collapsejs <- readr::read_lines("./js/collapse.js")
+transitionjs <- readr::read_lines("./js/transition.js")
+dropdownjs <- readr::read_lines("./js/dropdown.js")
+linksanchorjs <- readr::read_lines("./js/book.js")
+
+htmlhead <- c(
+  paste('
+<script>',
+paste(transitionjs, collapse = "\n"),
+'</script>
+<script>',
+paste(collapsejs, collapse = "\n"),
+'</script>
+<script>',
+paste(codejs, collapse = "\n"),
+'</script>
+<script>',
+paste(dropdownjs, collapse = "\n"),
+'</script>
+<script>',
+paste(linksanchorjs, collapse = "\n"),
+'</script>
+<link rel="shortcut icon" href="img/favicon.ico" />
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "hide");
+});
+</script>
+', sep = "\n"),
+  paste0('<script>document.write(\'<div class="btn-group pull-right" style="position: absolute; top: 35px; right: 2%; z-index: 10"><button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"aria-expanded="true" data-_extension-text-contrast=""><span>global code</span><span class="caret"></span></button><ul class="dropdown-menu" style="min-width: 50px;"><li><a id="rmd-show-all-code" href="#">Show All</a></li><li><a id="rmd-hide-all-code" href="#">Hide All</a></li></ul></div>\')</script>')
+)
+
+readr::write_lines(htmlhead, file = "header.html")
+```
+
+
+---
+
+<div id="myModal" class="modal">
+  <span class="close">&times;</span>
+  <img class="modal-content" id="img01">
+  <div id="caption"></div>
+</div>
+
+<script src="./js/zoom.js"></script>
+

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="202.7003"
+   height="45.749767"
+   viewBox="0 0 53.631126 12.104626"
+   version="1.1"
+   id="svg872"
+   inkscape:version="1.1.1 (eb90963e84, 2021-10-02)"
+   sodipodi:docname="baeyes_theorem.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs866">
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect14897"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.431987"
+     inkscape:cx="141.24253"
+     inkscape:cy="65.789825"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1600"
+     inkscape:window-height="847"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="0"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata869">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-43.395283,-132.86332)">
+    <text
+       xml:space="preserve"
+       style="font-size:4.93889px;line-height:1.25;font-family:'Serto Kharput';-inkscape-font-specification:'Serto Kharput';word-spacing:0px;stroke-width:0.264583"
+       x="43.08419"
+       y="140.15036"
+       id="text2210"><tspan
+         sodipodi:role="line"
+         id="tspan2208"
+         style="font-style:italic;font-variant:normal;font-weight:500;font-stretch:normal;font-size:4.93889px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif Medium Italic';stroke-width:0.264583"
+         x="43.08419"
+         y="140.15036"><tspan
+   style="font-size:4.93889px;fill:#54436d;fill-opacity:1"
+   id="tspan17775">P(H|D)</tspan> = </tspan></text>
+    <g
+       id="g42927"
+       transform="translate(1.0583333,-0.58240287)">
+      <g
+         id="g46149"
+         transform="translate(-1.5875)">
+        <text
+           xml:space="preserve"
+           style="font-size:4.93889px;line-height:1.35;font-family:'Serto Kharput';-inkscape-font-specification:'Serto Kharput';text-align:center;word-spacing:0px;text-anchor:middle;stroke-width:0.264583"
+           x="83.135605"
+           y="137.14989"
+           id="text7572"><tspan
+             sodipodi:role="line"
+             id="tspan7570"
+             style="font-style:italic;font-variant:normal;font-weight:500;font-stretch:normal;font-size:4.93889px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif Medium Italic';text-align:center;text-anchor:middle;stroke-width:0.264583"
+             x="83.135605"
+             y="137.14989"><tspan
+   style="font-size:4.93889px;fill:#b35136;fill-opacity:1"
+   id="tspan31135">P(D|H)</tspan> <tspan
+   style="font-size:4.93889px;fill:#cfcbbf;fill-opacity:1"
+   id="tspan33061">P(H)</tspan></tspan><tspan
+             sodipodi:role="line"
+             style="font-style:italic;font-variant:normal;font-weight:500;font-stretch:normal;font-size:4.93889px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif Medium Italic';text-align:center;text-anchor:middle;stroke-width:0.264583"
+             x="84.019447"
+             y="144.31563"
+             id="tspan8146">P(D) </tspan></text>
+        <path
+           style="fill:none;stroke:#000000;stroke-width:0.132293;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 68.89892,139.49804 c 9.55234,0 19.104553,0 28.656653,0"
+           id="path14895"
+           inkscape:path-effect="#path-effect14897"
+           inkscape:original-d="m 68.89892,139.49804 c 9.55234,2.7e-4 19.104553,2.7e-4 28.656653,0" />
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,27 @@
+bookdown::gitbook:
+  includes:
+    in_header: header.html
+  css: style.css
+  split_by: chapter
+  config:
+    toc:
+      collapse: section
+      before: |
+        <li><a href="https://github.com/k-hench/statistical_explorations">github repository</a></li>
+      after:  |
+    sharing:
+      facebook: no
+      github: yes
+      twitter: no
+      linkedin: no
+      weibo: no
+      instapaper: no
+      vk: no
+      all: ['github']
+bookdown::pdf_book:
+  includes:
+  in_header: preamble.tex
+  latex_engine: xelatex
+  citation_package: natbib
+bookdown::epub_book:
+  stylesheet: style.css
