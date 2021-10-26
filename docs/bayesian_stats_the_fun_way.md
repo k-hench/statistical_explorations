@@ -1,7 +1,4 @@
 ---
-title: "Bayesian Statistics the Fun Way"
-author: "Kosmas Hench"
-date: "10/8/2021"
 output:
   html_document:
       theme: yeti
@@ -176,7 +173,7 @@ integrate(function(p){ dbeta(p, 14, 27) }, 0, x_cutoff)
 ```
 
 ```
-## 0.9807613 with absolute error < 5.9e-06
+#> 0.9807613 with absolute error < 5.9e-06
 ```
 
 ```r
@@ -201,7 +198,7 @@ integrate(function(p){ dbeta(p, alpha, beta) }, x_cutoff, 1)
 ```
 
 ```
-## 0.2850559 with absolute error < 1e-04
+#> 0.2850559 with absolute error < 1e-04
 ```
 
 ```r
@@ -226,7 +223,7 @@ integrate(function(p){ dbeta(p, 4, 6) }, 0.6, 1)
 ```
 
 ```
-## 0.09935258 with absolute error < 1.1e-15
+#> 0.09935258 with absolute error < 1.1e-15
 ```
 
 ```r
@@ -235,7 +232,7 @@ integrate(function(p){ dbeta(p, 9, 11) }, 0.45, 0.55)
 ```
 
 ```
-## 0.30988 with absolute error < 3.4e-15
+#> 0.30988 with absolute error < 3.4e-15
 ```
 
 ```r
@@ -244,7 +241,7 @@ integrate(function(p){ dbeta(p, 109, 111) }, 0.45, 0.55)
 ```
 
 ```
-## 0.8589371 with absolute error < 9.5e-15
+#> 0.8589371 with absolute error < 9.5e-15
 ```
 
 ```r
@@ -348,7 +345,7 @@ var(x) * ((n-1)/n) == var_k(x)
 ```
 
 ```
-## [1] TRUE
+#> [1] TRUE
 ```
 
 ```r
@@ -356,7 +353,7 @@ sd(x) * sqrt((n-1)/n) == sd_k(x)
 ```
 
 ```
-## [1] TRUE
+#> [1] TRUE
 ```
 
 ## The normal distribution
@@ -390,7 +387,7 @@ integrate(function(x){ dnorm(x, mu, sigma) }, 0, x_cutoff)
 ```
 
 ```
-## 0.05425369 with absolute error < 3.5e-05
+#> 0.05425369 with absolute error < 3.5e-05
 ```
 
 Known probability mass under a normal distribution in terms of ist standard deviation:
@@ -430,7 +427,7 @@ ggplot(tibble(x = seq(mu - 4 * sigma, mu + 4 * sigma, length.out = 3)), aes(x)) 
 ```
 
 ```
-## [1] 0.3550062
+#> [1] 0.3550062
 ```
 
 ## Cummulative Density and Quantile Function
@@ -521,7 +518,7 @@ p_b_superior
 ```
 
 ```
-## [1] 0.9589
+#> [1] 0.95869
 ```
 
 ```r
@@ -636,10 +633,10 @@ bayes_fs %>%
 ```
 
 ```
-## # A tibble: 1 x 1
-##   p_lower_than_half
-##               <dbl>
-## 1              1.00
+#> # A tibble: 1 x 1
+#>   p_lower_than_half
+#>               <dbl>
+#> 1              1.00
 ```
 
 *Expectation* of the probability distribution (*sum of expectations weighted by their value*)
@@ -650,7 +647,7 @@ sum(bayes_fs$posterior_normalized * bayes_fs$hypothesis)
 ```
 
 ```
-## [1] 0.2402704
+#> [1] 0.2402704
 ```
 Or (because of gap) choose most *likely* estimate:
 

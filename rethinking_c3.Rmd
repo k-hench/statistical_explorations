@@ -7,27 +7,26 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Rethinking: Chapter 1
+# Rethinking: Chapter 3
 
-**The Golem of Prague**
+**Sampling the Imaginary**
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE,
-                      comment = "#>",
+                      comment = "#>", 
                       dev = "svg",         # for html rendering
                       # dev = "cairo_pdf", # for pdf rendering
                       fig.asp = .5, 
                       fig.align = "center",
                       message = FALSE,
-                      warning = FALSE)
+                      warning = FALSE
+                      )
 source("bayesian_settings.R")
 ```
 
 by [Richard McElreath](https://xcelab.net/rm/statistical-rethinking/), building on the Summary by [Solomon Kurz](https://bookdown.org/content/4857/)
 
-```{r, echo = FALSE, out.width = 650}
-knitr::include_graphics("img/golem.svg")
-```
+
 
 ---
 

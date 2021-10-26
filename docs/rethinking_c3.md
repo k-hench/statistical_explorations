@@ -7,15 +7,15 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Rethinking: Chapter 1
+# Rethinking: Chapter 3
 
-**The Golem of Prague**
+**Sampling the Imaginary**
 
 
 
 by [Richard McElreath](https://xcelab.net/rm/statistical-rethinking/), building on the Summary by [Solomon Kurz](https://bookdown.org/content/4857/)
 
-<img src="img/golem.svg" width="650" style="display: block; margin: auto;" />
+
 
 ---
 

@@ -1,8 +1,4 @@
 ---
-title: "Statistical Rethinking - Chapter 2"
-subtitle: "Small Worlds and Large Worlds"
-author: "Kosmas Hench"
-date: "10/8/2021"
 output:
   html_document:
   theme: yeti
@@ -13,8 +9,11 @@ editor_options:
 
 # Rethinking: Chapter 2
 
+**Small Worlds and Large Worlds**
+
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = TRUE, 
+knitr::opts_chunk$set(echo = TRUE,
+                      comment = "#>", 
                       dev = "svg",         # for html rendering
                       # dev = "cairo_pdf", # for pdf rendering
                       fig.asp = .5, 

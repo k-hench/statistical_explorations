@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>3 Rethinking: Chapter 2 | Mixed Models with R</title>
+  <title>3 Rethinking: Chapter 2 | Statistical Exploration</title>
   <meta name="description" content="statistical explorations by kh" />
   <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="3 Rethinking: Chapter 2 | Mixed Models with R" />
+  <meta property="og:title" content="3 Rethinking: Chapter 2 | Statistical Exploration" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="k-hench/statistical_explorations" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="3 Rethinking: Chapter 2 | Mixed Models with R" />
+  <meta name="twitter:title" content="3 Rethinking: Chapter 2 | Statistical Exploration" />
   
   <meta name="twitter:description" content="statistical explorations by kh" />
   
@@ -32,7 +32,7 @@
   
   
 <link rel="prev" href="rethinking-chapter-1.html"/>
-<link rel="next" href="bayesian-statistics-the-fun-way.html"/>
+<link rel="next" href="rethinking-chapter-3.html"/>
 <script src="libs/header-attrs-2.9.6/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -678,55 +678,57 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="3.6" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#marcov-chain-monte-carlo-mcmc"><i class="fa fa-check"></i><b>3.6</b> Marcov Chain Monte Carlo (MCMC)</a></li>
 <li class="chapter" data-level="3.7" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#homework"><i class="fa fa-check"></i><b>3.7</b> Homework</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html"><i class="fa fa-check"></i><b>4</b> Bayesian Statistics the Fun Way</a>
+<li class="chapter" data-level="4" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html"><i class="fa fa-check"></i><b>4</b> Rethinking: Chapter 3</a></li>
+<li class="chapter" data-level="5" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html"><i class="fa fa-check"></i><b>5</b> Rethinking: Chapter 4</a></li>
+<li class="chapter" data-level="6" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html"><i class="fa fa-check"></i><b>6</b> Bayesian Statistics the Fun Way</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#conditioning-probabilities"><i class="fa fa-check"></i><b>4.1</b> Conditioning Probabilities</a></li>
-<li class="chapter" data-level="4.2" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#combining-probailities-based-on-logic"><i class="fa fa-check"></i><b>4.2</b> Combining Probailities based on logic</a></li>
-<li class="chapter" data-level="4.3" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-binomial-distribution"><i class="fa fa-check"></i><b>4.3</b> The binomial distribution</a></li>
-<li class="chapter" data-level="4.4" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-beta-distribution"><i class="fa fa-check"></i><b>4.4</b> The beta distribution</a></li>
-<li class="chapter" data-level="4.5" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#bayes-theorem"><i class="fa fa-check"></i><b>4.5</b> Bayes’ Theorem</a></li>
-<li class="chapter" data-level="4.6" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-i"><i class="fa fa-check"></i><b>4.6</b> Parameter Estimation (I)</a></li>
-<li class="chapter" data-level="4.7" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-normal-distribution"><i class="fa fa-check"></i><b>4.7</b> The normal distribution</a></li>
-<li class="chapter" data-level="4.8" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#cummulative-density-and-quantile-function"><i class="fa fa-check"></i><b>4.8</b> Cummulative Density and Quantile Function</a></li>
-<li class="chapter" data-level="4.9" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimatino-with-prior-probabilities"><i class="fa fa-check"></i><b>4.9</b> Parameter estimatino with prior probabilities</a></li>
-<li class="chapter" data-level="4.10" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#monte-carlosimulation"><i class="fa fa-check"></i><b>4.10</b> Monte CarloSimulation</a></li>
-<li class="chapter" data-level="4.11" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#posterior-odds"><i class="fa fa-check"></i><b>4.11</b> Posterior Odds</a></li>
-<li class="chapter" data-level="4.12" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-ii"><i class="fa fa-check"></i><b>4.12</b> Parameter Estimation (II)</a></li>
+<li class="chapter" data-level="6.1" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#conditioning-probabilities"><i class="fa fa-check"></i><b>6.1</b> Conditioning Probabilities</a></li>
+<li class="chapter" data-level="6.2" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#combining-probailities-based-on-logic"><i class="fa fa-check"></i><b>6.2</b> Combining Probailities based on logic</a></li>
+<li class="chapter" data-level="6.3" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-binomial-distribution"><i class="fa fa-check"></i><b>6.3</b> The binomial distribution</a></li>
+<li class="chapter" data-level="6.4" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-beta-distribution"><i class="fa fa-check"></i><b>6.4</b> The beta distribution</a></li>
+<li class="chapter" data-level="6.5" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#bayes-theorem"><i class="fa fa-check"></i><b>6.5</b> Bayes’ Theorem</a></li>
+<li class="chapter" data-level="6.6" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-i"><i class="fa fa-check"></i><b>6.6</b> Parameter Estimation (I)</a></li>
+<li class="chapter" data-level="6.7" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-normal-distribution"><i class="fa fa-check"></i><b>6.7</b> The normal distribution</a></li>
+<li class="chapter" data-level="6.8" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#cummulative-density-and-quantile-function"><i class="fa fa-check"></i><b>6.8</b> Cummulative Density and Quantile Function</a></li>
+<li class="chapter" data-level="6.9" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimatino-with-prior-probabilities"><i class="fa fa-check"></i><b>6.9</b> Parameter estimatino with prior probabilities</a></li>
+<li class="chapter" data-level="6.10" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#monte-carlosimulation"><i class="fa fa-check"></i><b>6.10</b> Monte CarloSimulation</a></li>
+<li class="chapter" data-level="6.11" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#posterior-odds"><i class="fa fa-check"></i><b>6.11</b> Posterior Odds</a></li>
+<li class="chapter" data-level="6.12" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-ii"><i class="fa fa-check"></i><b>6.12</b> Parameter Estimation (II)</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html"><i class="fa fa-check"></i><b>5</b> Mixed Models with R</a>
+<li class="chapter" data-level="7" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html"><i class="fa fa-check"></i><b>7</b> Mixed Models with R</a>
 <ul>
-<li class="chapter" data-level="5.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#standard-regregression-model"><i class="fa fa-check"></i><b>5.1</b> Standard regregression model</a></li>
-<li class="chapter" data-level="5.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#mixed-nodel"><i class="fa fa-check"></i><b>5.2</b> mixed nodel</a>
+<li class="chapter" data-level="7.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#standard-regregression-model"><i class="fa fa-check"></i><b>7.1</b> Standard regregression model</a></li>
+<li class="chapter" data-level="7.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#mixed-nodel"><i class="fa fa-check"></i><b>7.2</b> mixed nodel</a>
 <ul>
-<li class="chapter" data-level="5.2.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#student-specific-effect-initial-depiction"><i class="fa fa-check"></i><b>5.2.1</b> student specific effect (initial depiction)</a></li>
-<li class="chapter" data-level="5.2.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#as-multi-level-model"><i class="fa fa-check"></i><b>5.2.2</b> as multi-level model</a></li>
-<li class="chapter" data-level="5.2.3" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#mixed-model"><i class="fa fa-check"></i><b>5.2.3</b> Mixed Model</a></li>
-<li class="chapter" data-level="5.2.4" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#estimation-of-random-effects"><i class="fa fa-check"></i><b>5.2.4</b> Estimation of random effects</a></li>
-<li class="chapter" data-level="5.2.5" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#prediction"><i class="fa fa-check"></i><b>5.2.5</b> Prediction</a></li>
-<li class="chapter" data-level="5.2.6" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#cluster-level-covariates"><i class="fa fa-check"></i><b>5.2.6</b> Cluster Level Covariates</a></li>
+<li class="chapter" data-level="7.2.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#student-specific-effect-initial-depiction"><i class="fa fa-check"></i><b>7.2.1</b> student specific effect (initial depiction)</a></li>
+<li class="chapter" data-level="7.2.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#as-multi-level-model"><i class="fa fa-check"></i><b>7.2.2</b> as multi-level model</a></li>
+<li class="chapter" data-level="7.2.3" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#mixed-model"><i class="fa fa-check"></i><b>7.2.3</b> Mixed Model</a></li>
+<li class="chapter" data-level="7.2.4" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#estimation-of-random-effects"><i class="fa fa-check"></i><b>7.2.4</b> Estimation of random effects</a></li>
+<li class="chapter" data-level="7.2.5" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#prediction"><i class="fa fa-check"></i><b>7.2.5</b> Prediction</a></li>
+<li class="chapter" data-level="7.2.6" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#cluster-level-covariates"><i class="fa fa-check"></i><b>7.2.6</b> Cluster Level Covariates</a></li>
 </ul></li>
-<li class="chapter" data-level="5.3" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#add-random-slope"><i class="fa fa-check"></i><b>5.3</b> Add random slope</a></li>
-<li class="chapter" data-level="5.4" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#cross-classified-models"><i class="fa fa-check"></i><b>5.4</b> Cross Classified models</a></li>
-<li class="chapter" data-level="5.5" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#hierachical-structure"><i class="fa fa-check"></i><b>5.5</b> Hierachical structure</a>
+<li class="chapter" data-level="7.3" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#add-random-slope"><i class="fa fa-check"></i><b>7.3</b> Add random slope</a></li>
+<li class="chapter" data-level="7.4" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#cross-classified-models"><i class="fa fa-check"></i><b>7.4</b> Cross Classified models</a></li>
+<li class="chapter" data-level="7.5" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#hierachical-structure"><i class="fa fa-check"></i><b>7.5</b> Hierachical structure</a>
 <ul>
-<li class="chapter" data-level="5.5.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#crossed-vs.-nested"><i class="fa fa-check"></i><b>5.5.1</b> Crossed vs. nested</a></li>
+<li class="chapter" data-level="7.5.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#crossed-vs.-nested"><i class="fa fa-check"></i><b>7.5.1</b> Crossed vs. nested</a></li>
 </ul></li>
-<li class="chapter" data-level="5.6" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#residual-structure"><i class="fa fa-check"></i><b>5.6</b> Residual Structure</a>
+<li class="chapter" data-level="7.6" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#residual-structure"><i class="fa fa-check"></i><b>7.6</b> Residual Structure</a>
 <ul>
-<li class="chapter" data-level="5.6.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#heterogeneous-variance"><i class="fa fa-check"></i><b>5.6.1</b> Heterogeneous variance</a></li>
-<li class="chapter" data-level="5.6.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#autocorrelation"><i class="fa fa-check"></i><b>5.6.2</b> Autocorrelation</a></li>
+<li class="chapter" data-level="7.6.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#heterogeneous-variance"><i class="fa fa-check"></i><b>7.6.1</b> Heterogeneous variance</a></li>
+<li class="chapter" data-level="7.6.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#autocorrelation"><i class="fa fa-check"></i><b>7.6.2</b> Autocorrelation</a></li>
 </ul></li>
-<li class="chapter" data-level="5.7" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#generalized-linear-mixed-models"><i class="fa fa-check"></i><b>5.7</b> Generalized Linear Mixed Models</a></li>
-<li class="chapter" data-level="5.8" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#issues-considderations"><i class="fa fa-check"></i><b>5.8</b> Issues/ Considderations</a>
+<li class="chapter" data-level="7.7" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#generalized-linear-mixed-models"><i class="fa fa-check"></i><b>7.7</b> Generalized Linear Mixed Models</a></li>
+<li class="chapter" data-level="7.8" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#issues-considderations"><i class="fa fa-check"></i><b>7.8</b> Issues/ Considderations</a>
 <ul>
-<li class="chapter" data-level="5.8.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#model-comparison"><i class="fa fa-check"></i><b>5.8.1</b> Model comparison</a></li>
+<li class="chapter" data-level="7.8.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#model-comparison"><i class="fa fa-check"></i><b>7.8.1</b> Model comparison</a></li>
 </ul></li>
-<li class="chapter" data-level="5.9" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#formula-summary"><i class="fa fa-check"></i><b>5.9</b> Formula summary</a></li>
+<li class="chapter" data-level="7.9" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#formula-summary"><i class="fa fa-check"></i><b>7.9</b> Formula summary</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="references-and-session-info.html"><a href="references-and-session-info.html"><i class="fa fa-check"></i><b>6</b> References and Session Info</a>
+<li class="chapter" data-level="8" data-path="references-and-session-info.html"><a href="references-and-session-info.html"><i class="fa fa-check"></i><b>8</b> References and Session Info</a>
 <ul>
-<li class="chapter" data-level="6.1" data-path="references-and-session-info.html"><a href="references-and-session-info.html#session-info"><i class="fa fa-check"></i><b>6.1</b> Session Info</a></li>
-<li class="chapter" data-level="6.2" data-path="references-and-session-info.html"><a href="references-and-session-info.html#references"><i class="fa fa-check"></i><b>6.2</b> References</a></li>
+<li class="chapter" data-level="8.1" data-path="references-and-session-info.html"><a href="references-and-session-info.html#session-info"><i class="fa fa-check"></i><b>8.1</b> Session Info</a></li>
+<li class="chapter" data-level="8.2" data-path="references-and-session-info.html"><a href="references-and-session-info.html#references"><i class="fa fa-check"></i><b>8.2</b> References</a></li>
 </ul></li>
 </ul>
 
@@ -737,7 +739,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Mixed Models with R</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Statistical Exploration</a>
           </h1>
         </div>
 
@@ -747,6 +749,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="rethinking-chapter-2" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Rethinking: Chapter 2</h1>
+<p><strong>Small Worlds and Large Worlds</strong></p>
 <p>by <a href="https://xcelab.net/rm/statistical-rethinking/">Richard McElreath</a>, building on the Summary by <a href="https://bookdown.org/content/4857/">Solomon Kurz</a></p>
 <div id="counting-possibilities" class="section level2" number="3.1">
 <h2><span class="header-section-number">3.1</span> Counting possibilities</h2>
@@ -818,7 +821,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-2"><a href="rethinking-chapter-2.html#cb3-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">marbles =</span> <span class="dv">4</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb3-3"><a href="rethinking-chapter-2.html#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">possibilities =</span> marbles <span class="sc">^</span> draws) <span class="sc">%&gt;%</span> </span>
 <span id="cb3-4"><a href="rethinking-chapter-2.html#cb3-4" aria-hidden="true" tabindex="-1"></a>  flextable<span class="sc">::</span><span class="fu">flextable</span>()</span></code></pre></div>
-<template id="1e1b3210-e6a2-4269-80ae-ad612a7751c1"><style>
+<template id="a53cccfe-3040-42b1-ab72-19195eed2a09"><style>
 .tabwid table{
   border-spacing:0px !important;
   border-collapse:collapse;
@@ -852,12 +855,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 .tabwid table tr {
 background-color: transparent;
 }
-</style><div class="tabwid"><style>.cl-a300aaa6{}.cl-a2fb9bd8{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a2fbaf42{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a2fbdb20{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a2fbdb3e{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a2fbdb48{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-a300aaa6'>
-<thead><tr style="overflow-wrap:break-word;"><td class="cl-a2fbdb48"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">draws</span></p></td><td class="cl-a2fbdb48"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">marbles</span></p></td><td class="cl-a2fbdb48"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-a2fbdb20"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">1</span></p></td><td class="cl-a2fbdb20"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">4</span></p></td><td class="cl-a2fbdb20"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a2fbdb20"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">2</span></p></td><td class="cl-a2fbdb20"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">4</span></p></td><td class="cl-a2fbdb20"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a2fbdb3e"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">3</span></p></td><td class="cl-a2fbdb3e"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">4</span></p></td><td class="cl-a2fbdb3e"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">64</span></p></td></tr></tbody></table></div></template>
-<div class="flextable-shadow-host" id="fd482cac-95a9-441b-bf6b-7d73f4b3a6da"></div>
+</style><div class="tabwid"><style>.cl-f4fd5eca{}.cl-f4f7d9b4{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-f4f7ed82{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-f4f81aa0{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-f4f81abe{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-f4f81ac8{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-f4fd5eca'>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-f4f81ac8"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">draws</span></p></td><td class="cl-f4f81ac8"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">marbles</span></p></td><td class="cl-f4f81ac8"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-f4f81aa0"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">1</span></p></td><td class="cl-f4f81aa0"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">4</span></p></td><td class="cl-f4f81aa0"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-f4f81aa0"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">2</span></p></td><td class="cl-f4f81aa0"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">4</span></p></td><td class="cl-f4f81aa0"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-f4f81abe"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">3</span></p></td><td class="cl-f4f81abe"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">4</span></p></td><td class="cl-f4f81abe"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">64</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="0e16b81d-0037-469a-8ef5-e3a61b7caee6"></div>
 <script>
-var dest = document.getElementById("fd482cac-95a9-441b-bf6b-7d73f4b3a6da");
-var template = document.getElementById("1e1b3210-e6a2-4269-80ae-ad612a7751c1");
+var dest = document.getElementById("0e16b81d-0037-469a-8ef5-e3a61b7caee6");
+var template = document.getElementById("a53cccfe-3040-42b1-ab72-19195eed2a09");
 var caption = template.content.querySelector("caption");
 if(caption) {
   caption.style.cssText = "display:block;text-align:center;";
@@ -1095,21 +1098,21 @@ fantome.appendChild(templateContent);
 <span id="cb8-13"><a href="rethinking-chapter-2.html#cb8-13" aria-hidden="true" tabindex="-1"></a> <span class="co"># you can learn more about lagging here: https://www.rdocumentation.org/packages/stats/versions/3.5.1/topics/lag or here: https://dplyr.tidyverse.org/reference/lead-lag.html</span></span>
 <span id="cb8-14"><a href="rethinking-chapter-2.html#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lagged_n_trials  =</span> <span class="fu">lag</span>(n_trials, <span class="at">k =</span> <span class="dv">1</span>),</span>
 <span id="cb8-15"><a href="rethinking-chapter-2.html#cb8-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">lagged_n_success =</span> <span class="fu">lag</span>(n_success, <span class="at">k =</span> <span class="dv">1</span>)) </span></code></pre></div>
-<pre><code>## # A tibble: 450 x 6
-## # Groups:   p_water [50]
-##    n_trials toss  n_success p_water lagged_n_trials lagged_n_success
-##       &lt;int&gt; &lt;chr&gt;     &lt;int&gt;   &lt;dbl&gt;           &lt;int&gt;            &lt;int&gt;
-##  1        1 w             1  0                   NA               NA
-##  2        1 w             1  0.0204              NA               NA
-##  3        1 w             1  0.0408              NA               NA
-##  4        1 w             1  0.0612              NA               NA
-##  5        1 w             1  0.0816              NA               NA
-##  6        1 w             1  0.102               NA               NA
-##  7        1 w             1  0.122               NA               NA
-##  8        1 w             1  0.143               NA               NA
-##  9        1 w             1  0.163               NA               NA
-## 10        1 w             1  0.184               NA               NA
-## # … with 440 more rows</code></pre>
+<pre><code>#&gt; # A tibble: 450 x 6
+#&gt; # Groups:   p_water [50]
+#&gt;    n_trials toss  n_success p_water lagged_n_trials lagged_n_success
+#&gt;       &lt;int&gt; &lt;chr&gt;     &lt;int&gt;   &lt;dbl&gt;           &lt;int&gt;            &lt;int&gt;
+#&gt;  1        1 w             1  0                   NA               NA
+#&gt;  2        1 w             1  0.0204              NA               NA
+#&gt;  3        1 w             1  0.0408              NA               NA
+#&gt;  4        1 w             1  0.0612              NA               NA
+#&gt;  5        1 w             1  0.0816              NA               NA
+#&gt;  6        1 w             1  0.102               NA               NA
+#&gt;  7        1 w             1  0.122               NA               NA
+#&gt;  8        1 w             1  0.143               NA               NA
+#&gt;  9        1 w             1  0.163               NA               NA
+#&gt; 10        1 w             1  0.184               NA               NA
+#&gt; # … with 440 more rows</code></pre>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="rethinking-chapter-2.html#cb10-1" aria-hidden="true" tabindex="-1"></a>stat_binom <span class="ot">&lt;-</span> <span class="cf">function</span>(n_trials, n_success, lag_n_trials, lag_n_success, sequence, ...){</span>
 <span id="cb10-2"><a href="rethinking-chapter-2.html#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(n_trials <span class="sc">==</span> <span class="dv">1</span>) {</span>
 <span id="cb10-3"><a href="rethinking-chapter-2.html#cb10-3" aria-hidden="true" tabindex="-1"></a>    g_lag <span class="ot">&lt;-</span> <span class="fu">stat_function</span>(<span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">n_trials =</span> n_trials, <span class="at">sequence =</span> sequence),</span>
@@ -1236,21 +1239,21 @@ Posterior = \frac{Probability~of~the~Data \times Prior}{ Average~probability~of~
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="rethinking-chapter-2.html#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conpare_qa</span>(<span class="at">w_in =</span> <span class="dv">6</span>, <span class="at">l_in =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
 <span id="cb18-2"><a href="rethinking-chapter-2.html#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">conpare_qa</span>(<span class="at">w_in =</span> <span class="dv">12</span>, <span class="at">l_in =</span> <span class="dv">6</span>) <span class="sc">+</span></span>
 <span id="cb18-3"><a href="rethinking-chapter-2.html#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">conpare_qa</span>(<span class="at">w_in =</span> <span class="dv">24</span>, <span class="at">l_in =</span> <span class="dv">12</span>)</span></code></pre></div>
-<pre><code>## 
-## 
-## |      mean|        sd|      5.5%|     94.5%|qa         |
-## |---------:|---------:|---------:|---------:|:----------|
-## | 0.6666667| 0.1571338| 0.4155366| 0.9177968|W: 6, L: 3 |
-## 
-## 
-## |      mean|        sd|      5.5%|     94.5%|qa          |
-## |---------:|---------:|---------:|---------:|:-----------|
-## | 0.6666662| 0.1111104| 0.4890902| 0.8442421|W: 12, L: 6 |
-## 
-## 
-## |      mean|        sd|      5.5%|     94.5%|qa           |
-## |---------:|---------:|---------:|---------:|:------------|
-## | 0.6666663| 0.0785669| 0.5411011| 0.7922314|W: 24, L: 12 |</code></pre>
+<pre><code>#&gt; 
+#&gt; 
+#&gt; |      mean|        sd|      5.5%|     94.5%|qa         |
+#&gt; |---------:|---------:|---------:|---------:|:----------|
+#&gt; | 0.6666666| 0.1571338| 0.4155364| 0.9177967|W: 6, L: 3 |
+#&gt; 
+#&gt; 
+#&gt; |      mean|        sd|      5.5%|     94.5%|qa          |
+#&gt; |---------:|---------:|---------:|---------:|:-----------|
+#&gt; | 0.6666662| 0.1111104| 0.4890902| 0.8442421|W: 12, L: 6 |
+#&gt; 
+#&gt; 
+#&gt; |      mean|        sd|     5.5%|     94.5%|qa           |
+#&gt; |---------:|---------:|--------:|---------:|:------------|
+#&gt; | 0.6666662| 0.0785669| 0.541101| 0.7922313|W: 24, L: 12 |</code></pre>
 <p><img src="rethinking_c2_files/figure-html/unnamed-chunk-17-1.svg" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="marcov-chain-monte-carlo-mcmc" class="section level2" number="3.6">
@@ -1319,7 +1322,7 @@ Pr(Earth | Land) = \frac{Pr(Land | Earth) \times Pr(Earth)}{Pr(Land)}
 <span id="cb24-3"><a href="rethinking-chapter-2.html#cb24-3" aria-hidden="true" tabindex="-1"></a>p_earth <span class="ot">&lt;-</span> .<span class="dv">5</span></span>
 <span id="cb24-4"><a href="rethinking-chapter-2.html#cb24-4" aria-hidden="true" tabindex="-1"></a>average_p_l <span class="ot">&lt;-</span> .<span class="dv">5</span> <span class="sc">*</span> (p_l_on_earth <span class="sc">+</span> p_l_on_mars)</span>
 <span id="cb24-5"><a href="rethinking-chapter-2.html#cb24-5" aria-hidden="true" tabindex="-1"></a>(p_earth_on_l <span class="ot">&lt;-</span> p_l_on_earth <span class="sc">*</span> p_earth <span class="sc">/</span> average_p_l)</span></code></pre></div>
-<pre><code>## [1] 0.2307692</code></pre>
+<pre><code>#&gt; [1] 0.2307692</code></pre>
 <p><strong>M4</strong> &amp; <strong>M5</strong></p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="rethinking-chapter-2.html#cb26-1" aria-hidden="true" tabindex="-1"></a>cards <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;C1b1|C1b2&quot;</span>, <span class="st">&quot;C2b1|C2w2&quot;</span>, <span class="st">&quot;C3w1|C3w2&quot;</span> )</span>
 <span id="cb26-2"><a href="rethinking-chapter-2.html#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1492,13 +1495,13 @@ Pr(spec_b | twin) = \frac{Pr(spec_b) \times Pr(twin | spec_b)}{Pr(twin)}
 <span id="cb29-9"><a href="rethinking-chapter-2.html#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-10"><a href="rethinking-chapter-2.html#cb29-10" aria-hidden="true" tabindex="-1"></a>(p_next_twn <span class="ot">&lt;-</span> pr_a_on_twn <span class="sc">*</span> pr_twn_on_a <span class="sc">+</span> pr_b_on_twn <span class="sc">*</span> pr_twn_on_b) <span class="sc">%&gt;%</span></span>
 <span id="cb29-11"><a href="rethinking-chapter-2.html#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
-<pre><code>## [1] 0.167</code></pre>
+<pre><code>#&gt; [1] 0.167</code></pre>
 <p><strong>H2</strong></p>
 <p><span class="math display">\[
 Pr(spec_a | twin) = \frac{2}{3}
 \]</span></p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="rethinking-chapter-2.html#cb31-1" aria-hidden="true" tabindex="-1"></a>pr_a_on_twn</span></code></pre></div>
-<pre><code>## [1] 0.6666667</code></pre>
+<pre><code>#&gt; [1] 0.6666667</code></pre>
 <p><strong>H3</strong></p>
 <p><span class="math display">\[
 Pr(single | spec_a) = Pr(\neg twin | spec_a) = 1 - Pr(twin | spec_a)
@@ -1553,11 +1556,11 @@ Pr(spec_a | test ) = \frac{Pr( test | spec_a ) \times Pr(spec_a)}{Pr(test_positi
 <span id="cb34-10"><a href="rethinking-chapter-2.html#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">pr_on_testa =</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;B&quot;</span>),</span>
 <span id="cb34-11"><a href="rethinking-chapter-2.html#cb34-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">genetic_test =</span> <span class="fu">c</span>((prior_a <span class="sc">*</span> pr_testa_on_a) <span class="sc">/</span> pr_testa,</span>
 <span id="cb34-12"><a href="rethinking-chapter-2.html#cb34-12" aria-hidden="true" tabindex="-1"></a>                        ((<span class="dv">1</span> <span class="sc">-</span> prior_a) <span class="sc">*</span> pr_testa_on_b) <span class="sc">/</span> pr_testa))</span></code></pre></div>
-<pre><code>## # A tibble: 2 x 2
-##   pr_on_testa genetic_test
-##   &lt;chr&gt;              &lt;dbl&gt;
-## 1 A                  0.696
-## 2 B                  0.304</code></pre>
+<pre><code>#&gt; # A tibble: 2 x 2
+#&gt;   pr_on_testa genetic_test
+#&gt;   &lt;chr&gt;              &lt;dbl&gt;
+#&gt; 1 A                  0.696
+#&gt; 2 B                  0.304</code></pre>
 <div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="rethinking-chapter-2.html#cb36-1" aria-hidden="true" tabindex="-1"></a>prior_a_updated <span class="ot">&lt;-</span> (prior_a <span class="sc">*</span> pr_testa_on_a) <span class="sc">/</span> pr_testa</span>
 <span id="cb36-2"><a href="rethinking-chapter-2.html#cb36-2" aria-hidden="true" tabindex="-1"></a>pr_twn_updated <span class="ot">&lt;-</span>  <span class="fu">weighted.mean</span>(<span class="at">x =</span> <span class="fu">c</span>(pr_twn_on_a, pr_twn_on_b),</span>
 <span id="cb36-3"><a href="rethinking-chapter-2.html#cb36-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">w =</span> <span class="fu">c</span>(prior_a_updated, <span class="dv">1</span><span class="sc">-</span> prior_a_updated))</span>
@@ -1604,7 +1607,7 @@ Pr(spec_a | test ) = \frac{Pr( test | spec_a ) \times Pr(spec_a)}{Pr(test_positi
         </div>
       </div>
 <a href="rethinking-chapter-1.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="bayesian-statistics-the-fun-way.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="rethinking-chapter-3.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

@@ -1,7 +1,4 @@
 ---
-title: "Bayesian Statistics the Fun Way"
-author: "Kosmas Hench"
-date: "10/8/2021"
 output:
   html_document:
       theme: yeti
@@ -13,7 +10,8 @@ editor_options:
 # Bayesian Statistics the Fun Way
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = TRUE, 
+knitr::opts_chunk$set(echo = TRUE,
+                      comment = "#>", 
                       dev = "svg",         # for html rendering
                       # dev = "cairo_pdf", # for pdf rendering
                       fig.asp = .5, 

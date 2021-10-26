@@ -1,8 +1,4 @@
 ---
-title: "Statistical Rethinking - Chapter 2"
-subtitle: "Small Worlds and Large Worlds"
-author: "Kosmas Hench"
-date: "10/8/2021"
 output:
   html_document:
   theme: yeti
@@ -12,6 +8,8 @@ editor_options:
 ---
 
 # Rethinking: Chapter 2
+
+**Small Worlds and Large Worlds**
 
 
 
@@ -69,7 +67,7 @@ tibble(draws = 1:3,
 ```
 
 ```{=html}
-<template id="1e1b3210-e6a2-4269-80ae-ad612a7751c1"><style>
+<template id="a53cccfe-3040-42b1-ab72-19195eed2a09"><style>
 .tabwid table{
   border-spacing:0px !important;
   border-collapse:collapse;
@@ -103,15 +101,15 @@ tibble(draws = 1:3,
 .tabwid table tr {
 background-color: transparent;
 }
-</style><div class="tabwid"><style>.cl-a300aaa6{}.cl-a2fb9bd8{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a2fbaf42{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a2fbdb20{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a2fbdb3e{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a2fbdb48{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-a300aaa6'>
+</style><div class="tabwid"><style>.cl-f4fd5eca{}.cl-f4f7d9b4{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-f4f7ed82{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-f4f81aa0{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-f4f81abe{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-f4f81ac8{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-f4fd5eca'>
 ```
 
 ```{=html}
-<thead><tr style="overflow-wrap:break-word;"><td class="cl-a2fbdb48"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">draws</span></p></td><td class="cl-a2fbdb48"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">marbles</span></p></td><td class="cl-a2fbdb48"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-a2fbdb20"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">1</span></p></td><td class="cl-a2fbdb20"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">4</span></p></td><td class="cl-a2fbdb20"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a2fbdb20"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">2</span></p></td><td class="cl-a2fbdb20"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">4</span></p></td><td class="cl-a2fbdb20"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a2fbdb3e"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">3</span></p></td><td class="cl-a2fbdb3e"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">4</span></p></td><td class="cl-a2fbdb3e"><p class="cl-a2fbaf42"><span class="cl-a2fb9bd8">64</span></p></td></tr></tbody></table></div></template>
-<div class="flextable-shadow-host" id="fd482cac-95a9-441b-bf6b-7d73f4b3a6da"></div>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-f4f81ac8"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">draws</span></p></td><td class="cl-f4f81ac8"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">marbles</span></p></td><td class="cl-f4f81ac8"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-f4f81aa0"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">1</span></p></td><td class="cl-f4f81aa0"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">4</span></p></td><td class="cl-f4f81aa0"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-f4f81aa0"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">2</span></p></td><td class="cl-f4f81aa0"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">4</span></p></td><td class="cl-f4f81aa0"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-f4f81abe"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">3</span></p></td><td class="cl-f4f81abe"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">4</span></p></td><td class="cl-f4f81abe"><p class="cl-f4f7ed82"><span class="cl-f4f7d9b4">64</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="0e16b81d-0037-469a-8ef5-e3a61b7caee6"></div>
 <script>
-var dest = document.getElementById("fd482cac-95a9-441b-bf6b-7d73f4b3a6da");
-var template = document.getElementById("1e1b3210-e6a2-4269-80ae-ad612a7751c1");
+var dest = document.getElementById("0e16b81d-0037-469a-8ef5-e3a61b7caee6");
+var template = document.getElementById("a53cccfe-3040-42b1-ab72-19195eed2a09");
 var caption = template.content.querySelector("caption");
 if(caption) {
   caption.style.cssText = "display:block;text-align:center;";
@@ -330,21 +328,21 @@ d %>%
 ```
 
 ```
-## # A tibble: 450 x 6
-## # Groups:   p_water [50]
-##    n_trials toss  n_success p_water lagged_n_trials lagged_n_success
-##       <int> <chr>     <int>   <dbl>           <int>            <int>
-##  1        1 w             1  0                   NA               NA
-##  2        1 w             1  0.0204              NA               NA
-##  3        1 w             1  0.0408              NA               NA
-##  4        1 w             1  0.0612              NA               NA
-##  5        1 w             1  0.0816              NA               NA
-##  6        1 w             1  0.102               NA               NA
-##  7        1 w             1  0.122               NA               NA
-##  8        1 w             1  0.143               NA               NA
-##  9        1 w             1  0.163               NA               NA
-## 10        1 w             1  0.184               NA               NA
-## # … with 440 more rows
+#> # A tibble: 450 x 6
+#> # Groups:   p_water [50]
+#>    n_trials toss  n_success p_water lagged_n_trials lagged_n_success
+#>       <int> <chr>     <int>   <dbl>           <int>            <int>
+#>  1        1 w             1  0                   NA               NA
+#>  2        1 w             1  0.0204              NA               NA
+#>  3        1 w             1  0.0408              NA               NA
+#>  4        1 w             1  0.0612              NA               NA
+#>  5        1 w             1  0.0816              NA               NA
+#>  6        1 w             1  0.102               NA               NA
+#>  7        1 w             1  0.122               NA               NA
+#>  8        1 w             1  0.143               NA               NA
+#>  9        1 w             1  0.163               NA               NA
+#> 10        1 w             1  0.184               NA               NA
+#> # … with 440 more rows
 ```
 
 ```r
@@ -516,21 +514,21 @@ conpare_qa(w_in = 24, l_in = 12)
 ```
 
 ```
-## 
-## 
-## |      mean|        sd|      5.5%|     94.5%|qa         |
-## |---------:|---------:|---------:|---------:|:----------|
-## | 0.6666667| 0.1571338| 0.4155366| 0.9177968|W: 6, L: 3 |
-## 
-## 
-## |      mean|        sd|      5.5%|     94.5%|qa          |
-## |---------:|---------:|---------:|---------:|:-----------|
-## | 0.6666662| 0.1111104| 0.4890902| 0.8442421|W: 12, L: 6 |
-## 
-## 
-## |      mean|        sd|      5.5%|     94.5%|qa           |
-## |---------:|---------:|---------:|---------:|:------------|
-## | 0.6666663| 0.0785669| 0.5411011| 0.7922314|W: 24, L: 12 |
+#> 
+#> 
+#> |      mean|        sd|      5.5%|     94.5%|qa         |
+#> |---------:|---------:|---------:|---------:|:----------|
+#> | 0.6666666| 0.1571338| 0.4155364| 0.9177967|W: 6, L: 3 |
+#> 
+#> 
+#> |      mean|        sd|      5.5%|     94.5%|qa          |
+#> |---------:|---------:|---------:|---------:|:-----------|
+#> | 0.6666662| 0.1111104| 0.4890902| 0.8442421|W: 12, L: 6 |
+#> 
+#> 
+#> |      mean|        sd|     5.5%|     94.5%|qa           |
+#> |---------:|---------:|--------:|---------:|:------------|
+#> | 0.6666662| 0.0785669| 0.541101| 0.7922313|W: 24, L: 12 |
 ```
 
 <img src="rethinking_c2_files/figure-html/unnamed-chunk-17-1.svg" width="672" style="display: block; margin: auto;" />
@@ -629,7 +627,7 @@ average_p_l <- .5 * (p_l_on_earth + p_l_on_mars)
 ```
 
 ```
-## [1] 0.2307692
+#> [1] 0.2307692
 ```
 
 **M4** & **M5**
@@ -732,7 +730,7 @@ pr_b_on_twn <- ((1 - prior_a) * pr_twn_on_b) / pr_twn
 ```
 
 ```
-## [1] 0.167
+#> [1] 0.167
 ```
 
 **H2**
@@ -747,7 +745,7 @@ pr_a_on_twn
 ```
 
 ```
-## [1] 0.6666667
+#> [1] 0.6666667
 ```
 
 **H3**
@@ -810,11 +808,11 @@ tibble(pr_on_testa = c("A","B"),
 ```
 
 ```
-## # A tibble: 2 x 2
-##   pr_on_testa genetic_test
-##   <chr>              <dbl>
-## 1 A                  0.696
-## 2 B                  0.304
+#> # A tibble: 2 x 2
+#>   pr_on_testa genetic_test
+#>   <chr>              <dbl>
+#> 1 A                  0.696
+#> 2 B                  0.304
 ```
 
 ```r

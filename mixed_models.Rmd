@@ -1,7 +1,4 @@
 ---
-title: "Mixed Models with R"
-author: "Kosmas Hench"
-date: "`r Sys.Date()`"
 output:
   html_document:
     toc: true
@@ -14,7 +11,8 @@ editor_options:
 # Mixed Models with R
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, 
+knitr::opts_chunk$set(echo = TRUE,
+                      comment = "#>", 
                       dev = "svg",         # for html rendering
                       # dev = "cairo_pdf", # for pdf rendering
                       fig.asp = .5, 

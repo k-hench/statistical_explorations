@@ -8,8 +8,8 @@ editor_options:
 ## Session Info
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = '../')
+knitr::opts_chunk$set(echo = TRUE,
+                      comment = "#>")
 options(knitr.kable.NA = '')
 
 source("bayesian_settings.R")

@@ -1,7 +1,4 @@
 ---
-title: "Mixed Models with R"
-author: "Kosmas Hench"
-date: "2021-10-26"
 output:
   html_document:
     toc: true
@@ -177,11 +174,11 @@ confint(gpa_mixed)
 ```
 
 ```
-##                  2.5 %    97.5 %
-## .sig01      0.22517423 0.2824604
-## .sigma      0.23071113 0.2518510
-## (Intercept) 2.55665145 2.6417771
-## occasion    0.09832589 0.1143027
+#>                  2.5 %    97.5 %
+#> .sig01      0.22517423 0.2824604
+#> .sigma      0.23071113 0.2518510
+#> (Intercept) 2.55665145 2.6417771
+#> occasion    0.09832589 0.1143027
 ```
 
 
