@@ -453,7 +453,7 @@ p_quantile <- ggplot(tibble(x = seq(0, 1, length.out = 3)), aes(x)) +
   theme(plot.caption = ggtext::element_markdown(halign = .5, hjust = .5))
 ```
 
-## Parameter estimatino with prior probabilities
+## Parameter estimation with prior probabilities
 
 ```{r}
 alpha_data <- 2

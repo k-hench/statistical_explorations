@@ -452,7 +452,7 @@ bound_right <- .009
 
 <img src="bayesian_stats_the_fun_way_files/figure-html/unnamed-chunk-13-1.svg" width="672" style="display: block; margin: auto;" />
 
-## Parameter estimatino with prior probabilities
+## Parameter estimation with prior probabilities
 
 
 ```r
@@ -518,7 +518,7 @@ p_b_superior
 ```
 
 ```
-#> [1] 0.95869
+#> [1] 0.95967
 ```
 
 ```r

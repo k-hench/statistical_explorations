@@ -24,7 +24,7 @@
 <meta name="author" content="Kosmas Hench" />
 
 
-<meta name="date" content="2021-10-26" />
+<meta name="date" content="2021-10-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -678,7 +678,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="3.6" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#marcov-chain-monte-carlo-mcmc"><i class="fa fa-check"></i><b>3.6</b> Marcov Chain Monte Carlo (MCMC)</a></li>
 <li class="chapter" data-level="3.7" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#homework"><i class="fa fa-check"></i><b>3.7</b> Homework</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html"><i class="fa fa-check"></i><b>4</b> Rethinking: Chapter 3</a></li>
+<li class="chapter" data-level="4" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html"><i class="fa fa-check"></i><b>4</b> Rethinking: Chapter 3</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#sampling-from-a-grid-approximate-posterior"><i class="fa fa-check"></i><b>4.1</b> Sampling from a grid approximate posterior</a></li>
+<li class="chapter" data-level="4.2" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#sampling-to-summarize"><i class="fa fa-check"></i><b>4.2</b> Sampling to Summarize</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#intervals-of-devined-boundaries"><i class="fa fa-check"></i><b>4.2.1</b> Intervals of devined boundaries</a></li>
+<li class="chapter" data-level="4.2.2" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#intervals-of-defined-mass"><i class="fa fa-check"></i><b>4.2.2</b> Intervals of defined mass</a></li>
+</ul></li>
+</ul></li>
 <li class="chapter" data-level="5" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html"><i class="fa fa-check"></i><b>5</b> Rethinking: Chapter 4</a></li>
 <li class="chapter" data-level="6" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html"><i class="fa fa-check"></i><b>6</b> Bayesian Statistics the Fun Way</a>
 <ul>
@@ -690,7 +698,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.6" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-i"><i class="fa fa-check"></i><b>6.6</b> Parameter Estimation (I)</a></li>
 <li class="chapter" data-level="6.7" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-normal-distribution"><i class="fa fa-check"></i><b>6.7</b> The normal distribution</a></li>
 <li class="chapter" data-level="6.8" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#cummulative-density-and-quantile-function"><i class="fa fa-check"></i><b>6.8</b> Cummulative Density and Quantile Function</a></li>
-<li class="chapter" data-level="6.9" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimatino-with-prior-probabilities"><i class="fa fa-check"></i><b>6.9</b> Parameter estimatino with prior probabilities</a></li>
+<li class="chapter" data-level="6.9" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-with-prior-probabilities"><i class="fa fa-check"></i><b>6.9</b> Parameter estimation with prior probabilities</a></li>
 <li class="chapter" data-level="6.10" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#monte-carlosimulation"><i class="fa fa-check"></i><b>6.10</b> Monte CarloSimulation</a></li>
 <li class="chapter" data-level="6.11" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#posterior-odds"><i class="fa fa-check"></i><b>6.11</b> Posterior Odds</a></li>
 <li class="chapter" data-level="6.12" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-ii"><i class="fa fa-check"></i><b>6.12</b> Parameter Estimation (II)</a></li>
@@ -751,6 +759,129 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1><span class="header-section-number">4</span> Rethinking: Chapter 3</h1>
 <p><strong>Sampling the Imaginary</strong></p>
 <p>by <a href="https://xcelab.net/rm/statistical-rethinking/">Richard McElreath</a>, building on the Summary by <a href="https://bookdown.org/content/4857/">Solomon Kurz</a></p>
+<p><span class="math display">\[
+Pr(vampire|positive) = \frac{Pr(positive|vampire) \times Pr(vampire)}{Pr(positive)}
+\]</span></p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="rethinking-chapter-3.html#cb37-1" aria-hidden="true" tabindex="-1"></a>pr_positive_on_vamp <span class="ot">&lt;-</span> .<span class="dv">95</span></span>
+<span id="cb37-2"><a href="rethinking-chapter-3.html#cb37-2" aria-hidden="true" tabindex="-1"></a>pr_positive_on_mort <span class="ot">&lt;-</span> .<span class="dv">01</span></span>
+<span id="cb37-3"><a href="rethinking-chapter-3.html#cb37-3" aria-hidden="true" tabindex="-1"></a>pr_vamp <span class="ot">&lt;-</span> .<span class="dv">001</span></span>
+<span id="cb37-4"><a href="rethinking-chapter-3.html#cb37-4" aria-hidden="true" tabindex="-1"></a>pr_positive <span class="ot">&lt;-</span> pr_positive_on_vamp <span class="sc">*</span> pr_vamp <span class="sc">+</span> pr_positive_on_mort <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> pr_vamp)</span>
+<span id="cb37-5"><a href="rethinking-chapter-3.html#cb37-5" aria-hidden="true" tabindex="-1"></a>(pr_vamp_on_positive <span class="ot">&lt;-</span> pr_positive_on_vamp <span class="sc">*</span> pr_vamp <span class="sc">/</span>pr_positive)</span></code></pre></div>
+<pre><code>#&gt; [1] 0.08683729</code></pre>
+<div id="sampling-from-a-grid-approximate-posterior" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Sampling from a grid approximate posterior</h2>
+<p><em>posterior</em> here means simply ‘the probability of <em>p</em> conditional on the data’:</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="rethinking-chapter-3.html#cb39-1" aria-hidden="true" tabindex="-1"></a>grid_approx <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">n_grid =</span> <span class="dv">20</span>, <span class="at">L =</span> <span class="dv">6</span>, <span class="at">W =</span> <span class="dv">3</span>, <span class="at">prior =</span> <span class="cf">function</span>(x){<span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(x))}){</span>
+<span id="cb39-2"><a href="rethinking-chapter-3.html#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">p_grid =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> n_grid),</span>
+<span id="cb39-3"><a href="rethinking-chapter-3.html#cb39-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">prior =</span> <span class="fu">prior</span>(p_grid),</span>
+<span id="cb39-4"><a href="rethinking-chapter-3.html#cb39-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">likelihood =</span> <span class="fu">dbinom</span>(L, <span class="at">size =</span> W <span class="sc">+</span> L, <span class="at">prob =</span> p_grid),</span>
+<span id="cb39-5"><a href="rethinking-chapter-3.html#cb39-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">posterior_unstand =</span> likelihood <span class="sc">*</span> prior,</span>
+<span id="cb39-6"><a href="rethinking-chapter-3.html#cb39-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">posterior =</span> posterior_unstand <span class="sc">/</span> <span class="fu">sum</span>(posterior_unstand))</span>
+<span id="cb39-7"><a href="rethinking-chapter-3.html#cb39-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb39-8"><a href="rethinking-chapter-3.html#cb39-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-9"><a href="rethinking-chapter-3.html#cb39-9" aria-hidden="true" tabindex="-1"></a>grid_data <span class="ot">&lt;-</span> <span class="fu">grid_approx</span>(<span class="at">n_grid =</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">4</span>)</span>
+<span id="cb39-10"><a href="rethinking-chapter-3.html#cb39-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-11"><a href="rethinking-chapter-3.html#cb39-11" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">sample =</span> <span class="dv">1</span><span class="sc">:</span>(<span class="dv">10</span><span class="sc">^</span><span class="dv">4</span>),</span>
+<span id="cb39-12"><a href="rethinking-chapter-3.html#cb39-12" aria-hidden="true" tabindex="-1"></a>                    <span class="at">proportion_water =</span> <span class="fu">sample</span>(<span class="at">x =</span> grid_data<span class="sc">$</span>p_grid, <span class="at">size =</span> <span class="fu">length</span>(sample),</span>
+<span id="cb39-13"><a href="rethinking-chapter-3.html#cb39-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">prob =</span> grid_data<span class="sc">$</span>posterior, <span class="at">replace =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb39-14"><a href="rethinking-chapter-3.html#cb39-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-15"><a href="rethinking-chapter-3.html#cb39-15" aria-hidden="true" tabindex="-1"></a>p_scatter <span class="ot">&lt;-</span> samples <span class="sc">%&gt;%</span> </span>
+<span id="cb39-16"><a href="rethinking-chapter-3.html#cb39-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> sample, <span class="at">y =</span> proportion_water)) <span class="sc">+</span></span>
+<span id="cb39-17"><a href="rethinking-chapter-3.html#cb39-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> .<span class="dv">75</span>, <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">color =</span> <span class="fu">clr_alpha</span>(clr2,.<span class="dv">3</span>), <span class="at">fill =</span> <span class="fu">clr_alpha</span>(clr2,.<span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb39-18"><a href="rethinking-chapter-3.html#cb39-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>))</span>
+<span id="cb39-19"><a href="rethinking-chapter-3.html#cb39-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-20"><a href="rethinking-chapter-3.html#cb39-20" aria-hidden="true" tabindex="-1"></a>p_dens <span class="ot">&lt;-</span> samples <span class="sc">%&gt;%</span> </span>
+<span id="cb39-21"><a href="rethinking-chapter-3.html#cb39-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> proportion_water)) <span class="sc">+</span></span>
+<span id="cb39-22"><a href="rethinking-chapter-3.html#cb39-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>( <span class="at">color =</span> clr2, <span class="at">fill =</span> fll2) <span class="sc">+</span></span>
+<span id="cb39-23"><a href="rethinking-chapter-3.html#cb39-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) </span>
+<span id="cb39-24"><a href="rethinking-chapter-3.html#cb39-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-25"><a href="rethinking-chapter-3.html#cb39-25" aria-hidden="true" tabindex="-1"></a>p_scatter <span class="sc">+</span> p_dens</span></code></pre></div>
+<p><img src="rethinking_c3_files/figure-html/unnamed-chunk-2-1.svg" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="sampling-to-summarize" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Sampling to Summarize</h2>
+<p>Once the posterior distribution is created, the model is done.</p>
+<p>Typical targets / questions:</p>
+<ul>
+<li>intervals of <em>defined boundaries</em></li>
+<li>intervals of <em>defined probability mass</em></li>
+<li><em>point estimates</em></li>
+</ul>
+<div id="intervals-of-devined-boundaries" class="section level3" number="4.2.1">
+<h3><span class="header-section-number">4.2.1</span> Intervals of devined boundaries</h3>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="rethinking-chapter-3.html#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(grid_data<span class="sc">$</span>posterior[grid_data<span class="sc">$</span>p_grid <span class="sc">&lt;</span> <span class="fl">0.5</span>])</span></code></pre></div>
+<pre><code>#&gt; [1] 0.171875</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="rethinking-chapter-3.html#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(samples<span class="sc">$</span>proportion_water <span class="sc">&lt;</span> .<span class="dv">5</span>) <span class="sc">/</span> <span class="fu">length</span>(samples<span class="sc">$</span>proportion_water)</span></code></pre></div>
+<pre><code>#&gt; [1] 0.1651</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="rethinking-chapter-3.html#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(samples<span class="sc">$</span>proportion_water <span class="sc">&gt;</span> .<span class="dv">5</span> <span class="sc">&amp;</span> samples<span class="sc">$</span>proportion_water <span class="sc">&lt;</span> .<span class="dv">75</span>) <span class="sc">/</span> <span class="fu">length</span>(samples<span class="sc">$</span>proportion_water)</span></code></pre></div>
+<pre><code>#&gt; [1] 0.6058</code></pre>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="rethinking-chapter-3.html#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># f_post &lt;-  function(x){dbeta(x = x, shape1 = 9 +1 , shape2 = 6 +1)}</span></span>
+<span id="cb46-2"><a href="rethinking-chapter-3.html#cb46-2" aria-hidden="true" tabindex="-1"></a>f_post <span class="ot">&lt;-</span>  <span class="cf">function</span>(x){<span class="fu">dbinom</span>(<span class="at">x =</span> <span class="dv">6</span>, <span class="at">size =</span> <span class="dv">9</span>, <span class="at">prob =</span> x)}</span>
+<span id="cb46-3"><a href="rethinking-chapter-3.html#cb46-3" aria-hidden="true" tabindex="-1"></a>f_post_norm <span class="ot">&lt;-</span> <span class="cf">function</span>(x){ <span class="fu">f_post</span>(x) <span class="sc">/</span> <span class="fu">integrate</span>(<span class="at">f =</span> f_post,<span class="at">lower =</span> <span class="dv">0</span>, <span class="at">upper =</span> <span class="dv">1</span>)[[<span class="dv">1</span>]]}</span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="rethinking-chapter-3.html#cb47-1" aria-hidden="true" tabindex="-1"></a>plot_intervals <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">x_bounds =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb47-2"><a href="rethinking-chapter-3.html#cb47-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">x_line =</span> <span class="fu">as.numeric</span>(<span class="cn">NA</span>),</span>
+<span id="cb47-3"><a href="rethinking-chapter-3.html#cb47-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">f_posterior =</span> f_post_norm,</span>
+<span id="cb47-4"><a href="rethinking-chapter-3.html#cb47-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">data =</span> samples,</span>
+<span id="cb47-5"><a href="rethinking-chapter-3.html#cb47-5" aria-hidden="true" tabindex="-1"></a>                           <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">3</span>)){</span>
+<span id="cb47-6"><a href="rethinking-chapter-3.html#cb47-6" aria-hidden="true" tabindex="-1"></a>  p_d <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb47-7"><a href="rethinking-chapter-3.html#cb47-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> f_posterior, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb47-8"><a href="rethinking-chapter-3.html#cb47-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">geom =</span> <span class="st">&quot;area&quot;</span>, <span class="at">color =</span> clr0, <span class="at">fill =</span> fll0) <span class="sc">+</span></span>
+<span id="cb47-9"><a href="rethinking-chapter-3.html#cb47-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> f_posterior, <span class="at">xlim =</span> x_bounds,</span>
+<span id="cb47-10"><a href="rethinking-chapter-3.html#cb47-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">geom =</span> <span class="st">&quot;area&quot;</span>, <span class="at">color =</span> clr2, <span class="at">fill =</span> fll2) <span class="sc">+</span></span>
+<span id="cb47-11"><a href="rethinking-chapter-3.html#cb47-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;density&quot;</span>, <span class="at">x =</span> <span class="st">&quot;proportion_water&quot;</span>)</span>
+<span id="cb47-12"><a href="rethinking-chapter-3.html#cb47-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-13"><a href="rethinking-chapter-3.html#cb47-13" aria-hidden="true" tabindex="-1"></a>p_d_emp <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb47-14"><a href="rethinking-chapter-3.html#cb47-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> proportion_water)) <span class="sc">+</span></span>
+<span id="cb47-15"><a href="rethinking-chapter-3.html#cb47-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>( <span class="at">color =</span> clr0, <span class="at">fill =</span> fll0) <span class="sc">+</span></span>
+<span id="cb47-16"><a href="rethinking-chapter-3.html#cb47-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> <span class="cf">function</span>(x){<span class="fu">demp</span>(<span class="at">obs =</span> data<span class="sc">$</span>proportion_water, <span class="at">x =</span> x)},</span>
+<span id="cb47-17"><a href="rethinking-chapter-3.html#cb47-17" aria-hidden="true" tabindex="-1"></a>                <span class="at">xlim =</span> x_bounds,</span>
+<span id="cb47-18"><a href="rethinking-chapter-3.html#cb47-18" aria-hidden="true" tabindex="-1"></a>                <span class="at">geom =</span> <span class="st">&quot;area&quot;</span>, <span class="at">color =</span> clr2, <span class="at">fill =</span> fll2) <span class="sc">+</span></span>
+<span id="cb47-19"><a href="rethinking-chapter-3.html#cb47-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;empirical density&quot;</span>)</span>
+<span id="cb47-20"><a href="rethinking-chapter-3.html#cb47-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-21"><a href="rethinking-chapter-3.html#cb47-21" aria-hidden="true" tabindex="-1"></a>p_d <span class="sc">+</span> p_d_emp  <span class="sc">&amp;</span></span>
+<span id="cb47-22"><a href="rethinking-chapter-3.html#cb47-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">x =</span> x_line),</span>
+<span id="cb47-23"><a href="rethinking-chapter-3.html#cb47-23" aria-hidden="true" tabindex="-1"></a>             <span class="fu">aes</span>(<span class="at">xintercept =</span> x), <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">&amp;</span></span>
+<span id="cb47-24"><a href="rethinking-chapter-3.html#cb47-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> ylim)<span class="sc">&amp;</span></span>
+<span id="cb47-25"><a href="rethinking-chapter-3.html#cb47-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb47-26"><a href="rethinking-chapter-3.html#cb47-26" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="rethinking-chapter-3.html#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_intervals</span>(<span class="at">x_bounds =</span> <span class="fu">c</span>(<span class="dv">0</span>, .<span class="dv">5</span>), <span class="at">x_line =</span> .<span class="dv">5</span>) <span class="sc">/</span></span>
+<span id="cb48-2"><a href="rethinking-chapter-3.html#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_intervals</span>(<span class="at">x_bounds =</span> <span class="fu">c</span>(.<span class="dv">5</span>, .<span class="dv">75</span>), <span class="at">x_line =</span> <span class="fu">c</span>(.<span class="dv">5</span>, .<span class="dv">75</span>))</span></code></pre></div>
+<p><img src="rethinking_c3_files/figure-html/unnamed-chunk-5-1.svg" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="intervals-of-defined-mass" class="section level3" number="4.2.2">
+<h3><span class="header-section-number">4.2.2</span> Intervals of defined mass</h3>
+<p>aka.:</p>
+<ul>
+<li><strong><em>compatibility interval</em></strong></li>
+<li><em>credible interval</em></li>
+<li><em>percentile interval</em></li>
+</ul>
+<p>special form: <em>highest posterior density interval (HPDI)</em></p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="rethinking-chapter-3.html#cb49-1" aria-hidden="true" tabindex="-1"></a>qnt_80 <span class="ot">&lt;-</span> <span class="fu">quantile</span>(samples<span class="sc">$</span>proportion_water, <span class="at">probs =</span> .<span class="dv">8</span>)</span>
+<span id="cb49-2"><a href="rethinking-chapter-3.html#cb49-2" aria-hidden="true" tabindex="-1"></a>qnt_80_inner <span class="ot">&lt;-</span> <span class="fu">quantile</span>(samples<span class="sc">$</span>proportion_water, <span class="at">probs =</span> <span class="fu">c</span>(.<span class="dv">1</span>, .<span class="dv">9</span>))</span>
+<span id="cb49-3"><a href="rethinking-chapter-3.html#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_intervals</span>(<span class="at">x_bounds =</span> <span class="fu">c</span>(<span class="dv">0</span>, qnt_80), <span class="at">x_line =</span> qnt_80)<span class="sc">/</span></span>
+<span id="cb49-4"><a href="rethinking-chapter-3.html#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_intervals</span>(<span class="at">x_bounds =</span> qnt_80_inner, <span class="at">x_line =</span> qnt_80_inner)</span></code></pre></div>
+<p><img src="rethinking_c3_files/figure-html/unnamed-chunk-6-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="rethinking-chapter-3.html#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rethinking)</span>
+<span id="cb50-2"><a href="rethinking-chapter-3.html#cb50-2" aria-hidden="true" tabindex="-1"></a>map <span class="ot">&lt;-</span> purrr<span class="sc">::</span>map</span>
+<span id="cb50-3"><a href="rethinking-chapter-3.html#cb50-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-4"><a href="rethinking-chapter-3.html#cb50-4" aria-hidden="true" tabindex="-1"></a>grid_data_skew <span class="ot">&lt;-</span> <span class="fu">grid_approx</span>(<span class="at">L =</span> <span class="dv">3</span>, <span class="at">W =</span> <span class="dv">0</span>, <span class="at">n_grid =</span> <span class="dv">10</span><span class="sc">^</span><span class="dv">4</span>)</span>
+<span id="cb50-5"><a href="rethinking-chapter-3.html#cb50-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-6"><a href="rethinking-chapter-3.html#cb50-6" aria-hidden="true" tabindex="-1"></a>samples_skew <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">sample =</span> <span class="dv">1</span><span class="sc">:</span>(<span class="dv">10</span><span class="sc">^</span><span class="dv">4</span>),</span>
+<span id="cb50-7"><a href="rethinking-chapter-3.html#cb50-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">proportion_water =</span> <span class="fu">sample</span>(<span class="at">x =</span> grid_data_skew<span class="sc">$</span>p_grid, <span class="at">size =</span> <span class="fu">length</span>(sample),</span>
+<span id="cb50-8"><a href="rethinking-chapter-3.html#cb50-8" aria-hidden="true" tabindex="-1"></a>                                                 <span class="at">prob =</span> grid_data_skew<span class="sc">$</span>posterior, <span class="at">replace =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb50-9"><a href="rethinking-chapter-3.html#cb50-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-10"><a href="rethinking-chapter-3.html#cb50-10" aria-hidden="true" tabindex="-1"></a>f_post_skew <span class="ot">&lt;-</span>  <span class="cf">function</span>(x){<span class="fu">dbinom</span>(<span class="at">x =</span> <span class="dv">3</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">prob =</span> x)}</span>
+<span id="cb50-11"><a href="rethinking-chapter-3.html#cb50-11" aria-hidden="true" tabindex="-1"></a>f_post_norm_skew <span class="ot">&lt;-</span> <span class="cf">function</span>(x){ <span class="fu">f_post_skew</span>(x) <span class="sc">/</span> <span class="fu">integrate</span>(<span class="at">f =</span> f_post_skew, <span class="at">lower =</span> <span class="dv">0</span>, <span class="at">upper =</span> <span class="dv">1</span>)[[<span class="dv">1</span>]]}</span>
+<span id="cb50-12"><a href="rethinking-chapter-3.html#cb50-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-13"><a href="rethinking-chapter-3.html#cb50-13" aria-hidden="true" tabindex="-1"></a>qnt_50_inner <span class="ot">&lt;-</span> <span class="fu">PI</span>(samples_skew<span class="sc">$</span>proportion_water, <span class="at">prob =</span> .<span class="dv">5</span>)</span>
+<span id="cb50-14"><a href="rethinking-chapter-3.html#cb50-14" aria-hidden="true" tabindex="-1"></a>qnt_50_high_dens <span class="ot">&lt;-</span> <span class="fu">HPDI</span>(samples_skew<span class="sc">$</span>proportion_water, <span class="at">prob =</span> .<span class="dv">5</span>)</span>
+<span id="cb50-15"><a href="rethinking-chapter-3.html#cb50-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-16"><a href="rethinking-chapter-3.html#cb50-16" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_intervals</span>(<span class="at">x_bounds =</span> qnt_50_inner, <span class="at">x_line =</span> qnt_50_inner,</span>
+<span id="cb50-17"><a href="rethinking-chapter-3.html#cb50-17" aria-hidden="true" tabindex="-1"></a>               <span class="at">f_posterior =</span> f_post_norm_skew, <span class="at">data =</span> samples_skew, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">4</span>)) <span class="sc">/</span></span>
+<span id="cb50-18"><a href="rethinking-chapter-3.html#cb50-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_intervals</span>(<span class="at">x_bounds =</span> qnt_50_high_dens, <span class="at">x_line =</span> qnt_50_high_dens,</span>
+<span id="cb50-19"><a href="rethinking-chapter-3.html#cb50-19" aria-hidden="true" tabindex="-1"></a>               <span class="at">f_posterior =</span> f_post_norm_skew, <span class="at">data =</span> samples_skew, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">4</span>)) </span></code></pre></div>
+<p><img src="rethinking_c3_files/figure-html/unnamed-chunk-7-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <hr />
 <div id="myModal" class="modal">
 <span class="close">×</span>
@@ -761,6 +892,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <script src="./js/zoom.js"></script>
 
+</div>
+</div>
 </div>
             </section>
 
