@@ -19,8 +19,8 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.asp = .5, 
                       fig.align = "center",
                       message = FALSE,
-                      warning = FALSE
-                      )
+                      warning = FALSE )
+
 source("bayesian_settings.R")
 ```
 
@@ -167,6 +167,175 @@ plot_intervals(x_bounds = qnt_50_inner, x_line = qnt_50_inner,
   plot_intervals(x_bounds = qnt_50_high_dens, x_line = qnt_50_high_dens,
                f_posterior = f_post_norm_skew, data = samples_skew, ylim = c(0, 4)) 
 ```
+
+## Point estimates
+
+```{r}
+point_estimates <- tibble(proportion_water= list(mean, median, chainmode) %>%
+                            map_dbl(.f = function(f, vals){ f(vals) },
+                                    vals = samples_skew$proportion_water),
+                          statistic = c("mean", "median", "mode"))
+
+p_point_estimates <- ggplot() +
+  stat_function(fun = f_post_norm_skew, xlim = c(0,1),
+                geom = "area", color = clr0, fill = fll0) +
+  geom_vline(data = point_estimates, 
+             aes(xintercept = proportion_water, linetype = statistic),
+             color = clr1) +
+  labs(y = "density")
+
+f_loss <- function(x){
+    map_dbl(x, function(x){ sum( grid_data_skew$posterior  * abs( x - grid_data_skew$p_grid))
+    })}
+
+f_loss_quad <- function(x){
+    map_dbl(x, function(x){ sum( grid_data_skew$posterior  * ( x - grid_data_skew$p_grid) ^ 2)
+    })}
+
+p_loss <- ggplot() +
+  stat_function(fun = f_loss,
+    xlim = c(0,1),
+    geom = "area", color = clr0, fill = fll0) +
+  geom_point(data = tibble(x = point_estimates$proportion_water[2],
+                           y = f_loss(point_estimates$proportion_water[2])),
+             aes(x = x, y = y), shape = 1, size = 3, color = clr1) +
+  labs(x = "poportion_water", y = "expected proportional loss")
+
+p_loss_quad <- ggplot() +
+  stat_function(fun = f_loss_quad,
+    xlim = c(0,1),
+    geom = "area", color = clr0, fill = fll0) +
+  geom_point(data = tibble(x = point_estimates$proportion_water[2],
+                           y = f_loss_quad(point_estimates$proportion_water[2])),
+             aes(x = x, y = y), shape = 1, size = 3, color = clr1) +
+  labs(x = "poportion_water", y = "expected proportional loss")
+
+p_point_estimates + p_loss + p_loss_quad +
+  plot_layout(guide = "collect") & theme(legend.position = "bottom")
+```
+
+## sample to simulate prediction
+
+
+binomial likelihood
+
+$$
+Pr(W | N ,p) = \frac{N!}{W! (N -W)!} p^{W}(1 - p)^{N-W}
+$$
+
+
+```{r}
+dbinom( 0:2, size = 2, prob = .7)
+rbinom( 10, size = 2, prob = .7)
+create_dummy_w <- function(size, prob){
+  tibble(x = rbinom(10^5, size = size, prob = prob),
+         size = size,
+         prob = prob)
+}
+dummy_w <- create_dummy_w(size = 9, prob = .7)
+
+dummy_w %>% 
+  group_by(x) %>% 
+  count() %>% 
+  ungroup() %>% 
+  ggplot(aes(x = factor(x), y =  n)) +
+  geom_bar(stat = "identity", color = clr1, fill = fll1, width = .6) +
+  labs(y = "count", x = "dummy water count")
+```
+
+
+```{r, fig.asp = .7}
+tibble(size = rep(c(3,6,9), each = 3),
+       prob = rep(c(.3,.6,.9),3)) %>% 
+  pmap_dfr(create_dummy_w) %>% 
+  group_by(x, size , prob) %>% 
+  count() %>% 
+  ungroup() %>% 
+  ggplot(aes(x = factor(x), y =  n)) +
+  geom_bar(stat = "identity", color = clr1, fill = fll1, width = .6) +
+  facet_grid(prob ~ size, scales = "free",
+             space = "free_x", labeller = label_both) +
+  labs(y = "count", x = "dummy water count") +
+  theme(panel.background = element_rect(color = clr0d, fill = clr_alpha(clr0d,.2)))
+  
+```
+
+
+```{r}
+f_posterior <- function(x){dbinom(x = 6, size = 9, prob = x)}
+f_posterior_dens <- function(x){ f_posterior(x) / integrate(f = f_posterior, lower = 0, upper = 1)[[1]]}
+
+
+grid_points <- grid_points <- tibble(x = seq(.1,.9,by = .1),
+                      y = f_posterior_dens(x))
+
+p_posterior <- ggplot() +
+  stat_function(fun = f_posterior_dens,
+                geom = "area", color = clr0d, fill = fll0,xlim = c(0,1)) +
+  geom_segment(data = grid_points, aes(x = x, xend = x, y = 0, yend = y),
+               color = clr1, linetype = 3) +
+  geom_point(data = grid_points, aes(x = x, y = y),
+               color = clr1) +
+  labs(x = "probability of water", y = "density")
+
+simulate_binom <- function(probability, n_draws = 10^5, size = 9) {
+  rbinom(n_draws, size = size, prob = probability) 
+}
+
+d_small <- tibble(probability = seq(from = .1, to = .9, by = .1)) %>% 
+  mutate(draws = purrr::map(probability, simulate_binom)) %>% 
+  unnest(draws)
+
+p_small <- d_small %>% 
+  ggplot(aes(x = draws)) +
+  geom_bar(stat = "count", color = clr1, fill = fll1, width = .6) +
+  facet_wrap(probability ~ ., nrow = 1)
+
+dist_posterior <- tibble(n_water = rbinom(10^4, size = 9, prob = samples$proportion_water),
+                         seq = map(n_water, .f = function(x){sample(x = rep(c("W","L"), c(x, 9-x)),
+                                                                    size = 9,
+                                                                    replace = FALSE)}),
+                         max_run_length = map_dbl(seq,.f = function(x){rle(x)$lengths %>% max()}),
+                         n_switches = map_dbl(seq,.f = function(x){(rle(x)$lengths %>% length()) -1})) 
+
+p_posterior_predictive <- dist_posterior %>% 
+  ggplot(aes(x = factor(n_water))) +
+  geom_bar(stat = "count", color = clr1, fill = fll1, width = .6) +
+  labs(x = "number of water samples")
+```
+
+
+```{r, fig.asp = .8}
+p_posterior / 
+  p_small /
+  p_posterior_predictive
+```
+
+
+```{r, fig.asp = .45}
+globe_data <- c("w", "l", "w", "w", "w", "l", "w", "l", "w")
+globe_run_length <- rle(globe_data)$lengths %>% max()
+globe_n_switches <- (rle(globe_data)$lengths %>% length()) -1 
+
+p_run_length <- dist_posterior %>% 
+  ggplot(aes(x = factor(max_run_length))) +
+  geom_bar(stat = "count", aes(color = max_run_length == globe_run_length, 
+                               fill = after_scale(clr_alpha(color))), width = .6) +
+  scale_color_manual(values = c(`TRUE` = clr2, `FALSE` = clr0d), guide = "none") +
+  labs(x = "longest run length")
+
+p_switches <- dist_posterior %>% 
+  ggplot(aes(x = factor(n_switches))) +
+  geom_bar(stat = "count", aes(color = n_switches == globe_n_switches, 
+                               fill = after_scale(clr_alpha(color))), width = .6) +
+  scale_color_manual(values = c(`TRUE` = clr2, `FALSE` = clr0d), guide = "none") +
+  labs(x = "number of switches")
+p_run_length + p_switches
+```
+
+## Homework
+
+**E1**
 
 ---
 

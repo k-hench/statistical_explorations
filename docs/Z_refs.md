@@ -45,7 +45,7 @@ sessionInfo()
 #>  [1] ggrepel_0.9.1      Rcpp_1.0.6         lubridate_1.7.10   assertthat_0.2.1  
 #>  [5] digest_0.6.27      utf8_1.2.1         ggforce_0.3.2.9000 R6_2.5.0          
 #>  [9] cellranger_1.1.0   backports_1.2.1    reprex_2.0.0       evaluate_0.14     
-#> [13] httr_1.4.2         pillar_1.6.1       rlang_0.4.11       readxl_1.3.1      
+#> [13] httr_1.4.2         pillar_1.6.1       rlang_0.4.12       readxl_1.3.1      
 #> [17] rstudioapi_0.13    jquerylib_0.1.3    rmarkdown_2.9.6    polyclip_1.10-0   
 #> [21] igraph_1.2.6       munsell_0.5.0      broom_0.7.6        compiler_4.0.3    
 #> [25] modelr_0.1.8       xfun_0.24          pkgconfig_2.0.3    htmltools_0.5.1.1 

@@ -434,6 +434,8 @@ tibble(x = p) %>%
   theme(legend.position = "bottom")
 ```
 
+---
+
 ## Homework
 
 **M1**
