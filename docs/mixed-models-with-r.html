@@ -24,7 +24,7 @@
 <meta name="author" content="Kosmas Hench" />
 
 
-<meta name="date" content="2021-10-28" />
+<meta name="date" content="2021-10-31" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -761,8 +761,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="mixed-models-with-r" class="section level1" number="7">
 <h1><span class="header-section-number">7</span> Mixed Models with R</h1>
 <p>by <a href="https://m-clark.github.io/mixed-models-with-R/">Michael Clark</a></p>
-<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="mixed-models-with-r.html#cb143-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;data/gpa.RData&quot;</span>)</span>
-<span id="cb143-2"><a href="mixed-models-with-r.html#cb143-2" aria-hidden="true" tabindex="-1"></a>gpa <span class="ot">&lt;-</span> gpa <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="mixed-models-with-r.html#cb158-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;data/gpa.RData&quot;</span>)</span>
+<span id="cb158-2"><a href="mixed-models-with-r.html#cb158-2" aria-hidden="true" tabindex="-1"></a>gpa <span class="ot">&lt;-</span> gpa <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>()</span></code></pre></div>
 <div id="standard-regregression-model" class="section level2" number="7.1">
 <h2><span class="header-section-number">7.1</span> Standard regregression model</h2>
 <p><span class="math display">\[
@@ -809,18 +809,18 @@ gpa = b_{int\_student} + b_{occ} \times occasion + \epsilon\\
 b_{int\_student} = b_{intercept} + \textit{effect}_{student}
 \]</span></p>
 <p>! There is no student-specific effect for <span class="math inline">\(occasion\)</span> (which is termed <em>fixed effect</em>), and there is no random component</p>
-<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="mixed-models-with-r.html#cb144-1" aria-hidden="true" tabindex="-1"></a>gpa_lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(gpa <span class="sc">~</span> occasion, <span class="at">data =</span> gpa)</span>
-<span id="cb144-2"><a href="mixed-models-with-r.html#cb144-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb144-3"><a href="mixed-models-with-r.html#cb144-3" aria-hidden="true" tabindex="-1"></a>gpa <span class="sc">%&gt;%</span> </span>
-<span id="cb144-4"><a href="mixed-models-with-r.html#cb144-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year <span class="sc">-</span> <span class="dv">1</span>  <span class="sc">+</span> <span class="fu">as.numeric</span>(semester)<span class="sc">/</span><span class="dv">2</span>, <span class="at">y =</span> gpa, <span class="at">group =</span> student)) <span class="sc">+</span></span>
-<span id="cb144-5"><a href="mixed-models-with-r.html#cb144-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb144-6"><a href="mixed-models-with-r.html#cb144-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">2</span>]],</span>
-<span id="cb144-7"><a href="mixed-models-with-r.html#cb144-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">intercept =</span>  gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">1</span>]],</span>
-<span id="cb144-8"><a href="mixed-models-with-r.html#cb144-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">color =</span> clr2, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb144-9"><a href="mixed-models-with-r.html#cb144-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;semester&quot;</span>) <span class="sc">+</span></span>
-<span id="cb144-10"><a href="mixed-models-with-r.html#cb144-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>), <span class="at">expand =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="mixed-models-with-r.html#cb159-1" aria-hidden="true" tabindex="-1"></a>gpa_lm <span class="ot">&lt;-</span> <span class="fu">lm</span>(gpa <span class="sc">~</span> occasion, <span class="at">data =</span> gpa)</span>
+<span id="cb159-2"><a href="mixed-models-with-r.html#cb159-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb159-3"><a href="mixed-models-with-r.html#cb159-3" aria-hidden="true" tabindex="-1"></a>gpa <span class="sc">%&gt;%</span> </span>
+<span id="cb159-4"><a href="mixed-models-with-r.html#cb159-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year <span class="sc">-</span> <span class="dv">1</span>  <span class="sc">+</span> <span class="fu">as.numeric</span>(semester)<span class="sc">/</span><span class="dv">2</span>, <span class="at">y =</span> gpa, <span class="at">group =</span> student)) <span class="sc">+</span></span>
+<span id="cb159-5"><a href="mixed-models-with-r.html#cb159-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb159-6"><a href="mixed-models-with-r.html#cb159-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">2</span>]],</span>
+<span id="cb159-7"><a href="mixed-models-with-r.html#cb159-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">intercept =</span>  gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">1</span>]],</span>
+<span id="cb159-8"><a href="mixed-models-with-r.html#cb159-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">color =</span> clr2, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb159-9"><a href="mixed-models-with-r.html#cb159-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;semester&quot;</span>) <span class="sc">+</span></span>
+<span id="cb159-10"><a href="mixed-models-with-r.html#cb159-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>), <span class="at">expand =</span> <span class="dv">0</span>)</span></code></pre></div>
 <p><img src="mixed_models_files/figure-html/unnamed-chunk-2-1.svg" width="672" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb145-1"><a href="mixed-models-with-r.html#cb145-1" aria-hidden="true" tabindex="-1"></a>pander<span class="sc">::</span><span class="fu">pander</span>(<span class="fu">summary</span>(gpa_lm), <span class="at">round =</span> <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="mixed-models-with-r.html#cb160-1" aria-hidden="true" tabindex="-1"></a>pander<span class="sc">::</span><span class="fu">pander</span>(<span class="fu">summary</span>(gpa_lm), <span class="at">round =</span> <span class="dv">3</span>)</span></code></pre></div>
 <table style="width:88%;">
 <colgroup>
 <col width="25%" />
@@ -884,11 +884,11 @@ b_{int\_student} = b_{intercept} + \textit{effect}_{student}
 </div>
 <div id="mixed-model" class="section level3" number="7.2.3">
 <h3><span class="header-section-number">7.2.3</span> Mixed Model</h3>
-<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="mixed-models-with-r.html#cb146-1" aria-hidden="true" tabindex="-1"></a>gpa_mixed <span class="ot">&lt;-</span> <span class="fu">lmer</span>(gpa <span class="sc">~</span> occasion <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> student), <span class="at">data =</span> gpa)</span></code></pre></div>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="mixed-models-with-r.html#cb161-1" aria-hidden="true" tabindex="-1"></a>gpa_mixed <span class="ot">&lt;-</span> <span class="fu">lmer</span>(gpa <span class="sc">~</span> occasion <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> student), <span class="at">data =</span> gpa)</span></code></pre></div>
 <p>(Test automatic equation creation)</p>
-<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="mixed-models-with-r.html#cb147-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(equatiomatic)</span>
-<span id="cb147-2"><a href="mixed-models-with-r.html#cb147-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Give the results to extract_eq</span></span>
-<span id="cb147-3"><a href="mixed-models-with-r.html#cb147-3" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_eq</span>(gpa_mixed,)</span></code></pre></div>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="mixed-models-with-r.html#cb162-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(equatiomatic)</span>
+<span id="cb162-2"><a href="mixed-models-with-r.html#cb162-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Give the results to extract_eq</span></span>
+<span id="cb162-3"><a href="mixed-models-with-r.html#cb162-3" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_eq</span>(gpa_mixed,)</span></code></pre></div>
 <p><span class="math display">\[
 \begin{aligned}
   \operatorname{gpa}_{i}  &amp;\sim N \left(\alpha_{j[i]} + \beta_{1}(\operatorname{occasion}), \sigma^2 \right) \\
@@ -974,14 +974,14 @@ b_{int\_student} = b_{intercept} + \textit{effect}_{student}
 </table>
 <p>Coefficients (<em>fixed effects</em>) for <code>time</code> and <code>intercept</code> are the same as <code>lm()</code></p>
 <p>Getting confidence intervals from a mixed model (since <span class="math inline">\(p\)</span> values are not given (<code>== 0</code> ?))</p>
-<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="mixed-models-with-r.html#cb148-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(gpa_mixed)</span></code></pre></div>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="mixed-models-with-r.html#cb163-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(gpa_mixed)</span></code></pre></div>
 <pre><code>#&gt;                  2.5 %    97.5 %
 #&gt; .sig01      0.22517423 0.2824604
 #&gt; .sigma      0.23071113 0.2518510
 #&gt; (Intercept) 2.55665145 2.6417771
 #&gt; occasion    0.09832589 0.1143027</code></pre>
-<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb150-1"><a href="mixed-models-with-r.html#cb150-1" aria-hidden="true" tabindex="-1"></a>mm_cinf <span class="ot">&lt;-</span> mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(gpa_mixed)</span>
-<span id="cb150-2"><a href="mixed-models-with-r.html#cb150-2" aria-hidden="true" tabindex="-1"></a>mm_cinf <span class="sc">%&gt;%</span> pander<span class="sc">::</span><span class="fu">pander</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="mixed-models-with-r.html#cb165-1" aria-hidden="true" tabindex="-1"></a>mm_cinf <span class="ot">&lt;-</span> mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(gpa_mixed)</span>
+<span id="cb165-2"><a href="mixed-models-with-r.html#cb165-2" aria-hidden="true" tabindex="-1"></a>mm_cinf <span class="sc">%&gt;%</span> pander<span class="sc">::</span><span class="fu">pander</span>()</span></code></pre></div>
 <table>
 <caption>Table continues below</caption>
 <colgroup>
@@ -1053,7 +1053,7 @@ b_{int\_student} = b_{intercept} + \textit{effect}_{student}
 <div id="estimation-of-random-effects" class="section level3" number="7.2.4">
 <h3><span class="header-section-number">7.2.4</span> Estimation of random effects</h3>
 <p>Random effect</p>
-<div class="sourceCode" id="cb151"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb151-1"><a href="mixed-models-with-r.html#cb151-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_random_effects</span>(gpa_mixed) <span class="sc">%&gt;%</span>  <span class="fu">head</span>(<span class="dv">5</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="mixed-models-with-r.html#cb166-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_random_effects</span>(gpa_mixed) <span class="sc">%&gt;%</span>  <span class="fu">head</span>(<span class="dv">5</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1115,8 +1115,8 @@ b_{int\_student} = b_{intercept} + \textit{effect}_{student}
 </tbody>
 </table>
 <p>Random intercept (intercept + random effect)</p>
-<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="mixed-models-with-r.html#cb152-1" aria-hidden="true" tabindex="-1"></a>mm_coefs <span class="ot">&lt;-</span> mixedup<span class="sc">::</span><span class="fu">extract_coef</span>(gpa_mixed)</span>
-<span id="cb152-2"><a href="mixed-models-with-r.html#cb152-2" aria-hidden="true" tabindex="-1"></a>mm_coefs <span class="sc">%&gt;%</span>  <span class="fu">head</span>(<span class="dv">5</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="mixed-models-with-r.html#cb167-1" aria-hidden="true" tabindex="-1"></a>mm_coefs <span class="ot">&lt;-</span> mixedup<span class="sc">::</span><span class="fu">extract_coef</span>(gpa_mixed)</span>
+<span id="cb167-2"><a href="mixed-models-with-r.html#cb167-2" aria-hidden="true" tabindex="-1"></a>mm_coefs <span class="sc">%&gt;%</span>  <span class="fu">head</span>(<span class="dv">5</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1177,50 +1177,50 @@ b_{int\_student} = b_{intercept} + \textit{effect}_{student}
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="mixed-models-with-r.html#cb153-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(merTools)</span>
-<span id="cb153-2"><a href="mixed-models-with-r.html#cb153-2" aria-hidden="true" tabindex="-1"></a>mm_intervals <span class="ot">&lt;-</span> <span class="fu">predictInterval</span>(gpa_mixed) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>()</span>
-<span id="cb153-3"><a href="mixed-models-with-r.html#cb153-3" aria-hidden="true" tabindex="-1"></a>mm_mean_sd <span class="ot">&lt;-</span> <span class="fu">REsim</span>(gpa_mixed) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>()</span>
-<span id="cb153-4"><a href="mixed-models-with-r.html#cb153-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb153-5"><a href="mixed-models-with-r.html#cb153-5" aria-hidden="true" tabindex="-1"></a>sd_level <span class="ot">&lt;-</span> .<span class="dv">95</span></span>
-<span id="cb153-6"><a href="mixed-models-with-r.html#cb153-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb153-7"><a href="mixed-models-with-r.html#cb153-7" aria-hidden="true" tabindex="-1"></a>mm_mean_sd <span class="sc">%&gt;%</span></span>
-<span id="cb153-8"><a href="mixed-models-with-r.html#cb153-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sd_leveled =</span> sd <span class="sc">*</span> <span class="fu">qnorm</span>(<span class="dv">1</span> <span class="sc">-</span> ((<span class="dv">1</span> <span class="sc">-</span> sd_level)<span class="sc">/</span><span class="dv">2</span>)),</span>
-<span id="cb153-9"><a href="mixed-models-with-r.html#cb153-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">sig =</span> (median <span class="sc">+</span> sd_leveled) <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> (median <span class="sc">-</span> sd_leveled) <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb153-10"><a href="mixed-models-with-r.html#cb153-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(median) <span class="sc">%&gt;%</span> </span>
-<span id="cb153-11"><a href="mixed-models-with-r.html#cb153-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb153-12"><a href="mixed-models-with-r.html#cb153-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(groupID) <span class="sc">%&gt;%</span> </span>
-<span id="cb153-13"><a href="mixed-models-with-r.html#cb153-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> rank)) <span class="sc">+</span></span>
-<span id="cb153-14"><a href="mixed-models-with-r.html#cb153-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> rank, <span class="at">y =</span> median <span class="sc">-</span> sd_leveled, <span class="at">yend =</span> median <span class="sc">+</span>  sd_leveled, <span class="at">color =</span> sig)) <span class="sc">+</span></span>
-<span id="cb153-15"><a href="mixed-models-with-r.html#cb153-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> median), <span class="at">size =</span> .<span class="dv">3</span>, <span class="at">alpha =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb153-16"><a href="mixed-models-with-r.html#cb153-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">size =</span> .<span class="dv">4</span>, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb153-17"><a href="mixed-models-with-r.html#cb153-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">TRUE</span><span class="st">`</span> <span class="ot">=</span> clr2, <span class="st">`</span><span class="at">FALSE</span><span class="st">`</span> <span class="ot">=</span> clr0d), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
-<span id="cb153-18"><a href="mixed-models-with-r.html#cb153-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Student&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Coefficient&quot;</span>, <span class="at">caption =</span> <span class="st">&quot;interval estimates of random effects&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="mixed-models-with-r.html#cb168-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(merTools)</span>
+<span id="cb168-2"><a href="mixed-models-with-r.html#cb168-2" aria-hidden="true" tabindex="-1"></a>mm_intervals <span class="ot">&lt;-</span> <span class="fu">predictInterval</span>(gpa_mixed) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>()</span>
+<span id="cb168-3"><a href="mixed-models-with-r.html#cb168-3" aria-hidden="true" tabindex="-1"></a>mm_mean_sd <span class="ot">&lt;-</span> <span class="fu">REsim</span>(gpa_mixed) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>()</span>
+<span id="cb168-4"><a href="mixed-models-with-r.html#cb168-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb168-5"><a href="mixed-models-with-r.html#cb168-5" aria-hidden="true" tabindex="-1"></a>sd_level <span class="ot">&lt;-</span> .<span class="dv">95</span></span>
+<span id="cb168-6"><a href="mixed-models-with-r.html#cb168-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb168-7"><a href="mixed-models-with-r.html#cb168-7" aria-hidden="true" tabindex="-1"></a>mm_mean_sd <span class="sc">%&gt;%</span></span>
+<span id="cb168-8"><a href="mixed-models-with-r.html#cb168-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sd_leveled =</span> sd <span class="sc">*</span> <span class="fu">qnorm</span>(<span class="dv">1</span> <span class="sc">-</span> ((<span class="dv">1</span> <span class="sc">-</span> sd_level)<span class="sc">/</span><span class="dv">2</span>)),</span>
+<span id="cb168-9"><a href="mixed-models-with-r.html#cb168-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">sig =</span> (median <span class="sc">+</span> sd_leveled) <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> (median <span class="sc">-</span> sd_leveled) <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb168-10"><a href="mixed-models-with-r.html#cb168-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(median) <span class="sc">%&gt;%</span> </span>
+<span id="cb168-11"><a href="mixed-models-with-r.html#cb168-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb168-12"><a href="mixed-models-with-r.html#cb168-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(groupID) <span class="sc">%&gt;%</span> </span>
+<span id="cb168-13"><a href="mixed-models-with-r.html#cb168-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> rank)) <span class="sc">+</span></span>
+<span id="cb168-14"><a href="mixed-models-with-r.html#cb168-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> rank, <span class="at">y =</span> median <span class="sc">-</span> sd_leveled, <span class="at">yend =</span> median <span class="sc">+</span>  sd_leveled, <span class="at">color =</span> sig)) <span class="sc">+</span></span>
+<span id="cb168-15"><a href="mixed-models-with-r.html#cb168-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> median), <span class="at">size =</span> .<span class="dv">3</span>, <span class="at">alpha =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb168-16"><a href="mixed-models-with-r.html#cb168-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">size =</span> .<span class="dv">4</span>, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb168-17"><a href="mixed-models-with-r.html#cb168-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">TRUE</span><span class="st">`</span> <span class="ot">=</span> clr2, <span class="st">`</span><span class="at">FALSE</span><span class="st">`</span> <span class="ot">=</span> clr0d), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb168-18"><a href="mixed-models-with-r.html#cb168-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Student&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Coefficient&quot;</span>, <span class="at">caption =</span> <span class="st">&quot;interval estimates of random effects&quot;</span>)</span></code></pre></div>
 <p><img src="mixed_models_files/figure-html/unnamed-chunk-10-1.svg" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="prediction" class="section level3" number="7.2.5">
 <h3><span class="header-section-number">7.2.5</span> Prediction</h3>
-<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb154-1"><a href="mixed-models-with-r.html#cb154-1" aria-hidden="true" tabindex="-1"></a>gpa_predictions <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">lm =</span> <span class="fu">predict</span>(gpa_lm),</span>
-<span id="cb154-2"><a href="mixed-models-with-r.html#cb154-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">lmm_no_random_effects =</span> <span class="fu">predict</span>(gpa_mixed, <span class="at">re.form =</span> <span class="cn">NA</span>),</span>
-<span id="cb154-3"><a href="mixed-models-with-r.html#cb154-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">lmm_with_random_effects =</span> <span class="fu">predict</span>(gpa_mixed)) <span class="sc">%&gt;%</span> </span>
-<span id="cb154-4"><a href="mixed-models-with-r.html#cb154-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(gpa, .)</span>
-<span id="cb154-5"><a href="mixed-models-with-r.html#cb154-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb154-6"><a href="mixed-models-with-r.html#cb154-6" aria-hidden="true" tabindex="-1"></a>gpa_predictions <span class="sc">%&gt;%</span> </span>
-<span id="cb154-7"><a href="mixed-models-with-r.html#cb154-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> lm)) <span class="sc">+</span></span>
-<span id="cb154-8"><a href="mixed-models-with-r.html#cb154-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> lmm_with_random_effects, <span class="at">color =</span> <span class="st">&quot;with_re&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb154-9"><a href="mixed-models-with-r.html#cb154-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> lmm_no_random_effects, <span class="at">color =</span> <span class="st">&quot;no_re&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb154-10"><a href="mixed-models-with-r.html#cb154-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">no_re =</span> clr2, <span class="at">with_re =</span> clr0d)) </span></code></pre></div>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="mixed-models-with-r.html#cb169-1" aria-hidden="true" tabindex="-1"></a>gpa_predictions <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">lm =</span> <span class="fu">predict</span>(gpa_lm),</span>
+<span id="cb169-2"><a href="mixed-models-with-r.html#cb169-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">lmm_no_random_effects =</span> <span class="fu">predict</span>(gpa_mixed, <span class="at">re.form =</span> <span class="cn">NA</span>),</span>
+<span id="cb169-3"><a href="mixed-models-with-r.html#cb169-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">lmm_with_random_effects =</span> <span class="fu">predict</span>(gpa_mixed)) <span class="sc">%&gt;%</span> </span>
+<span id="cb169-4"><a href="mixed-models-with-r.html#cb169-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(gpa, .)</span>
+<span id="cb169-5"><a href="mixed-models-with-r.html#cb169-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb169-6"><a href="mixed-models-with-r.html#cb169-6" aria-hidden="true" tabindex="-1"></a>gpa_predictions <span class="sc">%&gt;%</span> </span>
+<span id="cb169-7"><a href="mixed-models-with-r.html#cb169-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> lm)) <span class="sc">+</span></span>
+<span id="cb169-8"><a href="mixed-models-with-r.html#cb169-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> lmm_with_random_effects, <span class="at">color =</span> <span class="st">&quot;with_re&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb169-9"><a href="mixed-models-with-r.html#cb169-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> lmm_no_random_effects, <span class="at">color =</span> <span class="st">&quot;no_re&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb169-10"><a href="mixed-models-with-r.html#cb169-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">no_re =</span> clr2, <span class="at">with_re =</span> clr0d)) </span></code></pre></div>
 <p><img src="mixed_models_files/figure-html/unnamed-chunk-11-1.svg" width="672" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb155-1"><a href="mixed-models-with-r.html#cb155-1" aria-hidden="true" tabindex="-1"></a>student_select <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span></span>
-<span id="cb155-2"><a href="mixed-models-with-r.html#cb155-2" aria-hidden="true" tabindex="-1"></a>gpa_predictions <span class="sc">%&gt;%</span></span>
-<span id="cb155-3"><a href="mixed-models-with-r.html#cb155-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(student <span class="sc">%in%</span> student_select) <span class="sc">%&gt;%</span> </span>
-<span id="cb155-4"><a href="mixed-models-with-r.html#cb155-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> occasion)) <span class="sc">+</span></span>
-<span id="cb155-5"><a href="mixed-models-with-r.html#cb155-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> gpa, <span class="at">color =</span> student))<span class="sc">+</span></span>
-<span id="cb155-6"><a href="mixed-models-with-r.html#cb155-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">slope =</span> <span class="fu">c</span>(gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">2</span>]], mm_fixed<span class="sc">$</span>value[<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>)]), </span>
-<span id="cb155-7"><a href="mixed-models-with-r.html#cb155-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">intercept =</span>  <span class="fu">c</span>(gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">1</span>]], mm_coefs<span class="sc">$</span>value[<span class="fu">as.numeric</span>(<span class="fu">as.character</span>(mm_coefs<span class="sc">$</span>group)) <span class="sc">%in%</span> student_select]),</span>
-<span id="cb155-8"><a href="mixed-models-with-r.html#cb155-8" aria-hidden="true" tabindex="-1"></a>                             <span class="at">model =</span> <span class="fu">c</span>(<span class="st">&quot;lm&quot;</span>, <span class="fu">as.character</span>(mm_coefs<span class="sc">$</span>group[<span class="fu">as.numeric</span>(<span class="fu">as.character</span>(mm_coefs<span class="sc">$</span>group)) <span class="sc">%in%</span> student_select]))),</span>
-<span id="cb155-9"><a href="mixed-models-with-r.html#cb155-9" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">slope =</span> slope, <span class="at">intercept =</span> intercept, <span class="at">color =</span> model), <span class="at">size =</span> .<span class="dv">6</span>) <span class="sc">+</span></span>
-<span id="cb155-10"><a href="mixed-models-with-r.html#cb155-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">lm =</span> clr2, <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> clr1, <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> clr0d), </span>
-<span id="cb155-11"><a href="mixed-models-with-r.html#cb155-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;lm&quot;</span>, <span class="st">&quot;lmm (student1)&quot;</span>, <span class="st">&quot;lmm (student2)&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="mixed-models-with-r.html#cb170-1" aria-hidden="true" tabindex="-1"></a>student_select <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span></span>
+<span id="cb170-2"><a href="mixed-models-with-r.html#cb170-2" aria-hidden="true" tabindex="-1"></a>gpa_predictions <span class="sc">%&gt;%</span></span>
+<span id="cb170-3"><a href="mixed-models-with-r.html#cb170-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(student <span class="sc">%in%</span> student_select) <span class="sc">%&gt;%</span> </span>
+<span id="cb170-4"><a href="mixed-models-with-r.html#cb170-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> occasion)) <span class="sc">+</span></span>
+<span id="cb170-5"><a href="mixed-models-with-r.html#cb170-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> gpa, <span class="at">color =</span> student))<span class="sc">+</span></span>
+<span id="cb170-6"><a href="mixed-models-with-r.html#cb170-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">slope =</span> <span class="fu">c</span>(gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">2</span>]], mm_fixed<span class="sc">$</span>value[<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>)]), </span>
+<span id="cb170-7"><a href="mixed-models-with-r.html#cb170-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">intercept =</span>  <span class="fu">c</span>(gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">1</span>]], mm_coefs<span class="sc">$</span>value[<span class="fu">as.numeric</span>(<span class="fu">as.character</span>(mm_coefs<span class="sc">$</span>group)) <span class="sc">%in%</span> student_select]),</span>
+<span id="cb170-8"><a href="mixed-models-with-r.html#cb170-8" aria-hidden="true" tabindex="-1"></a>                             <span class="at">model =</span> <span class="fu">c</span>(<span class="st">&quot;lm&quot;</span>, <span class="fu">as.character</span>(mm_coefs<span class="sc">$</span>group[<span class="fu">as.numeric</span>(<span class="fu">as.character</span>(mm_coefs<span class="sc">$</span>group)) <span class="sc">%in%</span> student_select]))),</span>
+<span id="cb170-9"><a href="mixed-models-with-r.html#cb170-9" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">slope =</span> slope, <span class="at">intercept =</span> intercept, <span class="at">color =</span> model), <span class="at">size =</span> .<span class="dv">6</span>) <span class="sc">+</span></span>
+<span id="cb170-10"><a href="mixed-models-with-r.html#cb170-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">lm =</span> clr2, <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> clr1, <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> clr0d), </span>
+<span id="cb170-11"><a href="mixed-models-with-r.html#cb170-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;lm&quot;</span>, <span class="st">&quot;lmm (student1)&quot;</span>, <span class="st">&quot;lmm (student2)&quot;</span>))</span></code></pre></div>
 <p><img src="mixed_models_files/figure-html/unnamed-chunk-11-2.svg" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="cluster-level-covariates" class="section level3" number="7.2.6">
@@ -1237,9 +1237,9 @@ gpa = b_{intercept} + b_{occ} \times \textit{occasion} + b_{sex} \times \textit{
 </div>
 <div id="add-random-slope" class="section level2" number="7.3">
 <h2><span class="header-section-number">7.3</span> Add random slope</h2>
-<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="mixed-models-with-r.html#cb156-1" aria-hidden="true" tabindex="-1"></a>gpa_mixed2 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(gpa <span class="sc">~</span> occasion <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> occasion <span class="sc">|</span> student), <span class="at">data =</span> gpa)</span>
-<span id="cb156-2"><a href="mixed-models-with-r.html#cb156-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb156-3"><a href="mixed-models-with-r.html#cb156-3" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(gpa_mixed2) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="mixed-models-with-r.html#cb171-1" aria-hidden="true" tabindex="-1"></a>gpa_mixed2 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(gpa <span class="sc">~</span> occasion <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> occasion <span class="sc">|</span> student), <span class="at">data =</span> gpa)</span>
+<span id="cb171-2"><a href="mixed-models-with-r.html#cb171-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb171-3"><a href="mixed-models-with-r.html#cb171-3" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(gpa_mixed2) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1273,7 +1273,7 @@ gpa = b_{intercept} + b_{occ} \times \textit{occasion} + b_{sex} \times \textit{
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="mixed-models-with-r.html#cb157-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(gpa_mixed2, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="mixed-models-with-r.html#cb172-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(gpa_mixed2, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1308,9 +1308,9 @@ gpa = b_{intercept} + b_{occ} \times \textit{occasion} + b_{sex} \times \textit{
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb158-1"><a href="mixed-models-with-r.html#cb158-1" aria-hidden="true" tabindex="-1"></a>gpa_mixed2_rc <span class="ot">&lt;-</span> mixedup<span class="sc">::</span><span class="fu">extract_random_coefs</span>(gpa_mixed2)</span></code></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="mixed-models-with-r.html#cb173-1" aria-hidden="true" tabindex="-1"></a>gpa_mixed2_rc <span class="ot">&lt;-</span> mixedup<span class="sc">::</span><span class="fu">extract_random_coefs</span>(gpa_mixed2)</span></code></pre></div>
 <p>correlation of the intercepts and slopes (negative, so students with a low starting score tend to increase a little more)</p>
-<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="mixed-models-with-r.html#cb159-1" aria-hidden="true" tabindex="-1"></a><span class="fu">VarCorr</span>(gpa_mixed2) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>() </span></code></pre></div>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="mixed-models-with-r.html#cb174-1" aria-hidden="true" tabindex="-1"></a><span class="fu">VarCorr</span>(gpa_mixed2) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>() </span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1352,78 +1352,78 @@ gpa = b_{intercept} + b_{occ} \times \textit{occasion} + b_{sex} \times \textit{
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb160-1"><a href="mixed-models-with-r.html#cb160-1" aria-hidden="true" tabindex="-1"></a>gpa_lm_separate <span class="ot">&lt;-</span> gpa <span class="sc">%&gt;%</span> </span>
-<span id="cb160-2"><a href="mixed-models-with-r.html#cb160-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(student) <span class="sc">%&gt;%</span> </span>
-<span id="cb160-3"><a href="mixed-models-with-r.html#cb160-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb160-4"><a href="mixed-models-with-r.html#cb160-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mod =</span> <span class="fu">map</span>(data,<span class="cf">function</span>(data){<span class="fu">lm</span>(gpa <span class="sc">~</span> occasion, <span class="at">data =</span> data)})) <span class="sc">%&gt;%</span> </span>
-<span id="cb160-5"><a href="mixed-models-with-r.html#cb160-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(., <span class="fu">summarise_model</span>(.)) </span>
-<span id="cb160-6"><a href="mixed-models-with-r.html#cb160-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb160-7"><a href="mixed-models-with-r.html#cb160-7" aria-hidden="true" tabindex="-1"></a>p_intercepts <span class="ot">&lt;-</span> <span class="fu">ggplot</span>()  <span class="sc">+</span></span>
-<span id="cb160-8"><a href="mixed-models-with-r.html#cb160-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">data =</span> gpa_mixed2_rc <span class="sc">%&gt;%</span> <span class="fu">filter</span>(effect <span class="sc">==</span> <span class="st">&quot;Intercept&quot;</span>),</span>
-<span id="cb160-9"><a href="mixed-models-with-r.html#cb160-9" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">color =</span> <span class="st">&quot;mixed&quot;</span>, <span class="at">fill =</span> <span class="fu">after_scale</span>(<span class="fu">clr_alpha</span>(color)))) <span class="sc">+</span></span>
-<span id="cb160-10"><a href="mixed-models-with-r.html#cb160-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">data =</span> gpa_lm_separate,</span>
-<span id="cb160-11"><a href="mixed-models-with-r.html#cb160-11" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> intercept, <span class="at">color =</span> <span class="st">&quot;separate&quot;</span>, <span class="at">fill =</span> <span class="fu">after_scale</span>(<span class="fu">clr_alpha</span>(color)))) <span class="sc">+</span></span>
-<span id="cb160-12"><a href="mixed-models-with-r.html#cb160-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;intercept&quot;</span>) <span class="sc">+</span></span>
-<span id="cb160-13"><a href="mixed-models-with-r.html#cb160-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="fl">1.5</span>, <span class="dv">4</span>)</span>
-<span id="cb160-14"><a href="mixed-models-with-r.html#cb160-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb160-15"><a href="mixed-models-with-r.html#cb160-15" aria-hidden="true" tabindex="-1"></a>p_slopes <span class="ot">&lt;-</span> <span class="fu">ggplot</span>()  <span class="sc">+</span></span>
-<span id="cb160-16"><a href="mixed-models-with-r.html#cb160-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">data =</span> gpa_mixed2_rc <span class="sc">%&gt;%</span> <span class="fu">filter</span>(effect <span class="sc">==</span> <span class="st">&quot;occasion&quot;</span>),</span>
-<span id="cb160-17"><a href="mixed-models-with-r.html#cb160-17" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">color =</span> <span class="st">&quot;mixed&quot;</span>, <span class="at">fill =</span> <span class="fu">after_scale</span>(<span class="fu">clr_alpha</span>(color)))) <span class="sc">+</span></span>
-<span id="cb160-18"><a href="mixed-models-with-r.html#cb160-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">data =</span> gpa_lm_separate, </span>
-<span id="cb160-19"><a href="mixed-models-with-r.html#cb160-19" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> slope, <span class="at">color =</span> <span class="st">&quot;separate&quot;</span>, <span class="at">fill =</span> <span class="fu">after_scale</span>(<span class="fu">clr_alpha</span>(color)))) <span class="sc">+</span></span>
-<span id="cb160-20"><a href="mixed-models-with-r.html#cb160-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;slope&quot;</span>)  <span class="sc">+</span></span>
-<span id="cb160-21"><a href="mixed-models-with-r.html#cb160-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="sc">-</span>.<span class="dv">2</span>, .<span class="dv">4</span>) </span>
-<span id="cb160-22"><a href="mixed-models-with-r.html#cb160-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb160-23"><a href="mixed-models-with-r.html#cb160-23" aria-hidden="true" tabindex="-1"></a>p_intercepts <span class="sc">+</span> p_slopes <span class="sc">+</span></span>
-<span id="cb160-24"><a href="mixed-models-with-r.html#cb160-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">&quot;collect&quot;</span>) <span class="sc">&amp;</span></span>
-<span id="cb160-25"><a href="mixed-models-with-r.html#cb160-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">&quot;model&quot;</span>, <span class="at">values =</span> <span class="fu">c</span>(<span class="at">separate =</span> clr0d, <span class="at">mixed =</span> clr2)) <span class="sc">&amp;</span></span>
-<span id="cb160-26"><a href="mixed-models-with-r.html#cb160-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="mixed-models-with-r.html#cb175-1" aria-hidden="true" tabindex="-1"></a>gpa_lm_separate <span class="ot">&lt;-</span> gpa <span class="sc">%&gt;%</span> </span>
+<span id="cb175-2"><a href="mixed-models-with-r.html#cb175-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(student) <span class="sc">%&gt;%</span> </span>
+<span id="cb175-3"><a href="mixed-models-with-r.html#cb175-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb175-4"><a href="mixed-models-with-r.html#cb175-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mod =</span> <span class="fu">map</span>(data,<span class="cf">function</span>(data){<span class="fu">lm</span>(gpa <span class="sc">~</span> occasion, <span class="at">data =</span> data)})) <span class="sc">%&gt;%</span> </span>
+<span id="cb175-5"><a href="mixed-models-with-r.html#cb175-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(., <span class="fu">summarise_model</span>(.)) </span>
+<span id="cb175-6"><a href="mixed-models-with-r.html#cb175-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb175-7"><a href="mixed-models-with-r.html#cb175-7" aria-hidden="true" tabindex="-1"></a>p_intercepts <span class="ot">&lt;-</span> <span class="fu">ggplot</span>()  <span class="sc">+</span></span>
+<span id="cb175-8"><a href="mixed-models-with-r.html#cb175-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">data =</span> gpa_mixed2_rc <span class="sc">%&gt;%</span> <span class="fu">filter</span>(effect <span class="sc">==</span> <span class="st">&quot;Intercept&quot;</span>),</span>
+<span id="cb175-9"><a href="mixed-models-with-r.html#cb175-9" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">color =</span> <span class="st">&quot;mixed&quot;</span>, <span class="at">fill =</span> <span class="fu">after_scale</span>(<span class="fu">clr_alpha</span>(color)))) <span class="sc">+</span></span>
+<span id="cb175-10"><a href="mixed-models-with-r.html#cb175-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">data =</span> gpa_lm_separate,</span>
+<span id="cb175-11"><a href="mixed-models-with-r.html#cb175-11" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> intercept, <span class="at">color =</span> <span class="st">&quot;separate&quot;</span>, <span class="at">fill =</span> <span class="fu">after_scale</span>(<span class="fu">clr_alpha</span>(color)))) <span class="sc">+</span></span>
+<span id="cb175-12"><a href="mixed-models-with-r.html#cb175-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;intercept&quot;</span>) <span class="sc">+</span></span>
+<span id="cb175-13"><a href="mixed-models-with-r.html#cb175-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="fl">1.5</span>, <span class="dv">4</span>)</span>
+<span id="cb175-14"><a href="mixed-models-with-r.html#cb175-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb175-15"><a href="mixed-models-with-r.html#cb175-15" aria-hidden="true" tabindex="-1"></a>p_slopes <span class="ot">&lt;-</span> <span class="fu">ggplot</span>()  <span class="sc">+</span></span>
+<span id="cb175-16"><a href="mixed-models-with-r.html#cb175-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">data =</span> gpa_mixed2_rc <span class="sc">%&gt;%</span> <span class="fu">filter</span>(effect <span class="sc">==</span> <span class="st">&quot;occasion&quot;</span>),</span>
+<span id="cb175-17"><a href="mixed-models-with-r.html#cb175-17" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">color =</span> <span class="st">&quot;mixed&quot;</span>, <span class="at">fill =</span> <span class="fu">after_scale</span>(<span class="fu">clr_alpha</span>(color)))) <span class="sc">+</span></span>
+<span id="cb175-18"><a href="mixed-models-with-r.html#cb175-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">data =</span> gpa_lm_separate, </span>
+<span id="cb175-19"><a href="mixed-models-with-r.html#cb175-19" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> slope, <span class="at">color =</span> <span class="st">&quot;separate&quot;</span>, <span class="at">fill =</span> <span class="fu">after_scale</span>(<span class="fu">clr_alpha</span>(color)))) <span class="sc">+</span></span>
+<span id="cb175-20"><a href="mixed-models-with-r.html#cb175-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;slope&quot;</span>)  <span class="sc">+</span></span>
+<span id="cb175-21"><a href="mixed-models-with-r.html#cb175-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="sc">-</span>.<span class="dv">2</span>, .<span class="dv">4</span>) </span>
+<span id="cb175-22"><a href="mixed-models-with-r.html#cb175-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb175-23"><a href="mixed-models-with-r.html#cb175-23" aria-hidden="true" tabindex="-1"></a>p_intercepts <span class="sc">+</span> p_slopes <span class="sc">+</span></span>
+<span id="cb175-24"><a href="mixed-models-with-r.html#cb175-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">&quot;collect&quot;</span>) <span class="sc">&amp;</span></span>
+<span id="cb175-25"><a href="mixed-models-with-r.html#cb175-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="st">&quot;model&quot;</span>, <span class="at">values =</span> <span class="fu">c</span>(<span class="at">separate =</span> clr0d, <span class="at">mixed =</span> clr2)) <span class="sc">&amp;</span></span>
+<span id="cb175-26"><a href="mixed-models-with-r.html#cb175-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
 <p><img src="mixed_models_files/figure-html/unnamed-chunk-14-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <p><span class="math inline">\(\rightarrow\)</span> mixed model intercepts and slopes are less extreme</p>
 <blockquote>
 <p>In both cases the mixed model shrinks what would have been the by-group estimate, which would otherwise overfit in this scenario. This regularizing effect is yet another bonus when using mixed models.</p>
 </blockquote>
-<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb161-1"><a href="mixed-models-with-r.html#cb161-1" aria-hidden="true" tabindex="-1"></a>gpa_predictions <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">lmm_with_random_slope =</span> <span class="fu">predict</span>(gpa_mixed2)) <span class="sc">%&gt;%</span> </span>
-<span id="cb161-2"><a href="mixed-models-with-r.html#cb161-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(gpa_predictions, .)</span>
-<span id="cb161-3"><a href="mixed-models-with-r.html#cb161-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb161-4"><a href="mixed-models-with-r.html#cb161-4" aria-hidden="true" tabindex="-1"></a>gpa_mixed2_rc_wide <span class="ot">&lt;-</span> gpa_mixed2_rc <span class="sc">%&gt;%</span> </span>
-<span id="cb161-5"><a href="mixed-models-with-r.html#cb161-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(group_var, group, effect, value) <span class="sc">%&gt;%</span> </span>
-<span id="cb161-6"><a href="mixed-models-with-r.html#cb161-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> effect, <span class="at">values_from =</span> value)</span>
-<span id="cb161-7"><a href="mixed-models-with-r.html#cb161-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb161-8"><a href="mixed-models-with-r.html#cb161-8" aria-hidden="true" tabindex="-1"></a>student_select <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span></span>
-<span id="cb161-9"><a href="mixed-models-with-r.html#cb161-9" aria-hidden="true" tabindex="-1"></a>p_two_students <span class="ot">&lt;-</span> gpa_predictions <span class="sc">%&gt;%</span></span>
-<span id="cb161-10"><a href="mixed-models-with-r.html#cb161-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(student <span class="sc">%in%</span> student_select) <span class="sc">%&gt;%</span> </span>
-<span id="cb161-11"><a href="mixed-models-with-r.html#cb161-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> occasion)) <span class="sc">+</span></span>
-<span id="cb161-12"><a href="mixed-models-with-r.html#cb161-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> gpa, <span class="at">color =</span> student))<span class="sc">+</span></span>
-<span id="cb161-13"><a href="mixed-models-with-r.html#cb161-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">slope =</span> <span class="fu">c</span>(gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">2</span>]], </span>
-<span id="cb161-14"><a href="mixed-models-with-r.html#cb161-14" aria-hidden="true" tabindex="-1"></a>                                            gpa_mixed2_rc_wide<span class="sc">$</span>occasion[<span class="fu">as.numeric</span>(<span class="fu">as.character</span>(gpa_mixed2_rc_wide<span class="sc">$</span>group)) <span class="sc">%in%</span> student_select]), </span>
-<span id="cb161-15"><a href="mixed-models-with-r.html#cb161-15" aria-hidden="true" tabindex="-1"></a>                             <span class="at">intercept =</span>  <span class="fu">c</span>(gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">1</span>]], </span>
-<span id="cb161-16"><a href="mixed-models-with-r.html#cb161-16" aria-hidden="true" tabindex="-1"></a>                                            gpa_mixed2_rc_wide<span class="sc">$</span>Intercept[<span class="fu">as.numeric</span>(<span class="fu">as.character</span>(gpa_mixed2_rc_wide<span class="sc">$</span>group)) <span class="sc">%in%</span> student_select]),</span>
-<span id="cb161-17"><a href="mixed-models-with-r.html#cb161-17" aria-hidden="true" tabindex="-1"></a>                             <span class="at">model =</span> <span class="fu">c</span>(<span class="st">&quot;lm&quot;</span>, <span class="fu">as.character</span>(gpa_mixed2_rc_wide<span class="sc">$</span>group[<span class="fu">as.numeric</span>(<span class="fu">as.character</span>(gpa_mixed2_rc_wide<span class="sc">$</span>group)) <span class="sc">%in%</span> student_select]))),</span>
-<span id="cb161-18"><a href="mixed-models-with-r.html#cb161-18" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">slope =</span> slope, <span class="at">intercept =</span> intercept, <span class="at">color =</span> model), <span class="at">size =</span> .<span class="dv">6</span>) <span class="sc">+</span></span>
-<span id="cb161-19"><a href="mixed-models-with-r.html#cb161-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">lm =</span> clr2, <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> clr1, <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> clr0d), </span>
-<span id="cb161-20"><a href="mixed-models-with-r.html#cb161-20" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;lm&quot;</span>, <span class="st">&quot;lmm (student1)&quot;</span>, <span class="st">&quot;lmm (student2)&quot;</span>))</span>
-<span id="cb161-21"><a href="mixed-models-with-r.html#cb161-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb161-22"><a href="mixed-models-with-r.html#cb161-22" aria-hidden="true" tabindex="-1"></a>p_all_mod <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> gpa_predictions, <span class="fu">aes</span>(<span class="at">x =</span> occasion, <span class="at">y =</span> gpa)) <span class="sc">+</span></span>
-<span id="cb161-23"><a href="mixed-models-with-r.html#cb161-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">slope =</span> <span class="fu">c</span>(gpa_mixed2_rc_wide<span class="sc">$</span>occasion, gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">2</span>]]),</span>
-<span id="cb161-24"><a href="mixed-models-with-r.html#cb161-24" aria-hidden="true" tabindex="-1"></a>                            <span class="at">intercept =</span> <span class="fu">c</span>(gpa_mixed2_rc_wide<span class="sc">$</span>Intercept, gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">1</span>]]),</span>
-<span id="cb161-25"><a href="mixed-models-with-r.html#cb161-25" aria-hidden="true" tabindex="-1"></a>                            <span class="at">modeltype =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;lmm (random slope)&quot;</span>, <span class="fu">length</span>(gpa_mixed2_rc_wide<span class="sc">$</span>Intercept)), <span class="st">&quot;lm&quot;</span>)),</span>
-<span id="cb161-26"><a href="mixed-models-with-r.html#cb161-26" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">slope =</span> slope, <span class="at">intercept =</span> intercept, <span class="at">color =</span> modeltype), <span class="at">size =</span> .<span class="dv">6</span>) <span class="sc">+</span></span>
-<span id="cb161-27"><a href="mixed-models-with-r.html#cb161-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">lmm (random slope)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">clr_alpha</span>(clr0d ,.<span class="dv">6</span>), <span class="at">lm =</span> clr2))</span>
-<span id="cb161-28"><a href="mixed-models-with-r.html#cb161-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb161-29"><a href="mixed-models-with-r.html#cb161-29" aria-hidden="true" tabindex="-1"></a>p_two_students <span class="sc">+</span> p_all_mod <span class="sc">+</span></span>
-<span id="cb161-30"><a href="mixed-models-with-r.html#cb161-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">&quot;collect&quot;</span>) <span class="sc">&amp;</span></span>
-<span id="cb161-31"><a href="mixed-models-with-r.html#cb161-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="dv">0</span>,<span class="dv">5</span>) <span class="sc">&amp;</span> <span class="fu">ylim</span>(<span class="fl">2.2</span>, <span class="dv">4</span>) <span class="sc">&amp;</span></span>
-<span id="cb161-32"><a href="mixed-models-with-r.html#cb161-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="mixed-models-with-r.html#cb176-1" aria-hidden="true" tabindex="-1"></a>gpa_predictions <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">lmm_with_random_slope =</span> <span class="fu">predict</span>(gpa_mixed2)) <span class="sc">%&gt;%</span> </span>
+<span id="cb176-2"><a href="mixed-models-with-r.html#cb176-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(gpa_predictions, .)</span>
+<span id="cb176-3"><a href="mixed-models-with-r.html#cb176-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb176-4"><a href="mixed-models-with-r.html#cb176-4" aria-hidden="true" tabindex="-1"></a>gpa_mixed2_rc_wide <span class="ot">&lt;-</span> gpa_mixed2_rc <span class="sc">%&gt;%</span> </span>
+<span id="cb176-5"><a href="mixed-models-with-r.html#cb176-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(group_var, group, effect, value) <span class="sc">%&gt;%</span> </span>
+<span id="cb176-6"><a href="mixed-models-with-r.html#cb176-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> effect, <span class="at">values_from =</span> value)</span>
+<span id="cb176-7"><a href="mixed-models-with-r.html#cb176-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb176-8"><a href="mixed-models-with-r.html#cb176-8" aria-hidden="true" tabindex="-1"></a>student_select <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span></span>
+<span id="cb176-9"><a href="mixed-models-with-r.html#cb176-9" aria-hidden="true" tabindex="-1"></a>p_two_students <span class="ot">&lt;-</span> gpa_predictions <span class="sc">%&gt;%</span></span>
+<span id="cb176-10"><a href="mixed-models-with-r.html#cb176-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(student <span class="sc">%in%</span> student_select) <span class="sc">%&gt;%</span> </span>
+<span id="cb176-11"><a href="mixed-models-with-r.html#cb176-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> occasion)) <span class="sc">+</span></span>
+<span id="cb176-12"><a href="mixed-models-with-r.html#cb176-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> gpa, <span class="at">color =</span> student))<span class="sc">+</span></span>
+<span id="cb176-13"><a href="mixed-models-with-r.html#cb176-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">slope =</span> <span class="fu">c</span>(gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">2</span>]], </span>
+<span id="cb176-14"><a href="mixed-models-with-r.html#cb176-14" aria-hidden="true" tabindex="-1"></a>                                            gpa_mixed2_rc_wide<span class="sc">$</span>occasion[<span class="fu">as.numeric</span>(<span class="fu">as.character</span>(gpa_mixed2_rc_wide<span class="sc">$</span>group)) <span class="sc">%in%</span> student_select]), </span>
+<span id="cb176-15"><a href="mixed-models-with-r.html#cb176-15" aria-hidden="true" tabindex="-1"></a>                             <span class="at">intercept =</span>  <span class="fu">c</span>(gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">1</span>]], </span>
+<span id="cb176-16"><a href="mixed-models-with-r.html#cb176-16" aria-hidden="true" tabindex="-1"></a>                                            gpa_mixed2_rc_wide<span class="sc">$</span>Intercept[<span class="fu">as.numeric</span>(<span class="fu">as.character</span>(gpa_mixed2_rc_wide<span class="sc">$</span>group)) <span class="sc">%in%</span> student_select]),</span>
+<span id="cb176-17"><a href="mixed-models-with-r.html#cb176-17" aria-hidden="true" tabindex="-1"></a>                             <span class="at">model =</span> <span class="fu">c</span>(<span class="st">&quot;lm&quot;</span>, <span class="fu">as.character</span>(gpa_mixed2_rc_wide<span class="sc">$</span>group[<span class="fu">as.numeric</span>(<span class="fu">as.character</span>(gpa_mixed2_rc_wide<span class="sc">$</span>group)) <span class="sc">%in%</span> student_select]))),</span>
+<span id="cb176-18"><a href="mixed-models-with-r.html#cb176-18" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">slope =</span> slope, <span class="at">intercept =</span> intercept, <span class="at">color =</span> model), <span class="at">size =</span> .<span class="dv">6</span>) <span class="sc">+</span></span>
+<span id="cb176-19"><a href="mixed-models-with-r.html#cb176-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">lm =</span> clr2, <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> clr1, <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> clr0d), </span>
+<span id="cb176-20"><a href="mixed-models-with-r.html#cb176-20" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>( <span class="st">&quot;lm&quot;</span>, <span class="st">&quot;lmm (student1)&quot;</span>, <span class="st">&quot;lmm (student2)&quot;</span>))</span>
+<span id="cb176-21"><a href="mixed-models-with-r.html#cb176-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb176-22"><a href="mixed-models-with-r.html#cb176-22" aria-hidden="true" tabindex="-1"></a>p_all_mod <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> gpa_predictions, <span class="fu">aes</span>(<span class="at">x =</span> occasion, <span class="at">y =</span> gpa)) <span class="sc">+</span></span>
+<span id="cb176-23"><a href="mixed-models-with-r.html#cb176-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">slope =</span> <span class="fu">c</span>(gpa_mixed2_rc_wide<span class="sc">$</span>occasion, gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">2</span>]]),</span>
+<span id="cb176-24"><a href="mixed-models-with-r.html#cb176-24" aria-hidden="true" tabindex="-1"></a>                            <span class="at">intercept =</span> <span class="fu">c</span>(gpa_mixed2_rc_wide<span class="sc">$</span>Intercept, gpa_lm<span class="sc">$</span>coefficients[[<span class="dv">1</span>]]),</span>
+<span id="cb176-25"><a href="mixed-models-with-r.html#cb176-25" aria-hidden="true" tabindex="-1"></a>                            <span class="at">modeltype =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;lmm (random slope)&quot;</span>, <span class="fu">length</span>(gpa_mixed2_rc_wide<span class="sc">$</span>Intercept)), <span class="st">&quot;lm&quot;</span>)),</span>
+<span id="cb176-26"><a href="mixed-models-with-r.html#cb176-26" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">slope =</span> slope, <span class="at">intercept =</span> intercept, <span class="at">color =</span> modeltype), <span class="at">size =</span> .<span class="dv">6</span>) <span class="sc">+</span></span>
+<span id="cb176-27"><a href="mixed-models-with-r.html#cb176-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">lmm (random slope)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">clr_alpha</span>(clr0d ,.<span class="dv">6</span>), <span class="at">lm =</span> clr2))</span>
+<span id="cb176-28"><a href="mixed-models-with-r.html#cb176-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb176-29"><a href="mixed-models-with-r.html#cb176-29" aria-hidden="true" tabindex="-1"></a>p_two_students <span class="sc">+</span> p_all_mod <span class="sc">+</span></span>
+<span id="cb176-30"><a href="mixed-models-with-r.html#cb176-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">&quot;collect&quot;</span>) <span class="sc">&amp;</span></span>
+<span id="cb176-31"><a href="mixed-models-with-r.html#cb176-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="dv">0</span>,<span class="dv">5</span>) <span class="sc">&amp;</span> <span class="fu">ylim</span>(<span class="fl">2.2</span>, <span class="dv">4</span>) <span class="sc">&amp;</span></span>
+<span id="cb176-32"><a href="mixed-models-with-r.html#cb176-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
 <p><img src="mixed_models_files/figure-html/unnamed-chunk-15-1.svg" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="cross-classified-models" class="section level2" number="7.4">
 <h2><span class="header-section-number">7.4</span> Cross Classified models</h2>
 <p>Setups where data are grouped by several factors but these are not nested (<em>all</em> participants get to see <em>all</em> images).
 These are <em>crossed</em> random effects.</p>
-<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb162-1"><a href="mixed-models-with-r.html#cb162-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;data/pupils.RData&quot;</span>)</span>
-<span id="cb162-2"><a href="mixed-models-with-r.html#cb162-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb162-3"><a href="mixed-models-with-r.html#cb162-3" aria-hidden="true" tabindex="-1"></a>pupils <span class="sc">%&gt;%</span>  <span class="fu">head</span>() <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="mixed-models-with-r.html#cb177-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;data/pupils.RData&quot;</span>)</span>
+<span id="cb177-2"><a href="mixed-models-with-r.html#cb177-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb177-3"><a href="mixed-models-with-r.html#cb177-3" aria-hidden="true" tabindex="-1"></a>pupils <span class="sc">%&gt;%</span>  <span class="fu">head</span>() <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <colgroup>
 <col width="5%" />
@@ -1510,13 +1510,13 @@ These are <em>crossed</em> random effects.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="mixed-models-with-r.html#cb163-1" aria-hidden="true" tabindex="-1"></a>pupils_crossed <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
-<span id="cb163-2"><a href="mixed-models-with-r.html#cb163-2" aria-hidden="true" tabindex="-1"></a>  achievement <span class="sc">~</span> sex <span class="sc">+</span> ses <span class="sc">+</span></span>
-<span id="cb163-3"><a href="mixed-models-with-r.html#cb163-3" aria-hidden="true" tabindex="-1"></a>    ( <span class="dv">1</span> <span class="sc">|</span> primary_school_id ) <span class="sc">+</span> ( <span class="dv">1</span> <span class="sc">|</span> secondary_school_id ),</span>
-<span id="cb163-4"><a href="mixed-models-with-r.html#cb163-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> pupils</span>
-<span id="cb163-5"><a href="mixed-models-with-r.html#cb163-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb163-6"><a href="mixed-models-with-r.html#cb163-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb163-7"><a href="mixed-models-with-r.html#cb163-7" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(pupils_crossed) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="mixed-models-with-r.html#cb178-1" aria-hidden="true" tabindex="-1"></a>pupils_crossed <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
+<span id="cb178-2"><a href="mixed-models-with-r.html#cb178-2" aria-hidden="true" tabindex="-1"></a>  achievement <span class="sc">~</span> sex <span class="sc">+</span> ses <span class="sc">+</span></span>
+<span id="cb178-3"><a href="mixed-models-with-r.html#cb178-3" aria-hidden="true" tabindex="-1"></a>    ( <span class="dv">1</span> <span class="sc">|</span> primary_school_id ) <span class="sc">+</span> ( <span class="dv">1</span> <span class="sc">|</span> secondary_school_id ),</span>
+<span id="cb178-4"><a href="mixed-models-with-r.html#cb178-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> pupils</span>
+<span id="cb178-5"><a href="mixed-models-with-r.html#cb178-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb178-6"><a href="mixed-models-with-r.html#cb178-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb178-7"><a href="mixed-models-with-r.html#cb178-7" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(pupils_crossed) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1595,7 +1595,7 @@ These are <em>crossed</em> random effects.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="mixed-models-with-r.html#cb164-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(pupils_crossed, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="mixed-models-with-r.html#cb179-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(pupils_crossed, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1630,23 +1630,23 @@ These are <em>crossed</em> random effects.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb165-1"><a href="mixed-models-with-r.html#cb165-1" aria-hidden="true" tabindex="-1"></a>pupils_varicance_components_random_effects <span class="ot">&lt;-</span> <span class="fu">REsim</span>(pupils_crossed) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>()</span>
-<span id="cb165-2"><a href="mixed-models-with-r.html#cb165-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb165-3"><a href="mixed-models-with-r.html#cb165-3" aria-hidden="true" tabindex="-1"></a>pupils_varicance_components_random_effects <span class="sc">%&gt;%</span></span>
-<span id="cb165-4"><a href="mixed-models-with-r.html#cb165-4" aria-hidden="true" tabindex="-1"></a> <span class="fu">mutate</span>(<span class="at">sd_leveled =</span> sd <span class="sc">*</span> <span class="fu">qnorm</span>(<span class="dv">1</span> <span class="sc">-</span> ((<span class="dv">1</span> <span class="sc">-</span> sd_level)<span class="sc">/</span><span class="dv">2</span>)),</span>
-<span id="cb165-5"><a href="mixed-models-with-r.html#cb165-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">sig =</span> (median <span class="sc">+</span> sd_leveled) <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> (median <span class="sc">-</span> sd_leveled) <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb165-6"><a href="mixed-models-with-r.html#cb165-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(groupFctr) <span class="sc">%&gt;%</span> </span>
-<span id="cb165-7"><a href="mixed-models-with-r.html#cb165-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(groupFctr, median) <span class="sc">%&gt;%</span> </span>
-<span id="cb165-8"><a href="mixed-models-with-r.html#cb165-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb165-9"><a href="mixed-models-with-r.html#cb165-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(groupFctr, groupID) <span class="sc">%&gt;%</span> </span>
-<span id="cb165-10"><a href="mixed-models-with-r.html#cb165-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb165-11"><a href="mixed-models-with-r.html#cb165-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> rank)) <span class="sc">+</span></span>
-<span id="cb165-12"><a href="mixed-models-with-r.html#cb165-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> rank, <span class="at">y =</span> median <span class="sc">-</span> sd_leveled, <span class="at">yend =</span> median <span class="sc">+</span>  sd_leveled, <span class="at">color =</span> sig)) <span class="sc">+</span></span>
-<span id="cb165-13"><a href="mixed-models-with-r.html#cb165-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> median), <span class="at">size =</span> .<span class="dv">3</span>, <span class="at">alpha =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb165-14"><a href="mixed-models-with-r.html#cb165-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">size =</span> .<span class="dv">4</span>, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb165-15"><a href="mixed-models-with-r.html#cb165-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(groupFctr <span class="sc">~</span> ., <span class="at">scales =</span> <span class="st">&quot;free_x&quot;</span>) <span class="sc">+</span></span>
-<span id="cb165-16"><a href="mixed-models-with-r.html#cb165-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">TRUE</span><span class="st">`</span> <span class="ot">=</span> clr2, <span class="st">`</span><span class="at">FALSE</span><span class="st">`</span> <span class="ot">=</span> clr0d), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
-<span id="cb165-17"><a href="mixed-models-with-r.html#cb165-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Group&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Effect Range&quot;</span>, <span class="at">caption =</span> <span class="st">&quot;interval estimates of random effects&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="mixed-models-with-r.html#cb180-1" aria-hidden="true" tabindex="-1"></a>pupils_varicance_components_random_effects <span class="ot">&lt;-</span> <span class="fu">REsim</span>(pupils_crossed) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>()</span>
+<span id="cb180-2"><a href="mixed-models-with-r.html#cb180-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb180-3"><a href="mixed-models-with-r.html#cb180-3" aria-hidden="true" tabindex="-1"></a>pupils_varicance_components_random_effects <span class="sc">%&gt;%</span></span>
+<span id="cb180-4"><a href="mixed-models-with-r.html#cb180-4" aria-hidden="true" tabindex="-1"></a> <span class="fu">mutate</span>(<span class="at">sd_leveled =</span> sd <span class="sc">*</span> <span class="fu">qnorm</span>(<span class="dv">1</span> <span class="sc">-</span> ((<span class="dv">1</span> <span class="sc">-</span> sd_level)<span class="sc">/</span><span class="dv">2</span>)),</span>
+<span id="cb180-5"><a href="mixed-models-with-r.html#cb180-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">sig =</span> (median <span class="sc">+</span> sd_leveled) <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> (median <span class="sc">-</span> sd_leveled) <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb180-6"><a href="mixed-models-with-r.html#cb180-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(groupFctr) <span class="sc">%&gt;%</span> </span>
+<span id="cb180-7"><a href="mixed-models-with-r.html#cb180-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(groupFctr, median) <span class="sc">%&gt;%</span> </span>
+<span id="cb180-8"><a href="mixed-models-with-r.html#cb180-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb180-9"><a href="mixed-models-with-r.html#cb180-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(groupFctr, groupID) <span class="sc">%&gt;%</span> </span>
+<span id="cb180-10"><a href="mixed-models-with-r.html#cb180-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb180-11"><a href="mixed-models-with-r.html#cb180-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> rank)) <span class="sc">+</span></span>
+<span id="cb180-12"><a href="mixed-models-with-r.html#cb180-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> rank, <span class="at">y =</span> median <span class="sc">-</span> sd_leveled, <span class="at">yend =</span> median <span class="sc">+</span>  sd_leveled, <span class="at">color =</span> sig)) <span class="sc">+</span></span>
+<span id="cb180-13"><a href="mixed-models-with-r.html#cb180-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> median), <span class="at">size =</span> .<span class="dv">3</span>, <span class="at">alpha =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb180-14"><a href="mixed-models-with-r.html#cb180-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">size =</span> .<span class="dv">4</span>, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb180-15"><a href="mixed-models-with-r.html#cb180-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(groupFctr <span class="sc">~</span> ., <span class="at">scales =</span> <span class="st">&quot;free_x&quot;</span>) <span class="sc">+</span></span>
+<span id="cb180-16"><a href="mixed-models-with-r.html#cb180-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">TRUE</span><span class="st">`</span> <span class="ot">=</span> clr2, <span class="st">`</span><span class="at">FALSE</span><span class="st">`</span> <span class="ot">=</span> clr0d), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb180-17"><a href="mixed-models-with-r.html#cb180-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Group&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Effect Range&quot;</span>, <span class="at">caption =</span> <span class="st">&quot;interval estimates of random effects&quot;</span>)</span></code></pre></div>
 <p><img src="mixed_models_files/figure-html/unnamed-chunk-18-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <blockquote>
 <p>Note that we have the usual extensions here if desired. As an example, we could also do random slopes for student level characteristics.</p>
@@ -1655,8 +1655,8 @@ These are <em>crossed</em> random effects.</p>
 <div id="hierachical-structure" class="section level2" number="7.5">
 <h2><span class="header-section-number">7.5</span> Hierachical structure</h2>
 <p>These are setups, where different grouping factors are <em>nested</em> within each other (eg. cities, counties, states).</p>
-<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="mixed-models-with-r.html#cb166-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;data/nurses.RData&quot;</span>)</span>
-<span id="cb166-2"><a href="mixed-models-with-r.html#cb166-2" aria-hidden="true" tabindex="-1"></a>nurses <span class="sc">%&gt;%</span> <span class="fu">head</span>() <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="mixed-models-with-r.html#cb181-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;data/nurses.RData&quot;</span>)</span>
+<span id="cb181-2"><a href="mixed-models-with-r.html#cb181-2" aria-hidden="true" tabindex="-1"></a>nurses <span class="sc">%&gt;%</span> <span class="fu">head</span>() <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1754,13 +1754,13 @@ These are <em>crossed</em> random effects.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="mixed-models-with-r.html#cb167-1" aria-hidden="true" tabindex="-1"></a>nurses_hierach <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
-<span id="cb167-2"><a href="mixed-models-with-r.html#cb167-2" aria-hidden="true" tabindex="-1"></a>  stress <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> experience <span class="sc">+</span> treatment <span class="sc">+</span> wardtype <span class="sc">+</span> hospsize <span class="sc">+</span></span>
-<span id="cb167-3"><a href="mixed-models-with-r.html#cb167-3" aria-hidden="true" tabindex="-1"></a>    ( <span class="dv">1</span> <span class="sc">|</span> hospital) <span class="sc">+</span> ( <span class="dv">1</span> <span class="sc">|</span> hospital<span class="sc">:</span>ward), <span class="co"># together same as ( 1 | hospital / ward)</span></span>
-<span id="cb167-4"><a href="mixed-models-with-r.html#cb167-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> nurses</span>
-<span id="cb167-5"><a href="mixed-models-with-r.html#cb167-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb167-6"><a href="mixed-models-with-r.html#cb167-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb167-7"><a href="mixed-models-with-r.html#cb167-7" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(nurses_hierach) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="mixed-models-with-r.html#cb182-1" aria-hidden="true" tabindex="-1"></a>nurses_hierach <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
+<span id="cb182-2"><a href="mixed-models-with-r.html#cb182-2" aria-hidden="true" tabindex="-1"></a>  stress <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> experience <span class="sc">+</span> treatment <span class="sc">+</span> wardtype <span class="sc">+</span> hospsize <span class="sc">+</span></span>
+<span id="cb182-3"><a href="mixed-models-with-r.html#cb182-3" aria-hidden="true" tabindex="-1"></a>    ( <span class="dv">1</span> <span class="sc">|</span> hospital) <span class="sc">+</span> ( <span class="dv">1</span> <span class="sc">|</span> hospital<span class="sc">:</span>ward), <span class="co"># together same as ( 1 | hospital / ward)</span></span>
+<span id="cb182-4"><a href="mixed-models-with-r.html#cb182-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> nurses</span>
+<span id="cb182-5"><a href="mixed-models-with-r.html#cb182-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb182-6"><a href="mixed-models-with-r.html#cb182-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb182-7"><a href="mixed-models-with-r.html#cb182-7" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(nurses_hierach) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1848,7 +1848,7 @@ These are <em>crossed</em> random effects.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb168-1"><a href="mixed-models-with-r.html#cb168-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(nurses_hierach, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb183-1"><a href="mixed-models-with-r.html#cb183-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(nurses_hierach, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1883,40 +1883,40 @@ These are <em>crossed</em> random effects.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="mixed-models-with-r.html#cb169-1" aria-hidden="true" tabindex="-1"></a>nurses_varicance_components_random_effects <span class="ot">&lt;-</span> <span class="fu">REsim</span>(nurses_hierach) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>()</span>
-<span id="cb169-2"><a href="mixed-models-with-r.html#cb169-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb169-3"><a href="mixed-models-with-r.html#cb169-3" aria-hidden="true" tabindex="-1"></a>nurses_varicance_components_random_effects <span class="sc">%&gt;%</span></span>
-<span id="cb169-4"><a href="mixed-models-with-r.html#cb169-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sd_leveled =</span> sd <span class="sc">*</span> <span class="fu">qnorm</span>(<span class="dv">1</span> <span class="sc">-</span> ((<span class="dv">1</span> <span class="sc">-</span> sd_level)<span class="sc">/</span><span class="dv">2</span>)),</span>
-<span id="cb169-5"><a href="mixed-models-with-r.html#cb169-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">sig =</span> (median <span class="sc">+</span> sd_leveled) <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> (median <span class="sc">-</span> sd_leveled) <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb169-6"><a href="mixed-models-with-r.html#cb169-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(groupFctr) <span class="sc">%&gt;%</span> </span>
-<span id="cb169-7"><a href="mixed-models-with-r.html#cb169-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(groupFctr, median) <span class="sc">%&gt;%</span> </span>
-<span id="cb169-8"><a href="mixed-models-with-r.html#cb169-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb169-9"><a href="mixed-models-with-r.html#cb169-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(groupFctr, groupID) <span class="sc">%&gt;%</span> </span>
-<span id="cb169-10"><a href="mixed-models-with-r.html#cb169-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb169-11"><a href="mixed-models-with-r.html#cb169-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> rank)) <span class="sc">+</span></span>
-<span id="cb169-12"><a href="mixed-models-with-r.html#cb169-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> rank, <span class="at">y =</span> median <span class="sc">-</span> sd_leveled, <span class="at">yend =</span> median <span class="sc">+</span>  sd_leveled, <span class="at">color =</span> sig)) <span class="sc">+</span></span>
-<span id="cb169-13"><a href="mixed-models-with-r.html#cb169-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> median), <span class="at">size =</span> .<span class="dv">3</span>, <span class="at">alpha =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb169-14"><a href="mixed-models-with-r.html#cb169-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">size =</span> .<span class="dv">4</span>, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb169-15"><a href="mixed-models-with-r.html#cb169-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(groupFctr <span class="sc">~</span> ., <span class="at">scales =</span> <span class="st">&quot;free_x&quot;</span>) <span class="sc">+</span></span>
-<span id="cb169-16"><a href="mixed-models-with-r.html#cb169-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">TRUE</span><span class="st">`</span> <span class="ot">=</span> clr2, <span class="st">`</span><span class="at">FALSE</span><span class="st">`</span> <span class="ot">=</span> clr0d), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
-<span id="cb169-17"><a href="mixed-models-with-r.html#cb169-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="sc">-</span><span class="dv">2</span>,<span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb169-18"><a href="mixed-models-with-r.html#cb169-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Group&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Effect Range&quot;</span>, <span class="at">caption =</span> <span class="st">&quot;interval estimates of random effects&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="mixed-models-with-r.html#cb184-1" aria-hidden="true" tabindex="-1"></a>nurses_varicance_components_random_effects <span class="ot">&lt;-</span> <span class="fu">REsim</span>(nurses_hierach) <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>()</span>
+<span id="cb184-2"><a href="mixed-models-with-r.html#cb184-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb184-3"><a href="mixed-models-with-r.html#cb184-3" aria-hidden="true" tabindex="-1"></a>nurses_varicance_components_random_effects <span class="sc">%&gt;%</span></span>
+<span id="cb184-4"><a href="mixed-models-with-r.html#cb184-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sd_leveled =</span> sd <span class="sc">*</span> <span class="fu">qnorm</span>(<span class="dv">1</span> <span class="sc">-</span> ((<span class="dv">1</span> <span class="sc">-</span> sd_level)<span class="sc">/</span><span class="dv">2</span>)),</span>
+<span id="cb184-5"><a href="mixed-models-with-r.html#cb184-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">sig =</span> (median <span class="sc">+</span> sd_leveled) <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> (median <span class="sc">-</span> sd_leveled) <span class="sc">&lt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb184-6"><a href="mixed-models-with-r.html#cb184-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(groupFctr) <span class="sc">%&gt;%</span> </span>
+<span id="cb184-7"><a href="mixed-models-with-r.html#cb184-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(groupFctr, median) <span class="sc">%&gt;%</span> </span>
+<span id="cb184-8"><a href="mixed-models-with-r.html#cb184-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rank =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb184-9"><a href="mixed-models-with-r.html#cb184-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(groupFctr, groupID) <span class="sc">%&gt;%</span> </span>
+<span id="cb184-10"><a href="mixed-models-with-r.html#cb184-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb184-11"><a href="mixed-models-with-r.html#cb184-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> rank)) <span class="sc">+</span></span>
+<span id="cb184-12"><a href="mixed-models-with-r.html#cb184-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> rank, <span class="at">y =</span> median <span class="sc">-</span> sd_leveled, <span class="at">yend =</span> median <span class="sc">+</span>  sd_leveled, <span class="at">color =</span> sig)) <span class="sc">+</span></span>
+<span id="cb184-13"><a href="mixed-models-with-r.html#cb184-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> median), <span class="at">size =</span> .<span class="dv">3</span>, <span class="at">alpha =</span> .<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb184-14"><a href="mixed-models-with-r.html#cb184-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">size =</span> .<span class="dv">4</span>, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb184-15"><a href="mixed-models-with-r.html#cb184-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(groupFctr <span class="sc">~</span> ., <span class="at">scales =</span> <span class="st">&quot;free_x&quot;</span>) <span class="sc">+</span></span>
+<span id="cb184-16"><a href="mixed-models-with-r.html#cb184-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">TRUE</span><span class="st">`</span> <span class="ot">=</span> clr2, <span class="st">`</span><span class="at">FALSE</span><span class="st">`</span> <span class="ot">=</span> clr0d), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb184-17"><a href="mixed-models-with-r.html#cb184-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="sc">-</span><span class="dv">2</span>,<span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb184-18"><a href="mixed-models-with-r.html#cb184-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Group&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Effect Range&quot;</span>, <span class="at">caption =</span> <span class="st">&quot;interval estimates of random effects&quot;</span>)</span></code></pre></div>
 <p><img src="mixed_models_files/figure-html/unnamed-chunk-21-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <div id="crossed-vs.-nested" class="section level3" number="7.5.1">
 <h3><span class="header-section-number">7.5.1</span> Crossed vs. nested</h3>
-<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="mixed-models-with-r.html#cb170-1" aria-hidden="true" tabindex="-1"></a>nurses_hierach2 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
-<span id="cb170-2"><a href="mixed-models-with-r.html#cb170-2" aria-hidden="true" tabindex="-1"></a>  stress <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> experience <span class="sc">+</span> treatment <span class="sc">+</span> wardtype <span class="sc">+</span> hospsize <span class="sc">+</span></span>
-<span id="cb170-3"><a href="mixed-models-with-r.html#cb170-3" aria-hidden="true" tabindex="-1"></a>    ( <span class="dv">1</span> <span class="sc">|</span> hospital ) <span class="sc">+</span> ( <span class="dv">1</span> <span class="sc">|</span> hospital<span class="sc">:</span>wardid ), <span class="co"># needs to be wardid now because ward is duplicated over hospitals (not unique)</span></span>
-<span id="cb170-4"><a href="mixed-models-with-r.html#cb170-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> nurses</span>
-<span id="cb170-5"><a href="mixed-models-with-r.html#cb170-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb170-6"><a href="mixed-models-with-r.html#cb170-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb170-7"><a href="mixed-models-with-r.html#cb170-7" aria-hidden="true" tabindex="-1"></a>nurses_nested <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
-<span id="cb170-8"><a href="mixed-models-with-r.html#cb170-8" aria-hidden="true" tabindex="-1"></a>  stress <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> experience <span class="sc">+</span> treatment <span class="sc">+</span> wardtype <span class="sc">+</span> hospsize <span class="sc">+</span></span>
-<span id="cb170-9"><a href="mixed-models-with-r.html#cb170-9" aria-hidden="true" tabindex="-1"></a>    ( <span class="dv">1</span> <span class="sc">|</span> hospital ) <span class="sc">+</span> ( <span class="dv">1</span> <span class="sc">|</span> wardid ),</span>
-<span id="cb170-10"><a href="mixed-models-with-r.html#cb170-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> nurses</span>
-<span id="cb170-11"><a href="mixed-models-with-r.html#cb170-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb185-1"><a href="mixed-models-with-r.html#cb185-1" aria-hidden="true" tabindex="-1"></a>nurses_hierach2 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
+<span id="cb185-2"><a href="mixed-models-with-r.html#cb185-2" aria-hidden="true" tabindex="-1"></a>  stress <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> experience <span class="sc">+</span> treatment <span class="sc">+</span> wardtype <span class="sc">+</span> hospsize <span class="sc">+</span></span>
+<span id="cb185-3"><a href="mixed-models-with-r.html#cb185-3" aria-hidden="true" tabindex="-1"></a>    ( <span class="dv">1</span> <span class="sc">|</span> hospital ) <span class="sc">+</span> ( <span class="dv">1</span> <span class="sc">|</span> hospital<span class="sc">:</span>wardid ), <span class="co"># needs to be wardid now because ward is duplicated over hospitals (not unique)</span></span>
+<span id="cb185-4"><a href="mixed-models-with-r.html#cb185-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> nurses</span>
+<span id="cb185-5"><a href="mixed-models-with-r.html#cb185-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb185-6"><a href="mixed-models-with-r.html#cb185-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb185-7"><a href="mixed-models-with-r.html#cb185-7" aria-hidden="true" tabindex="-1"></a>nurses_nested <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
+<span id="cb185-8"><a href="mixed-models-with-r.html#cb185-8" aria-hidden="true" tabindex="-1"></a>  stress <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> experience <span class="sc">+</span> treatment <span class="sc">+</span> wardtype <span class="sc">+</span> hospsize <span class="sc">+</span></span>
+<span id="cb185-9"><a href="mixed-models-with-r.html#cb185-9" aria-hidden="true" tabindex="-1"></a>    ( <span class="dv">1</span> <span class="sc">|</span> hospital ) <span class="sc">+</span> ( <span class="dv">1</span> <span class="sc">|</span> wardid ),</span>
+<span id="cb185-10"><a href="mixed-models-with-r.html#cb185-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> nurses</span>
+<span id="cb185-11"><a href="mixed-models-with-r.html#cb185-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Nested:</p>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb171-1"><a href="mixed-models-with-r.html#cb171-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(nurses_hierach2) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="mixed-models-with-r.html#cb186-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(nurses_hierach2) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -2004,7 +2004,7 @@ These are <em>crossed</em> random effects.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="mixed-models-with-r.html#cb172-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(nurses_hierach2, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="mixed-models-with-r.html#cb187-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(nurses_hierach2, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -2040,7 +2040,7 @@ These are <em>crossed</em> random effects.</p>
 </tbody>
 </table>
 <p>Crossed:</p>
-<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb173-1"><a href="mixed-models-with-r.html#cb173-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(nurses_nested) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="mixed-models-with-r.html#cb188-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(nurses_nested) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -2128,7 +2128,7 @@ These are <em>crossed</em> random effects.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="mixed-models-with-r.html#cb174-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(nurses_nested, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb189-1"><a href="mixed-models-with-r.html#cb189-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(nurses_nested, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -2167,32 +2167,32 @@ These are <em>crossed</em> random effects.</p>
 </div>
 <div id="residual-structure" class="section level2" number="7.6">
 <h2><span class="header-section-number">7.6</span> Residual Structure</h2>
-<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="mixed-models-with-r.html#cb175-1" aria-hidden="true" tabindex="-1"></a>rescov <span class="ot">&lt;-</span> <span class="cf">function</span>(model, data) {</span>
-<span id="cb175-2"><a href="mixed-models-with-r.html#cb175-2" aria-hidden="true" tabindex="-1"></a>  var.d <span class="ot">&lt;-</span> <span class="fu">crossprod</span>(<span class="fu">getME</span>(model,<span class="st">&quot;Lambdat&quot;</span>))</span>
-<span id="cb175-3"><a href="mixed-models-with-r.html#cb175-3" aria-hidden="true" tabindex="-1"></a>  Zt <span class="ot">&lt;-</span> <span class="fu">getME</span>(model,<span class="st">&quot;Zt&quot;</span>)</span>
-<span id="cb175-4"><a href="mixed-models-with-r.html#cb175-4" aria-hidden="true" tabindex="-1"></a>  vr <span class="ot">&lt;-</span> <span class="fu">sigma</span>(model)<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb175-5"><a href="mixed-models-with-r.html#cb175-5" aria-hidden="true" tabindex="-1"></a>  var.b <span class="ot">&lt;-</span> vr<span class="sc">*</span>(<span class="fu">t</span>(Zt) <span class="sc">%*%</span> var.d <span class="sc">%*%</span> Zt)</span>
-<span id="cb175-6"><a href="mixed-models-with-r.html#cb175-6" aria-hidden="true" tabindex="-1"></a>  sI <span class="ot">&lt;-</span> vr <span class="sc">*</span> <span class="fu">Diagonal</span>(<span class="fu">nrow</span>(data))</span>
-<span id="cb175-7"><a href="mixed-models-with-r.html#cb175-7" aria-hidden="true" tabindex="-1"></a>  var.y <span class="ot">&lt;-</span> var.b <span class="sc">+</span> sI</span>
-<span id="cb175-8"><a href="mixed-models-with-r.html#cb175-8" aria-hidden="true" tabindex="-1"></a>  var.y  <span class="sc">%&gt;%</span></span>
-<span id="cb175-9"><a href="mixed-models-with-r.html#cb175-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.matrix</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb175-10"><a href="mixed-models-with-r.html#cb175-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb175-11"><a href="mixed-models-with-r.html#cb175-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">row =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb175-12"><a href="mixed-models-with-r.html#cb175-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>row, <span class="at">names_to =</span> <span class="st">&quot;column&quot;</span>)</span>
-<span id="cb175-13"><a href="mixed-models-with-r.html#cb175-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb175-14"><a href="mixed-models-with-r.html#cb175-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb175-15"><a href="mixed-models-with-r.html#cb175-15" aria-hidden="true" tabindex="-1"></a><span class="fu">rescov</span>(gpa_mixed, gpa) <span class="sc">%&gt;%</span></span>
-<span id="cb175-16"><a href="mixed-models-with-r.html#cb175-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(column),</span>
-<span id="cb175-17"><a href="mixed-models-with-r.html#cb175-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> <span class="fu">as.numeric</span>(row)) <span class="sc">%&gt;%</span> </span>
-<span id="cb175-18"><a href="mixed-models-with-r.html#cb175-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">between</span>(x,<span class="dv">0</span>,<span class="dv">30</span>),</span>
-<span id="cb175-19"><a href="mixed-models-with-r.html#cb175-19" aria-hidden="true" tabindex="-1"></a>         <span class="fu">between</span>(y,<span class="dv">0</span>,<span class="dv">30</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb175-20"><a href="mixed-models-with-r.html#cb175-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x,</span>
-<span id="cb175-21"><a href="mixed-models-with-r.html#cb175-21" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> y,</span>
-<span id="cb175-22"><a href="mixed-models-with-r.html#cb175-22" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill =</span> value)) <span class="sc">+</span></span>
-<span id="cb175-23"><a href="mixed-models-with-r.html#cb175-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="fu">aes</span>(<span class="at">color =</span> <span class="fu">after_scale</span>(<span class="fu">clr_darken</span>(fill))), <span class="at">size =</span> .<span class="dv">3</span>, <span class="at">width =</span> .<span class="dv">9</span>, <span class="at">height =</span> .<span class="dv">9</span>) <span class="sc">+</span></span>
-<span id="cb175-24"><a href="mixed-models-with-r.html#cb175-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(clr0, <span class="fu">clr_lighten</span>(clr1), <span class="fu">clr_lighten</span>(clr2))) <span class="sc">+</span></span>
-<span id="cb175-25"><a href="mixed-models-with-r.html#cb175-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_reverse</span>() <span class="sc">+</span></span>
-<span id="cb175-26"><a href="mixed-models-with-r.html#cb175-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_equal</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb190-1"><a href="mixed-models-with-r.html#cb190-1" aria-hidden="true" tabindex="-1"></a>rescov <span class="ot">&lt;-</span> <span class="cf">function</span>(model, data) {</span>
+<span id="cb190-2"><a href="mixed-models-with-r.html#cb190-2" aria-hidden="true" tabindex="-1"></a>  var.d <span class="ot">&lt;-</span> <span class="fu">crossprod</span>(<span class="fu">getME</span>(model,<span class="st">&quot;Lambdat&quot;</span>))</span>
+<span id="cb190-3"><a href="mixed-models-with-r.html#cb190-3" aria-hidden="true" tabindex="-1"></a>  Zt <span class="ot">&lt;-</span> <span class="fu">getME</span>(model,<span class="st">&quot;Zt&quot;</span>)</span>
+<span id="cb190-4"><a href="mixed-models-with-r.html#cb190-4" aria-hidden="true" tabindex="-1"></a>  vr <span class="ot">&lt;-</span> <span class="fu">sigma</span>(model)<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb190-5"><a href="mixed-models-with-r.html#cb190-5" aria-hidden="true" tabindex="-1"></a>  var.b <span class="ot">&lt;-</span> vr<span class="sc">*</span>(<span class="fu">t</span>(Zt) <span class="sc">%*%</span> var.d <span class="sc">%*%</span> Zt)</span>
+<span id="cb190-6"><a href="mixed-models-with-r.html#cb190-6" aria-hidden="true" tabindex="-1"></a>  sI <span class="ot">&lt;-</span> vr <span class="sc">*</span> <span class="fu">Diagonal</span>(<span class="fu">nrow</span>(data))</span>
+<span id="cb190-7"><a href="mixed-models-with-r.html#cb190-7" aria-hidden="true" tabindex="-1"></a>  var.y <span class="ot">&lt;-</span> var.b <span class="sc">+</span> sI</span>
+<span id="cb190-8"><a href="mixed-models-with-r.html#cb190-8" aria-hidden="true" tabindex="-1"></a>  var.y  <span class="sc">%&gt;%</span></span>
+<span id="cb190-9"><a href="mixed-models-with-r.html#cb190-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.matrix</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb190-10"><a href="mixed-models-with-r.html#cb190-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb190-11"><a href="mixed-models-with-r.html#cb190-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">row =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb190-12"><a href="mixed-models-with-r.html#cb190-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>row, <span class="at">names_to =</span> <span class="st">&quot;column&quot;</span>)</span>
+<span id="cb190-13"><a href="mixed-models-with-r.html#cb190-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb190-14"><a href="mixed-models-with-r.html#cb190-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb190-15"><a href="mixed-models-with-r.html#cb190-15" aria-hidden="true" tabindex="-1"></a><span class="fu">rescov</span>(gpa_mixed, gpa) <span class="sc">%&gt;%</span></span>
+<span id="cb190-16"><a href="mixed-models-with-r.html#cb190-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(column),</span>
+<span id="cb190-17"><a href="mixed-models-with-r.html#cb190-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> <span class="fu">as.numeric</span>(row)) <span class="sc">%&gt;%</span> </span>
+<span id="cb190-18"><a href="mixed-models-with-r.html#cb190-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">between</span>(x,<span class="dv">0</span>,<span class="dv">30</span>),</span>
+<span id="cb190-19"><a href="mixed-models-with-r.html#cb190-19" aria-hidden="true" tabindex="-1"></a>         <span class="fu">between</span>(y,<span class="dv">0</span>,<span class="dv">30</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb190-20"><a href="mixed-models-with-r.html#cb190-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x,</span>
+<span id="cb190-21"><a href="mixed-models-with-r.html#cb190-21" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> y,</span>
+<span id="cb190-22"><a href="mixed-models-with-r.html#cb190-22" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill =</span> value)) <span class="sc">+</span></span>
+<span id="cb190-23"><a href="mixed-models-with-r.html#cb190-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="fu">aes</span>(<span class="at">color =</span> <span class="fu">after_scale</span>(<span class="fu">clr_darken</span>(fill))), <span class="at">size =</span> .<span class="dv">3</span>, <span class="at">width =</span> .<span class="dv">9</span>, <span class="at">height =</span> .<span class="dv">9</span>) <span class="sc">+</span></span>
+<span id="cb190-24"><a href="mixed-models-with-r.html#cb190-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradientn</span>(<span class="at">colours =</span> <span class="fu">c</span>(clr0, <span class="fu">clr_lighten</span>(clr1), <span class="fu">clr_lighten</span>(clr2))) <span class="sc">+</span></span>
+<span id="cb190-25"><a href="mixed-models-with-r.html#cb190-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_reverse</span>() <span class="sc">+</span></span>
+<span id="cb190-26"><a href="mixed-models-with-r.html#cb190-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_equal</span>()</span></code></pre></div>
 <p><img src="mixed_models_files/figure-html/unnamed-chunk-25-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <p>covariance matrix for a cluster (compound symmetry):</p>
 <p><span class="math display">\[
@@ -2261,16 +2261,16 @@ So now we have something like this, where <span class="math inline">\(\rho\)</sp
 \]</span></p>
 <div id="heterogeneous-variance" class="section level3" number="7.6.1">
 <h3><span class="header-section-number">7.6.1</span> Heterogeneous variance</h3>
-<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="mixed-models-with-r.html#cb176-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nlme)</span>
-<span id="cb176-2"><a href="mixed-models-with-r.html#cb176-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb176-3"><a href="mixed-models-with-r.html#cb176-3" aria-hidden="true" tabindex="-1"></a>gpa_hetero_res <span class="ot">&lt;-</span> <span class="fu">lme</span>(</span>
-<span id="cb176-4"><a href="mixed-models-with-r.html#cb176-4" aria-hidden="true" tabindex="-1"></a>  gpa <span class="sc">~</span> occasion,</span>
-<span id="cb176-5"><a href="mixed-models-with-r.html#cb176-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> gpa,</span>
-<span id="cb176-6"><a href="mixed-models-with-r.html#cb176-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">random =</span> <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> student,</span>
-<span id="cb176-7"><a href="mixed-models-with-r.html#cb176-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">weights =</span> <span class="fu">varIdent</span>(<span class="at">form =</span> <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> occasion)</span>
-<span id="cb176-8"><a href="mixed-models-with-r.html#cb176-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb176-9"><a href="mixed-models-with-r.html#cb176-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb176-10"><a href="mixed-models-with-r.html#cb176-10" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(gpa_hetero_res) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb191-1"><a href="mixed-models-with-r.html#cb191-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nlme)</span>
+<span id="cb191-2"><a href="mixed-models-with-r.html#cb191-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb191-3"><a href="mixed-models-with-r.html#cb191-3" aria-hidden="true" tabindex="-1"></a>gpa_hetero_res <span class="ot">&lt;-</span> <span class="fu">lme</span>(</span>
+<span id="cb191-4"><a href="mixed-models-with-r.html#cb191-4" aria-hidden="true" tabindex="-1"></a>  gpa <span class="sc">~</span> occasion,</span>
+<span id="cb191-5"><a href="mixed-models-with-r.html#cb191-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> gpa,</span>
+<span id="cb191-6"><a href="mixed-models-with-r.html#cb191-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">random =</span> <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> student,</span>
+<span id="cb191-7"><a href="mixed-models-with-r.html#cb191-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">weights =</span> <span class="fu">varIdent</span>(<span class="at">form =</span> <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> occasion)</span>
+<span id="cb191-8"><a href="mixed-models-with-r.html#cb191-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb191-9"><a href="mixed-models-with-r.html#cb191-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb191-10"><a href="mixed-models-with-r.html#cb191-10" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(gpa_hetero_res) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -2304,7 +2304,7 @@ So now we have something like this, where <span class="math inline">\(\rho\)</sp
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="mixed-models-with-r.html#cb177-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(gpa_hetero_res, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb192-1"><a href="mixed-models-with-r.html#cb192-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(gpa_hetero_res, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -2333,20 +2333,20 @@ So now we have something like this, where <span class="math inline">\(\rho\)</sp
 </tbody>
 </table>
 <p>alternative approach to heterogeneous variance models:</p>
-<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="mixed-models-with-r.html#cb178-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmmTMB)</span>
-<span id="cb178-2"><a href="mixed-models-with-r.html#cb178-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb178-3"><a href="mixed-models-with-r.html#cb178-3" aria-hidden="true" tabindex="-1"></a>gpa_hetero_res2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(</span>
-<span id="cb178-4"><a href="mixed-models-with-r.html#cb178-4" aria-hidden="true" tabindex="-1"></a>  gpa <span class="sc">~</span> occasion <span class="sc">+</span> ( <span class="dv">1</span> <span class="sc">|</span> student ) <span class="sc">+</span> <span class="fu">diag</span>( <span class="dv">0</span> <span class="sc">+</span> occas <span class="sc">|</span> student ),</span>
-<span id="cb178-5"><a href="mixed-models-with-r.html#cb178-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> gpa</span>
-<span id="cb178-6"><a href="mixed-models-with-r.html#cb178-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="mixed-models-with-r.html#cb193-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmmTMB)</span>
+<span id="cb193-2"><a href="mixed-models-with-r.html#cb193-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb193-3"><a href="mixed-models-with-r.html#cb193-3" aria-hidden="true" tabindex="-1"></a>gpa_hetero_res2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(</span>
+<span id="cb193-4"><a href="mixed-models-with-r.html#cb193-4" aria-hidden="true" tabindex="-1"></a>  gpa <span class="sc">~</span> occasion <span class="sc">+</span> ( <span class="dv">1</span> <span class="sc">|</span> student ) <span class="sc">+</span> <span class="fu">diag</span>( <span class="dv">0</span> <span class="sc">+</span> occas <span class="sc">|</span> student ),</span>
+<span id="cb193-5"><a href="mixed-models-with-r.html#cb193-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> gpa</span>
+<span id="cb193-6"><a href="mixed-models-with-r.html#cb193-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Comparing results of {nlme} and {glmmTMB}</p>
-<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="mixed-models-with-r.html#cb179-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">relative_val =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">coef</span>(gpa_hetero_res<span class="sc">$</span>modelStruct<span class="sc">$</span>varStruct, <span class="at">unconstrained =</span> <span class="cn">FALSE</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb179-2"><a href="mixed-models-with-r.html#cb179-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">absolute_val =</span> (relative_val <span class="sc">*</span> gpa_hetero_res<span class="sc">$</span>sigma) <span class="sc">^</span> <span class="dv">2</span>,</span>
-<span id="cb179-3"><a href="mixed-models-with-r.html#cb179-3" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">hetero_res (nlme)</span><span class="st">`</span> <span class="ot">=</span> mixedup<span class="sc">::</span><span class="fu">extract_het_var</span>(gpa_hetero_res, <span class="at">scale =</span> <span class="st">&#39;var&#39;</span>, <span class="at">digits =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb179-4"><a href="mixed-models-with-r.html#cb179-4" aria-hidden="true" tabindex="-1"></a>           <span class="fu">unname</span>() <span class="sc">%&gt;%</span> <span class="fu">as.vector</span>() <span class="sc">%&gt;%</span> <span class="fu">t</span>() <span class="sc">%&gt;%</span> .[,<span class="dv">1</span>],</span>
-<span id="cb179-5"><a href="mixed-models-with-r.html#cb179-5" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">hetero_res (glmmTMB)</span><span class="st">`</span> <span class="ot">=</span> mixedup<span class="sc">::</span><span class="fu">extract_het_var</span>(gpa_hetero_res2, <span class="at">scale =</span> <span class="st">&#39;var&#39;</span>, <span class="at">digits =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb179-6"><a href="mixed-models-with-r.html#cb179-6" aria-hidden="true" tabindex="-1"></a>           dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>group) <span class="sc">%&gt;%</span> <span class="fu">unname</span>() <span class="sc">%&gt;%</span> <span class="fu">as.vector</span>() <span class="sc">%&gt;%</span> <span class="fu">t</span>() <span class="sc">%&gt;%</span> .[,<span class="dv">1</span>]) <span class="sc">%&gt;%</span> </span>
-<span id="cb179-7"><a href="mixed-models-with-r.html#cb179-7" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb194-1"><a href="mixed-models-with-r.html#cb194-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">relative_val =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">coef</span>(gpa_hetero_res<span class="sc">$</span>modelStruct<span class="sc">$</span>varStruct, <span class="at">unconstrained =</span> <span class="cn">FALSE</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb194-2"><a href="mixed-models-with-r.html#cb194-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">absolute_val =</span> (relative_val <span class="sc">*</span> gpa_hetero_res<span class="sc">$</span>sigma) <span class="sc">^</span> <span class="dv">2</span>,</span>
+<span id="cb194-3"><a href="mixed-models-with-r.html#cb194-3" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">hetero_res (nlme)</span><span class="st">`</span> <span class="ot">=</span> mixedup<span class="sc">::</span><span class="fu">extract_het_var</span>(gpa_hetero_res, <span class="at">scale =</span> <span class="st">&#39;var&#39;</span>, <span class="at">digits =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb194-4"><a href="mixed-models-with-r.html#cb194-4" aria-hidden="true" tabindex="-1"></a>           <span class="fu">unname</span>() <span class="sc">%&gt;%</span> <span class="fu">as.vector</span>() <span class="sc">%&gt;%</span> <span class="fu">t</span>() <span class="sc">%&gt;%</span> .[,<span class="dv">1</span>],</span>
+<span id="cb194-5"><a href="mixed-models-with-r.html#cb194-5" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">hetero_res (glmmTMB)</span><span class="st">`</span> <span class="ot">=</span> mixedup<span class="sc">::</span><span class="fu">extract_het_var</span>(gpa_hetero_res2, <span class="at">scale =</span> <span class="st">&#39;var&#39;</span>, <span class="at">digits =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb194-6"><a href="mixed-models-with-r.html#cb194-6" aria-hidden="true" tabindex="-1"></a>           dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>group) <span class="sc">%&gt;%</span> <span class="fu">unname</span>() <span class="sc">%&gt;%</span> <span class="fu">as.vector</span>() <span class="sc">%&gt;%</span> <span class="fu">t</span>() <span class="sc">%&gt;%</span> .[,<span class="dv">1</span>]) <span class="sc">%&gt;%</span> </span>
+<span id="cb194-7"><a href="mixed-models-with-r.html#cb194-7" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -2398,14 +2398,14 @@ So now we have something like this, where <span class="math inline">\(\rho\)</sp
 </div>
 <div id="autocorrelation" class="section level3" number="7.6.2">
 <h3><span class="header-section-number">7.6.2</span> Autocorrelation</h3>
-<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="mixed-models-with-r.html#cb180-1" aria-hidden="true" tabindex="-1"></a>gpa_autocorr <span class="ot">&lt;-</span> <span class="fu">lme</span>(</span>
-<span id="cb180-2"><a href="mixed-models-with-r.html#cb180-2" aria-hidden="true" tabindex="-1"></a>  gpa <span class="sc">~</span> occasion,</span>
-<span id="cb180-3"><a href="mixed-models-with-r.html#cb180-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> gpa,</span>
-<span id="cb180-4"><a href="mixed-models-with-r.html#cb180-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">random =</span> <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> student,</span>
-<span id="cb180-5"><a href="mixed-models-with-r.html#cb180-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">correlation =</span> <span class="fu">corAR1</span>(<span class="at">form =</span> <span class="sc">~</span> occasion)</span>
-<span id="cb180-6"><a href="mixed-models-with-r.html#cb180-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb180-7"><a href="mixed-models-with-r.html#cb180-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb180-8"><a href="mixed-models-with-r.html#cb180-8" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(gpa_autocorr) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="mixed-models-with-r.html#cb195-1" aria-hidden="true" tabindex="-1"></a>gpa_autocorr <span class="ot">&lt;-</span> <span class="fu">lme</span>(</span>
+<span id="cb195-2"><a href="mixed-models-with-r.html#cb195-2" aria-hidden="true" tabindex="-1"></a>  gpa <span class="sc">~</span> occasion,</span>
+<span id="cb195-3"><a href="mixed-models-with-r.html#cb195-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> gpa,</span>
+<span id="cb195-4"><a href="mixed-models-with-r.html#cb195-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">random =</span> <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> student,</span>
+<span id="cb195-5"><a href="mixed-models-with-r.html#cb195-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">correlation =</span> <span class="fu">corAR1</span>(<span class="at">form =</span> <span class="sc">~</span> occasion)</span>
+<span id="cb195-6"><a href="mixed-models-with-r.html#cb195-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb195-7"><a href="mixed-models-with-r.html#cb195-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb195-8"><a href="mixed-models-with-r.html#cb195-8" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(gpa_autocorr) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -2439,7 +2439,7 @@ So now we have something like this, where <span class="math inline">\(\rho\)</sp
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="mixed-models-with-r.html#cb181-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(gpa_autocorr, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="mixed-models-with-r.html#cb196-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(gpa_autocorr, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -2467,13 +2467,13 @@ So now we have something like this, where <span class="math inline">\(\rho\)</sp
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="mixed-models-with-r.html#cb182-1" aria-hidden="true" tabindex="-1"></a>gpa_autocorr2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(</span>
-<span id="cb182-2"><a href="mixed-models-with-r.html#cb182-2" aria-hidden="true" tabindex="-1"></a>  gpa <span class="sc">~</span> occasion <span class="sc">+</span> <span class="fu">ar1</span>( <span class="dv">0</span> <span class="sc">+</span> occas <span class="sc">|</span> student ) <span class="sc">+</span> ( <span class="dv">1</span> <span class="sc">|</span> student ),</span>
-<span id="cb182-3"><a href="mixed-models-with-r.html#cb182-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># occas is cotegorical version of occasion</span></span>
-<span id="cb182-4"><a href="mixed-models-with-r.html#cb182-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> gpa</span>
-<span id="cb182-5"><a href="mixed-models-with-r.html#cb182-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb182-6"><a href="mixed-models-with-r.html#cb182-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb182-7"><a href="mixed-models-with-r.html#cb182-7" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(gpa_autocorr2) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="mixed-models-with-r.html#cb197-1" aria-hidden="true" tabindex="-1"></a>gpa_autocorr2 <span class="ot">&lt;-</span> <span class="fu">glmmTMB</span>(</span>
+<span id="cb197-2"><a href="mixed-models-with-r.html#cb197-2" aria-hidden="true" tabindex="-1"></a>  gpa <span class="sc">~</span> occasion <span class="sc">+</span> <span class="fu">ar1</span>( <span class="dv">0</span> <span class="sc">+</span> occas <span class="sc">|</span> student ) <span class="sc">+</span> ( <span class="dv">1</span> <span class="sc">|</span> student ),</span>
+<span id="cb197-3"><a href="mixed-models-with-r.html#cb197-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># occas is cotegorical version of occasion</span></span>
+<span id="cb197-4"><a href="mixed-models-with-r.html#cb197-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> gpa</span>
+<span id="cb197-5"><a href="mixed-models-with-r.html#cb197-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb197-6"><a href="mixed-models-with-r.html#cb197-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb197-7"><a href="mixed-models-with-r.html#cb197-7" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(gpa_autocorr2) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -2507,7 +2507,7 @@ So now we have something like this, where <span class="math inline">\(\rho\)</sp
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb183-1"><a href="mixed-models-with-r.html#cb183-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(gpa_autocorr2, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="mixed-models-with-r.html#cb198-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(gpa_autocorr2, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -2542,16 +2542,16 @@ So now we have something like this, where <span class="math inline">\(\rho\)</sp
 </div>
 <div id="generalized-linear-mixed-models" class="section level2" number="7.7">
 <h2><span class="header-section-number">7.7</span> Generalized Linear Mixed Models</h2>
-<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="mixed-models-with-r.html#cb184-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;data/speed_dating.RData&quot;</span>)</span>
-<span id="cb184-2"><a href="mixed-models-with-r.html#cb184-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb184-3"><a href="mixed-models-with-r.html#cb184-3" aria-hidden="true" tabindex="-1"></a>sdating <span class="ot">&lt;-</span> <span class="fu">glmer</span>(</span>
-<span id="cb184-4"><a href="mixed-models-with-r.html#cb184-4" aria-hidden="true" tabindex="-1"></a>  decision <span class="sc">~</span> sex <span class="sc">+</span> samerace <span class="sc">+</span> attractive_sc <span class="sc">+</span> sincere_sc <span class="sc">+</span> intelligent_sc <span class="sc">+</span></span>
-<span id="cb184-5"><a href="mixed-models-with-r.html#cb184-5" aria-hidden="true" tabindex="-1"></a>    ( <span class="dv">1</span> <span class="sc">|</span> iid),</span>
-<span id="cb184-6"><a href="mixed-models-with-r.html#cb184-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> speed_dating,</span>
-<span id="cb184-7"><a href="mixed-models-with-r.html#cb184-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> binomial</span>
-<span id="cb184-8"><a href="mixed-models-with-r.html#cb184-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb184-9"><a href="mixed-models-with-r.html#cb184-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb184-10"><a href="mixed-models-with-r.html#cb184-10" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(sdating) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="mixed-models-with-r.html#cb199-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;data/speed_dating.RData&quot;</span>)</span>
+<span id="cb199-2"><a href="mixed-models-with-r.html#cb199-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb199-3"><a href="mixed-models-with-r.html#cb199-3" aria-hidden="true" tabindex="-1"></a>sdating <span class="ot">&lt;-</span> <span class="fu">glmer</span>(</span>
+<span id="cb199-4"><a href="mixed-models-with-r.html#cb199-4" aria-hidden="true" tabindex="-1"></a>  decision <span class="sc">~</span> sex <span class="sc">+</span> samerace <span class="sc">+</span> attractive_sc <span class="sc">+</span> sincere_sc <span class="sc">+</span> intelligent_sc <span class="sc">+</span></span>
+<span id="cb199-5"><a href="mixed-models-with-r.html#cb199-5" aria-hidden="true" tabindex="-1"></a>    ( <span class="dv">1</span> <span class="sc">|</span> iid),</span>
+<span id="cb199-6"><a href="mixed-models-with-r.html#cb199-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> speed_dating,</span>
+<span id="cb199-7"><a href="mixed-models-with-r.html#cb199-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> binomial</span>
+<span id="cb199-8"><a href="mixed-models-with-r.html#cb199-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb199-9"><a href="mixed-models-with-r.html#cb199-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb199-10"><a href="mixed-models-with-r.html#cb199-10" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixed_effects</span>(sdating) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -2621,7 +2621,7 @@ So now we have something like this, where <span class="math inline">\(\rho\)</sp
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb185-1"><a href="mixed-models-with-r.html#cb185-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(sdating, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="mixed-models-with-r.html#cb200-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_vc</span>(sdating, <span class="at">ci_level =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -2653,15 +2653,15 @@ So now we have something like this, where <span class="math inline">\(\rho\)</sp
 <div id="model-comparison" class="section level3" number="7.8.1">
 <h3><span class="header-section-number">7.8.1</span> Model comparison</h3>
 <p>Using AIC <em>can help</em>, but should not used to <em>make</em> the decision—reasoning about the implications of the used models should.</p>
-<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="mixed-models-with-r.html#cb186-1" aria-hidden="true" tabindex="-1"></a>gpa_1 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(gpa <span class="sc">~</span> occasion <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> occasion <span class="sc">|</span> student), <span class="at">data =</span> gpa)</span>
-<span id="cb186-2"><a href="mixed-models-with-r.html#cb186-2" aria-hidden="true" tabindex="-1"></a>gpa_2 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(gpa <span class="sc">~</span> occasion <span class="sc">+</span> sex <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> occasion <span class="sc">|</span> student), <span class="at">data =</span> gpa)</span>
-<span id="cb186-3"><a href="mixed-models-with-r.html#cb186-3" aria-hidden="true" tabindex="-1"></a>gpa_3 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(gpa <span class="sc">~</span> occasion <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> student), <span class="at">data =</span> gpa)</span>
-<span id="cb186-4"><a href="mixed-models-with-r.html#cb186-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb186-5"><a href="mixed-models-with-r.html#cb186-5" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(<span class="at">gpa_1 =</span> gpa_1, <span class="at">gpa_2 =</span> gpa_2, <span class="at">gpa_3 =</span> gpa_3) <span class="sc">%&gt;%</span></span>
-<span id="cb186-6"><a href="mixed-models-with-r.html#cb186-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_df</span>(<span class="cf">function</span>(mod) <span class="fu">data.frame</span>(<span class="at">AIC =</span> <span class="fu">AIC</span>(mod)), <span class="at">.id =</span> <span class="st">&#39;model&#39;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb186-7"><a href="mixed-models-with-r.html#cb186-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(AIC) <span class="sc">%&gt;%</span> </span>
-<span id="cb186-8"><a href="mixed-models-with-r.html#cb186-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Δ AIC</span><span class="st">`</span> <span class="ot">=</span> AIC <span class="sc">-</span> <span class="fu">min</span>(AIC)) <span class="sc">%&gt;%</span> </span>
-<span id="cb186-9"><a href="mixed-models-with-r.html#cb186-9" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="mixed-models-with-r.html#cb201-1" aria-hidden="true" tabindex="-1"></a>gpa_1 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(gpa <span class="sc">~</span> occasion <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> occasion <span class="sc">|</span> student), <span class="at">data =</span> gpa)</span>
+<span id="cb201-2"><a href="mixed-models-with-r.html#cb201-2" aria-hidden="true" tabindex="-1"></a>gpa_2 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(gpa <span class="sc">~</span> occasion <span class="sc">+</span> sex <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> occasion <span class="sc">|</span> student), <span class="at">data =</span> gpa)</span>
+<span id="cb201-3"><a href="mixed-models-with-r.html#cb201-3" aria-hidden="true" tabindex="-1"></a>gpa_3 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(gpa <span class="sc">~</span> occasion <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> student), <span class="at">data =</span> gpa)</span>
+<span id="cb201-4"><a href="mixed-models-with-r.html#cb201-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb201-5"><a href="mixed-models-with-r.html#cb201-5" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(<span class="at">gpa_1 =</span> gpa_1, <span class="at">gpa_2 =</span> gpa_2, <span class="at">gpa_3 =</span> gpa_3) <span class="sc">%&gt;%</span></span>
+<span id="cb201-6"><a href="mixed-models-with-r.html#cb201-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_df</span>(<span class="cf">function</span>(mod) <span class="fu">data.frame</span>(<span class="at">AIC =</span> <span class="fu">AIC</span>(mod)), <span class="at">.id =</span> <span class="st">&#39;model&#39;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb201-7"><a href="mixed-models-with-r.html#cb201-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(AIC) <span class="sc">%&gt;%</span> </span>
+<span id="cb201-8"><a href="mixed-models-with-r.html#cb201-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Δ AIC</span><span class="st">`</span> <span class="ot">=</span> AIC <span class="sc">-</span> <span class="fu">min</span>(AIC)) <span class="sc">%&gt;%</span> </span>
+<span id="cb201-9"><a href="mixed-models-with-r.html#cb201-9" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">

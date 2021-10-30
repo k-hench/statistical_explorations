@@ -93,7 +93,7 @@ sum(samples$proportion_water < .5) / length(samples$proportion_water)
 ```
 
 ```
-#> [1] 0.1797
+#> [1] 0.1761
 ```
 
 ```r
@@ -101,7 +101,7 @@ sum(samples$proportion_water > .5 & samples$proportion_water < .75) / length(sam
 ```
 
 ```
-#> [1] 0.5976
+#> [1] 0.6023
 ```
 
 ```r
@@ -147,7 +147,6 @@ plot_intervals(x_bounds = c(.5, .75), x_line = c(.5, .75))
 ```
 
 <img src="rethinking_c3_files/figure-html/unnamed-chunk-5-1.svg" width="672" style="display: block; margin: auto;" />
-
 
 ### Intervals of defined mass
 
@@ -245,7 +244,6 @@ p_point_estimates + p_loss + p_loss_quad +
 
 ## sample to simulate prediction
 
-
 binomial likelihood
 
 $$
@@ -267,7 +265,7 @@ rbinom( 10, size = 2, prob = .7)
 ```
 
 ```
-#>  [1] 2 2 1 2 2 1 1 0 1 2
+#>  [1] 1 2 2 1 1 1 2 0 2 2
 ```
 
 ```r
@@ -276,6 +274,7 @@ create_dummy_w <- function(size, prob){
          size = size,
          prob = prob)
 }
+
 dummy_w <- create_dummy_w(size = 9, prob = .7)
 
 dummy_w %>% 
@@ -293,7 +292,7 @@ dummy_w %>%
 
 ```r
 tibble(size = rep(c(3,6,9), each = 3),
-       prob = rep(c(.3,.6,.9),3)) %>% 
+       prob = rep(c(.3,.6,.9), 3)) %>% 
   pmap_dfr(create_dummy_w) %>% 
   group_by(x, size , prob) %>% 
   count() %>% 
@@ -309,22 +308,42 @@ tibble(size = rep(c(3,6,9), each = 3),
 <img src="rethinking_c3_files/figure-html/unnamed-chunk-10-1.svg" width="672" style="display: block; margin: auto;" />
 
 
+```r
+grid_data <- grid_approx(n_grid = 10^4 + 1, L = 6, W = 3,
+                         prior = function(x){rep(1, length(x))}) %>% 
+  mutate(idx = 1:(10^4 + 1))
+
+grid_data %>% 
+  ggplot(aes(x = p_grid))+
+  geom_line(aes(y = posterior, color = "posterior")) +
+  scale_color_manual(values = c(posterior = clr1), guide = "none") +
+  theme(legend.position = "bottom")
+```
+
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-11-1.svg" width="672" style="display: block; margin: auto;" />
+
 
 ```r
-f_posterior <- function(x){dbinom(x = 6, size = 9, prob = x)}
-f_posterior_dens <- function(x){ f_posterior(x) / integrate(f = f_posterior, lower = 0, upper = 1)[[1]]}
+samples <- grid_data %>% 
+  slice_sample(n = 10^5 , weight_by = posterior, replace = TRUE) %>% 
+  mutate(w = purrr::map_dbl(p_grid, rbinom, n = 1, size = 9),
+         seq = map(w, .f = function(x){sample(x = rep(c("W","L"), c(x, 9-x)),
+                                                    size = 9,
+                                                    replace = FALSE)}),
+         max_run_length = map_dbl(seq,.f = function(x){rle(x)$lengths %>% max()}),
+         n_switches = map_dbl(seq,.f = function(x){(rle(x)$lengths %>% length()) -1}))
 
-grid_points <- grid_points <- tibble(x = seq(.1,.9, by = .1),
-                      y = f_posterior_dens(x))
-
-p_posterior <- ggplot() +
-  stat_function(fun = f_posterior_dens,
-                geom = "area", color = clr0d, fill = fll0,xlim = c(0,1)) +
-  geom_segment(data = grid_points, aes(x = x, xend = x, y = 0, yend = y),
-               color = clr1, linetype = 3) +
-  geom_point(data = grid_points, aes(x = x, y = y),
+p_posterior <- grid_data %>% 
+  ggplot(aes(x = p_grid, y = posterior)) +
+  geom_area(color = clr0d, fill = fll0) +
+  geom_segment(data = grid_data %>% filter(idx %in% (1+ (1:9)*1000)),
+               aes(xend = p_grid,
+                   yend = 0, size = posterior),
+               color = fll1) +
+  geom_point(data = grid_data %>% filter(idx %in% (1+ (1:9)*1000)),
                color = clr1) +
-  labs(x = "probability of water", y = "density")
+  scale_size_continuous(range = c(.1, 1), guide = "none") +
+  labs(x = "probability of water", y = "density", title = "Posterior Probability")
 
 simulate_binom <- function(probability, n_draws = 10^5, size = 9) {
   rbinom(n_draws, size = size, prob = probability) 
@@ -337,21 +356,18 @@ d_small <- tibble(probability = seq(from = .1, to = .9, by = .1)) %>%
 p_small <- d_small %>% 
   ggplot(aes(x = draws)) +
   geom_bar(stat = "count", color = clr1, fill = fll1, width = .6) +
-  facet_wrap(probability ~ ., nrow = 1)
+  facet_wrap(probability ~ ., nrow = 1)+
+  labs(title = "Sampling Distributions")
 
-dist_posterior <- tibble(n_water = rbinom(10^4, size = 9, prob = samples$proportion_water),
-                         seq = map(n_water, .f = function(x){sample(x = rep(c("W","L"), c(x, 9-x)),
-                                                                    size = 9,
-                                                                    replace = FALSE)}),
-                         max_run_length = map_dbl(seq,.f = function(x){rle(x)$lengths %>% max()}),
-                         n_switches = map_dbl(seq,.f = function(x){(rle(x)$lengths %>% length()) -1})) 
-
-p_posterior_predictive <- dist_posterior %>% 
-  ggplot(aes(x = factor(n_water))) +
-  geom_bar(stat = "count", color = clr1, fill = fll1, width = .6) +
-  labs(x = "number of water samples")
+p_posterior_predictive <- samples %>% 
+  ggplot(aes(x = factor(w))) +
+  geom_bar(stat = "count",
+           aes(color = w == 6 ,
+               fill = after_scale(clr_alpha(color, .3))),
+           width = .6) +
+  scale_color_manual(values = c(`TRUE` = clr1, `FALSE` = clr0d), guide = "none") +
+  labs(x = "number of water samples", title = "Posterior Predictive Distribution")
 ```
-
 
 
 ```r
@@ -360,8 +376,15 @@ p_posterior /
   p_posterior_predictive
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-12-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-13-1.svg" width="672" style="display: block; margin: auto;" />
 
+```r
+sum( samples$w == 6 ) / length( samples$w )
+```
+
+```
+#> [1] 0.20118
+```
 
 
 ```r
@@ -369,14 +392,14 @@ globe_data <- c("w", "l", "w", "w", "w", "l", "w", "l", "w")
 globe_run_length <- rle(globe_data)$lengths %>% max()
 globe_n_switches <- (rle(globe_data)$lengths %>% length()) -1 
 
-p_run_length <- dist_posterior %>% 
+p_run_length <- samples %>% 
   ggplot(aes(x = factor(max_run_length))) +
   geom_bar(stat = "count", aes(color = max_run_length == globe_run_length, 
                                fill = after_scale(clr_alpha(color))), width = .6) +
   scale_color_manual(values = c(`TRUE` = clr2, `FALSE` = clr0d), guide = "none") +
   labs(x = "longest run length")
 
-p_switches <- dist_posterior %>% 
+p_switches <- samples %>% 
   ggplot(aes(x = factor(n_switches))) +
   geom_bar(stat = "count", aes(color = n_switches == globe_n_switches, 
                                fill = after_scale(clr_alpha(color))), width = .6) +
@@ -385,7 +408,7 @@ p_switches <- dist_posterior %>%
 p_run_length + p_switches
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-13-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-14-1.svg" width="672" style="display: block; margin: auto;" />
 
 ---
 
@@ -421,7 +444,7 @@ ggplot(aes(x = p_grid)) +
         legend.position = "bottom")
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-15-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-16-1.svg" width="672" style="display: block; margin: auto;" />
 
 **E1**
 
@@ -546,13 +569,15 @@ p_e7 <- easy_data %>%
 p_e6 + p_e7
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-22-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-23-1.svg" width="672" style="display: block; margin: auto;" />
 
 **M1**
 
 
 ```r
-grid_data <- grid_approx(n_grid = 10^4, L = 8, W = 7)
+grid_data <- grid_approx(n_grid = 10^4 + 1, L = 8, W = 7,
+                         prior = function(x){rep(1, length(x))}) %>% 
+  mutate(idx = 1:(10^4 + 1))
 
 grid_data %>% 
   ggplot(aes(x = p_grid))+
@@ -561,72 +586,59 @@ grid_data %>%
   theme(legend.position = "bottom")
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-23-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-24-1.svg" width="672" style="display: block; margin: auto;" />
 
 **M2**
 
 
 ```r
-samples <- tibble(sample = 1:(10^5),
-                  proportion_water = sample(x = grid_data$p_grid, size = length(sample),
-                                            prob = grid_data$posterior, replace = TRUE))
+samples <- grid_data %>% 
+  slice_sample(n = 10^5 , weight_by = posterior, replace = TRUE) %>% 
+  mutate(w = purrr::map_dbl(p_grid, rbinom, n = 1, size = 15))
 
-HPDI(samples$proportion_water, prob = .9)
+HPDI(samples$p_grid, prob = .9)
 ```
 
 ```
-#>      |0.9      0.9| 
-#> 0.3325333 0.7212721
+#>   |0.9   0.9| 
+#> 0.3329 0.7218
 ```
 
 **M3**
 
 
 ```r
-f_posterior <- function(x){dbinom(x = 8, size = 15, prob = x)}
-f_posterior_dens <- function(x){ f_posterior(x) / integrate(f = f_posterior, lower = 0, upper = 1)[[1]]}
-
-grid_points <- grid_points <- tibble(x = seq(.1, .9, by = .1),
-                      y = f_posterior_dens(x))
-
-p_posterior <- ggplot() +
-  stat_function(fun = f_posterior_dens,
-                geom = "area", color = clr0d, fill = fll0,xlim = c(0,1)) +
-  geom_segment(data = grid_points, aes(x = x, xend = x, y = 0, yend = y),
-               color = clr1, linetype = 3) +
-  geom_point(data = grid_points, aes(x = x, y = y),
-               color = clr1) +
-  labs(x = "probability of water", y = "density")
-
-simulate_binom <- function(probability, n_draws = 10^5, size = 15) {
-  rbinom(n_draws, size = size, prob = probability) 
-}
+p_posterior <- grid_data %>% 
+  ggplot(aes(x = p_grid, y = posterior)) +
+  geom_area(color = clr0d, fill = fll0) +
+  geom_segment(data = grid_data %>% filter(idx %in% (1+ (1:9)*1000)),
+               aes(xend = p_grid,
+                   yend = 0, size = posterior),
+               color = fll2) +
+  geom_point(data = grid_data %>% filter(idx %in% (1+ (1:9)*1000)),
+               color = clr2) +
+  scale_size_continuous(range = c(.1, 1), guide = "none") +
+  labs(x = "probability of water", y = "density", title = "Posterior Probability")
 
 d_small <- tibble(probability = seq(from = .1, to = .9, by = .1)) %>% 
-  mutate(draws = purrr::map(probability, simulate_binom)) %>% 
+  mutate(draws = purrr::map(probability, simulate_binom, size = 15)) %>% 
   unnest(draws)
 
 p_small <- d_small %>% 
   ggplot(aes(x = draws)) +
-  geom_bar(stat = "count", color = clr1, fill = fll1, width = .6) +
-  facet_wrap(probability ~ ., nrow = 1)
+  geom_bar(stat = "count", color = clr2, fill = fll2, width = .6) +
+  facet_wrap(probability ~ ., nrow = 1)+
+  labs(title = "Sampling Distributions")
 
-dist_posterior <- tibble(n_water = rbinom(10^4, size = 15, prob = samples$proportion_water),
-                         seq = map(n_water, .f = function(x){sample(x = rep(c("W","L"), c(x, 15-x)),
-                                                                    size = 15,
-                                                                    replace = FALSE)}),
-                         max_run_length = map_dbl(seq,.f = function(x){rle(x)$lengths %>% max()}),
-                         n_switches = map_dbl(seq,.f = function(x){(rle(x)$lengths %>% length()) -1})) 
-
-p_posterior_predictive <- dist_posterior %>%
-  ggplot(aes(x = factor(n_water))) +
-  geom_bar(stat = "count", aes(color = n_water == 8 ,
-                               fill = after_scale(clr_alpha(color, .3))),
+p_posterior_predictive <- samples %>% 
+  ggplot(aes(x = factor(w))) +
+  geom_bar(stat = "count",
+           aes(color = w == 8 ,
+               fill = after_scale(clr_alpha(color, .3))),
            width = .6) +
-  scale_color_manual(values = c(`TRUE` = clr1, `FALSE` = clr0d), guide = "none") +
-  labs(x = "number of water samples")
+  scale_color_manual(values = c(`TRUE` = clr2, `FALSE` = clr0d), guide = "none") +
+  labs(x = "number of water samples", title = "Posterior Predictive Distribution")
 ```
-
 
 
 ```r
@@ -635,121 +647,99 @@ p_posterior /
   p_posterior_predictive
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-26-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-27-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
-sum( dist_posterior$n_water == 8 ) / length( dist_posterior$n_water )
+sum( samples$w == 8 ) / length( samples$w )
 ```
 
 ```
-#> [1] 0.1462
+#> [1] 0.14738
 ```
 
 **M4**
 
 
 ```r
-dist_posterior <- tibble(n_water = rbinom(10^4, size = 9, prob = samples$proportion_water),
-                         seq = map(n_water, .f = function(x){sample(x = rep(c("W","L"), c(x, 9-x)),
-                                                                    size = 9,
-                                                                    replace = FALSE)}),
-                         max_run_length = map_dbl(seq,.f = function(x){rle(x)$lengths %>% max()}),
-                         n_switches = map_dbl(seq,.f = function(x){(rle(x)$lengths %>% length()) -1})) 
+samples <- grid_data %>% 
+  slice_sample(n = 10^5 , weight_by = posterior, replace = TRUE) %>% 
+  mutate(w = purrr::map_dbl(p_grid, rbinom, n = 1, size = 9))
 
-dist_posterior %>%
-  ggplot(aes(x = factor(n_water))) +
-  geom_bar(stat = "count", aes(color = n_water == 6 ,
-                               fill = after_scale(clr_alpha(color, .3))),
+samples %>% 
+  ggplot(aes(x = factor(w))) +
+  geom_bar(stat = "count",
+           aes(color = w == 6 ,
+               fill = after_scale(clr_alpha(color, .3))),
            width = .6) +
-  scale_color_manual(values = c(`TRUE` = clr1, `FALSE` = clr0d), guide = "none") +
-  labs(x = "number of water samples")
+  scale_color_manual(values = c(`TRUE` = clr2, `FALSE` = clr0d), guide = "none") +
+  labs(x = "number of water samples", title = "Posterior Predictive Distribution")
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-27-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-28-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
-sum( dist_posterior$n_water == 6 ) / length( dist_posterior$n_water )
+sum( samples$w == 6 ) / length( samples$w )
 ```
 
 ```
-#> [1] 0.175
+#> [1] 0.17634
 ```
 
 **M5**
 
 
 ```r
-grid_data <- grid_approx(n_grid = 10^4, L = 8, W = 7, prior = function(x){if_else(x < .5, 0, 1)})
-
-grid_data %>% 
-  ggplot(aes(x = p_grid))+
-  geom_line(aes(y = posterior, color = "posterior")) +
-  scale_color_manual(values = c(posterior = clr1), guide = "none") +
-  theme(legend.position = "bottom")
-```
-
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-28-1.svg" width="672" style="display: block; margin: auto;" />
-
-
-
-```r
-samples <- tibble(sample = 1:(10^5),
-                  proportion_water = sample(x = grid_data$p_grid, size = length(sample),
-                                            prob = grid_data$posterior, replace = TRUE))
-
-HPDI(samples$proportion_water, prob = .9)
-```
-
-```
-#>      |0.9      0.9| 
-#> 0.5000500 0.7127713
+grid_data <- grid_approx(n_grid = 10^4 + 1, L = 8, W = 7,
+                         prior = function(x){if_else(x < .5, 0, 1)}) %>% 
+  mutate(idx = 1:(10^4 + 1))
 ```
 
 
 ```r
-#<<CURRENT STATUS>>#
-f_posterior <- function(x){dbinom(x = 8, size = 15, prob = x)}
-f_posterior_dens <- function(x){ f_posterior(x) / integrate(f = f_posterior, lower = 0, upper = 1)[[1]]}
+samples <- grid_data %>% 
+  slice_sample(n = 10^5 , weight_by = posterior, replace = TRUE) %>% 
+  mutate(w = purrr::map_dbl(p_grid, rbinom, n = 1, size = 15))
 
-grid_points <- grid_points <- tibble(x = seq(.1, .9, by = .1),
-                      y = f_posterior_dens(x))
+HPDI(samples$p_grid, prob = .9)
+```
 
-p_posterior <- ggplot() +
-  stat_function(fun = f_posterior_dens,
-                geom = "area", color = clr0d, fill = fll0,xlim = c(0,1)) +
-  geom_segment(data = grid_points, aes(x = x, xend = x, y = 0, yend = y),
-               color = clr2, linetype = 3) +
-  geom_point(data = grid_points, aes(x = x, y = y),
+```
+#>   |0.9   0.9| 
+#> 0.5000 0.7117
+```
+
+
+```r
+p_posterior <- grid_data %>% 
+  ggplot(aes(x = p_grid, y = posterior)) +
+  geom_area(color = clr0d, fill = fll0) +
+  geom_segment(data = grid_data %>% filter(idx %in% (1+ (1:9)*1000)),
+               aes(xend = p_grid,
+                   yend = 0, size = posterior),
+               color = fll2) +
+  geom_point(data = grid_data %>% filter(idx %in% (1+ (1:9)*1000)),
                color = clr2) +
-  labs(x = "probability of water", y = "density")
-
-simulate_binom <- function(probability, n_draws = 10^5, size = 15) {
-  rbinom(n_draws, size = size, prob = probability) 
-}
+  scale_size_continuous(range = c(.1, 1), guide = "none") +
+  labs(x = "probability of water", y = "density", title = "Posterior Probability")
 
 d_small <- tibble(probability = seq(from = .1, to = .9, by = .1)) %>% 
-  mutate(draws = purrr::map(probability, simulate_binom)) %>% 
+  mutate(draws = purrr::map(probability, simulate_binom, size = 15)) %>% 
   unnest(draws)
 
 p_small <- d_small %>% 
   ggplot(aes(x = draws)) +
   geom_bar(stat = "count", color = clr2, fill = fll2, width = .6) +
-  facet_wrap(probability ~ ., nrow = 1)
+  facet_wrap(probability ~ ., nrow = 1)+
+  labs(title = "Sampling Distributions")
 
-dist_posterior <- tibble(n_water = rbinom(10^4, size = 15, prob = samples$proportion_water),
-                         seq = map(n_water, .f = function(x){sample(x = rep(c("W","L"), c(x, 15-x)),
-                                                                    size = 15,
-                                                                    replace = FALSE)}),
-                         max_run_length = map_dbl(seq,.f = function(x){rle(x)$lengths %>% max()}),
-                         n_switches = map_dbl(seq,.f = function(x){(rle(x)$lengths %>% length()) -1})) 
-
-p_posterior_predictive <- dist_posterior %>%
-  ggplot(aes(x = factor(n_water))) +
-  geom_bar(stat = "count", aes(color = n_water == 8 ,
-                               fill = after_scale(clr_alpha(color, .3))),
+p_posterior_predictive <- samples %>% 
+  ggplot(aes(x = factor(w))) +
+  geom_bar(stat = "count",
+           aes(color = w == 8 ,
+               fill = after_scale(clr_alpha(color, .3))),
            width = .6) +
   scale_color_manual(values = c(`TRUE` = clr2, `FALSE` = clr0d), guide = "none") +
-  labs(x = "number of water samples")
+  labs(x = "number of water samples", title = "Posterior Predictive Distribution")
 ```
 
 
@@ -759,15 +749,198 @@ p_posterior /
   p_posterior_predictive
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-31-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-32-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
-sum( dist_posterior$n_water == 8 ) / length( dist_posterior$n_water )
+sum( samples$w == 8 ) / length( samples$w )
 ```
 
 ```
-#> [1] 0.1561
+#> [1] 0.15846
 ```
+
+**M6**
+
+
+```r
+random_tosses <- function(n, n_grid = 1e4, n_posterior_sample = 1e4,
+                          prior = function(x){rep(1, length(x))}){
+  
+  grid_data <- tibble(p_grid = seq(0, 1, length.out = n_grid),
+                      prior = prior(p_grid),
+                      likelihood = dbinom(rbinom(1, size = n, prob = .7),
+                                          size = n, prob = p_grid),
+                      posterior_unstand = likelihood * prior,
+                      posterior = posterior_unstand / sum(posterior_unstand))
+  
+  samples <- grid_data %>% 
+    slice_sample(n = n_posterior_sample, weight_by = posterior, replace = TRUE)
+  
+  tibble(n = n,
+         grid_data = list(grid_data),
+         samples = list(samples),
+         hpdi = list(HPDI(samples[[1]]$p_grid, prob = .99)),
+         hpdi_width = diff(hpdi[[1]]))
+}
+
+
+c(c(1:10),((1:100) *30)) %>% 
+  map_dfr(random_tosses) %>% 
+  ggplot(aes(x = n, y = hpdi_width)) +
+  geom_point(aes(color = hpdi_width < .05)) +
+  geom_hline(yintercept = .05, color = "black", linetype = 3) +
+  scale_color_manual(values = c(`FALSE` = clr0d, `TRUE` = clr2),
+                     guide = "none")
+```
+
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-33-1.svg" width="672" style="display: block; margin: auto;" />
+
+**H1**
+
+
+```r
+library(rethinking)
+data(homeworkch3)
+
+n_grid <- 1e4 + 1
+grid_data <- tibble(p_grid = seq(0, 1, length.out = n_grid),
+                    prior = (function(x){rep(1, length(x))})(p_grid),
+                    likelihood = dbinom(sum(birth1 + birth2),
+                                        size = length(c(birth1, birth2)),
+                                        prob = p_grid),
+                    posterior_unstand = likelihood * prior,
+                    posterior = posterior_unstand / sum(posterior_unstand))
+
+samples <- grid_data %>% 
+  slice_sample(n = 1e5,
+               weight_by = posterior, replace = TRUE)
+
+(mode_posterior <- chainmode(samples$p_grid))
+```
+
+```
+#> [1] 0.5547754
+```
+
+```r
+grid_data %>% 
+  ggplot(aes(x = p_grid, y = posterior)) +
+  geom_area(color = clr0d, fill = fll0, size = .5) +
+  geom_vline(xintercept = mode_posterior, color = clr2, linetype = 3)
+```
+
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-34-1.svg" width="672" style="display: block; margin: auto;" />
+
+**H2**
+
+
+```r
+(percentile_intervals <- tibble(boundary = c("lower", "upper"),
+       p50 = HPDI(samples$p_grid, prob = .5),
+       p89 = HPDI(samples$p_grid, prob = .89),
+       p97 = HPDI(samples$p_grid, prob = .97))) %>% 
+  knitr::kable()
+```
+
+
+
+|boundary |    p50|    p89|    p97|
+|:--------|------:|------:|------:|
+|lower    | 0.5306| 0.4977| 0.4775|
+|upper    | 0.5778| 0.6090| 0.6274|
+
+```r
+grid_data %>% 
+  ggplot(aes(x = p_grid, y = posterior)) +
+  stat_function(fun = function(x){demp(x = x, obs = samples$p_grid)},
+                geom = "line", color = clr0d, xlim = c(0,1), n = 501) +
+  stat_function(fun = function(x){demp(x = x, obs = samples$p_grid)},
+                geom = "area", color = clr2, fill = clr_alpha(fll2,.2),
+                xlim = percentile_intervals$p50, n = 501) +
+  stat_function(fun = function(x){demp(x = x, obs = samples$p_grid)},
+                geom = "area", color = clr2, fill = clr_alpha(fll2,.2),
+                xlim = percentile_intervals$p89, n = 501) +
+  stat_function(fun = function(x){demp(x = x, obs = samples$p_grid)},
+                geom = "area", color = clr2, fill = clr_alpha(fll2,.2),
+                xlim = percentile_intervals$p97, n = 501)
+```
+
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-35-1.svg" width="672" style="display: block; margin: auto;" />
+
+**H3**
+
+
+```r
+random_births <- grid_data %>% 
+  slice_sample(n = 1e4,
+               weight_by = posterior, replace = TRUE) %>% 
+  mutate(births = map(p_grid, .f = function(x){rbinom(n = 200, size = 1, prob = x)}),
+         n_boys = map_dbl(births, sum),
+         n_girls = 200 - n_boys,
+         n_boys_firstborn = map_dbl(births, function(x){ sum(x[1:100]) }))
+
+sum(random_births$n_boys < sum(birth1 + birth2)) / sum(birth1 + birth2)
+```
+
+```
+#> [1] 43.45946
+```
+
+```r
+p_all <- random_births %>% 
+  ggplot(aes(x = n_boys)) +
+  geom_density(color = clr0d, fill = fll0) +
+  geom_vline(xintercept = sum(birth1 + birth2),
+             color = clr2, linetype = 3) +
+  scale_x_continuous(limits = c(0, 200)) 
+
+p_first <- random_births %>% 
+  ggplot(aes(x = n_boys_firstborn)) +
+  geom_density(color = clr0d, fill = fll0) +
+  geom_vline(xintercept = sum(birth1),
+             color = clr2, linetype = 3) +
+  scale_x_continuous(limits = c(0, 100)) 
+
+p_all + p_first
+```
+
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-36-1.svg" width="672" style="display: block; margin: auto;" />
+
+**H5**
+
+
+```r
+births_first_girl <- tibble(birth1 = birth1,
+                            birth2 = birth2) %>% 
+  filter(birth1 == 0)
+
+n_first_girl <- length(births_first_girl$birth2)
+
+random_births <- grid_data %>% 
+  slice_sample(n = 1e4,
+               weight_by = posterior, replace = TRUE) %>% 
+  mutate(births = map(p_grid, .f = function(x){rbinom(n = n_first_girl, size = 1, prob = x)}),
+         n_boys = map_dbl(births, sum),
+         n_girls = n_first_girl - n_boys)
+
+sum(random_births$n_boys < sum(births_first_girl$birth2)) / 1e4
+```
+
+```
+#> [1] 0.9991
+```
+
+```r
+random_births %>% 
+  ggplot(aes(x = n_boys)) +
+  geom_density(color = clr0d, fill = fll0) +
+  geom_vline(xintercept = sum(births_first_girl$birth2),
+             color = clr2, linetype = 3) +
+  scale_x_continuous(limits = c(0, n_first_girl),
+                     expand = c(0, 0)) 
+```
+
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-37-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ---
