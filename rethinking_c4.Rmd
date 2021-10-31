@@ -19,14 +19,349 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.asp = .5, 
                       fig.align = "center",
                       message = FALSE,
-                      warning = FALSE
-                      )
+                      warning = FALSE)
+
 source("bayesian_settings.R")
 ```
 
 by [Richard McElreath](https://xcelab.net/rm/statistical-rethinking/), building on the Summary by [Solomon Kurz](https://bookdown.org/content/4857/)
 
+## Why normal distributions are normal
 
+### Normal by addition
+
+```{r, fig.asp = .7}
+n_people <- 1e3
+position <- crossing(person = 1:n_people,
+                     step   = 0:16) %>% 
+  mutate(deviation = map_dbl(step, ~if_else(. == 0, 0, runif(1, -1, 1)))) %>% 
+  group_by(person) %>%
+  mutate(position = cumsum(deviation)) %>% 
+  ungroup()
+
+p_all_steps <- position %>% 
+  ggplot(aes(x = step, y = position, group = person)) +
+  geom_line(aes(color = person == n_people)) +
+  geom_point(data = position %>%  filter(person == n_people), aes(color = "TRUE"), size = 1) +
+  geom_vline(data = tibble(step = c(4, 8, 16)),
+             aes(xintercept = step), linetype = 3, color = rgb(0,0,0,.5)) +
+  scale_color_manual(values = c(`TRUE` = clr2, `FALSE` = clr_alpha(clr0d, .05)), guide = "none") +
+  scale_x_continuous(breaks = c(0,4,8,16)) +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank())
+
+plot_steps <- function(step_nr, data = position, add_ideal = FALSE){
+  data_step <- data %>% 
+    filter(step == step_nr) 
+  
+  p <- data_step %>% 
+    ggplot(aes(x = position)) +
+    geom_density(adjust = .2, color = clr0d, fill = fll0) +
+    scale_x_continuous(limits = c(-6, 6)) +
+    labs(title = glue("{step_nr} steps"))
+  
+  if(add_ideal){p <- p  +
+    stat_function(fun = function(x){dnorm(x, mean = 0, sd = sd(data_step$position))},
+                  n = 501, color = clr2, linetype = 3)}
+  
+  p
+}
+p_all_steps /
+(plot_steps(step_nr = 4) + plot_steps(step_nr = 8) + plot_steps(step_nr = 16, add_ideal = TRUE))
+```
+
+## Normal by multiplication and by log-multiplication
+
+```{r,fig.asp = .3}
+normal_by_multiplication <- function(effect_size = 0.1,
+                                     x_scale = ggplot2::scale_x_continuous(),
+                                     x_lab = "normal"){
+  tibble(person = 1:n_people,
+       growth = replicate(length(person), prod(1 + runif(12, 0, effect_size)))) %>% 
+  ggplot(aes(x = growth)) +
+  geom_density(color = clr0d, fill = fll0)  +
+  labs(title = glue("effect size: {effect_size}"), x = glue("growth ({x_lab})")) +
+  x_scale
+}
+
+normal_by_multiplication(effect_size = .01) +
+  normal_by_multiplication(effect_size = .1) +
+  normal_by_multiplication(effect_size = .5)+
+  normal_by_multiplication(effect_size = .5, x_scale = scale_x_log10(), x_lab = "log10") +
+  plot_layout(nrow = 1)
+```
+
+### using the Gaussian distribution
+
+- part of the *exponential family*
+- probability density function
+- $\mu$: mean
+- $\sigma$: standard deviation
+- $\tau$: precision
+
+$$
+p( y | \mu, \sigma) = \frac{1}{\sqrt{2\pi\sigma^2}} exp \left( \frac{(y-\mu)^2}{2\sigma^2} \right)\\
+\tau = 1 / \sigma^2 \\
+p( y | \mu, \tau) = \sqrt{\frac{\tau}{2\pi}}exp(-\tfrac{1}{2}\tau(y - \mu)^2)
+$$
+
+## A language for describing models
+
+*The first line defines the likelihood used in Bayes' theorem, the other lines describe the priors used. The tilde means that the relationships are **stochastic*.**
+
+re-describing the globe-toss model:
+
+> *The count $W$ is distributed binomially with a sample size $N$ and the probabiliy $p$.*
+> *The prior for $p$ is assumed to be uniform between zero and one*
+
+$$
+W \sim Binomial(N, p)\\
+p \sim Uniform(0, 1)
+$$
+
+Substituting in Bayes' theorem:
+
+$$
+Pr(p | w, n) = \frac{Binomial(w|n,p)~Uniform(p|0,1)}{\int Binomial(w|n,p)~Uniform(p|0,1) dp}
+$$
+
+```{r, fig.asp = .45}
+w <-  6
+n <-  9
+grid_data <- tibble(p_grid = seq(0,1, length.out = 101),
+       likelihood = dbinom(w, n, p_grid),
+       prior = dunif(p_grid, 0, 1),
+       posterior_unstand = likelihood * prior,
+       posterior = posterior_unstand / sum(posterior_unstand))
+
+grid_data %>%
+  pivot_longer(cols = c(prior, likelihood, posterior),
+               names_to = "bayes_part",
+               values_to = "p") %>% 
+  mutate(bayes_part = factor(bayes_part, levels = names(clr_bayes))) %>% 
+  ggplot(aes(x = p_grid)) +
+  geom_area(aes(y = p, color = bayes_part, fill = after_scale(clr_alpha(color)))) +
+  scale_color_manual(values = clr_bayes, guide = "none") +
+  facet_wrap(bayes_part ~ ., scales = "free_y")
+
+```
+
+### Gaussian model of height
+
+#### The data
+
+```{r}
+library(rethinking)
+data(Howell1)
+
+(data <- as_tibble(Howell1)) %>% 
+  precis() %>% as_tibble(rownames = NA) %>% knitr::kable()
+```
+
+```{r}
+(data_adults <- data %>% filter(age >= 18)) %>% 
+  precis() %>% as_tibble(rownames = NA) %>% knitr::kable()
+```
+
+```{r, fig.asp = .4}
+data_adults %>% 
+  ggplot(aes(x = height)) +
+  geom_density(adjust = .5, color = clr0d, fill = fll0) +
+  scale_x_continuous(limits = c(130,185))
+```
+
+#### The model
+
+$$
+\begin{array}{cccr} 
+h_i & \stackrel{iid}{\sim} & Normal(\mu, \sigma) & \textrm{[likelihood]}\\
+\mu & \sim & Normal(178, 20) & \textrm{[$\mu$ prior]}\\
+\sigma & \sim & Uniform(0,50) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+where, $iid$ means *"independent and identically distributed"*.
+
+```{r, fig.asp = .7}
+n_samples <- 1e4
+prior_simulation <- tibble(
+  sample_mu = rnorm(n_samples, 178, 20),
+  sample_sigma = runif(n_samples, 0, 50),
+  prior_h = rnorm(n_samples, sample_mu, sample_sigma),
+  bad_mu = rnorm(n_samples, 178, 100),
+  bad_prior = rnorm(n_samples, bad_mu, sample_sigma)
+)
+
+p_mu <- ggplot() +
+    stat_function(fun = function(x){dnorm(x = x, mean = 178, sd = 20)},
+                  xlim = c(100,250), color = clr0d, fill = fll0, geom = "area") +
+    labs(title = glue("*\U03BC* {mth('\U007E')} dnorm( 178, 20 )"), 
+         y = "density", x = "*\U03BC*")
+
+p_sigma <- ggplot() +
+    stat_function(fun = function(x){dunif(x = x, min = 0, max = 50)},
+                  xlim = c(-5, 55),
+                  color = clr1, fill = fll1, geom = "area") +
+    labs(title = glue("*{mth('\U03C3')}* {mth('\U007E')} dunif( 0, 50 )"), 
+         y = "density", x = glue("*{mth('\U03C3')}*"))
+
+p_prior_sim <- prior_simulation %>% 
+  ggplot(aes(x = prior_h)) +
+  geom_density(color = clr2, fill = fll2, adjust = .4) +
+  scale_x_continuous(limits = c(0,356), breaks = c(0,73,178,283)) +
+  labs(title =  glue("*h<sub>i</sub>* {mth('\U007E')} dnorm( *\U03BC*, {mth('\U03C3')} )"),
+       x = "height")
+
+p_bad_prior <- prior_simulation %>% 
+  ggplot(aes(x = bad_prior)) +
+  geom_density(color = clr2, fill = fll2, adjust = .4) +
+  scale_x_continuous(limits = c(-222,578),
+                     breaks = c(-128,0,178,484), expand = c(0,0)) +
+  geom_vline(data = tibble(h = c(0,272)), aes(xintercept = h), linetype = 3)+
+  labs(title =  glue("*h<sub>i</sub>* {mth('\U007E')} dnorm( *\U03BC*, {mth('\U03C3')} )<br>*\U03BC* {mth('\U007E')} dnorm( 178, 100 )"),
+       x = "height")
+
+p_mu + p_sigma +
+  p_prior_sim + p_bad_prior &
+  theme(plot.title = element_markdown(),
+        axis.title.x = element_markdown())
+
+```
+
+#### grid approximation of the posterior distribution
+
+```{r}
+n_grid <- 101
+
+grid_data <- cross_df(list(mu = seq(from = 152, to = 157, length.out = n_grid),
+                           sigma = seq(from = 6.5, to = 9, length.out = n_grid))) %>%
+  mutate(log_likelihood = map2_dbl(.x = mu, .y = sigma, .f = function(x, y){
+    dnorm(x = data_adults$height, mean = x, sd = y, log = TRUE) %>% sum()
+  }),
+  prior_mu = dnorm(mu, mean = 178, sd = 20, log = TRUE),
+  prior_sigma = dunif(sigma, min = 0, max = 50, log = TRUE),
+  product = log_likelihood + prior_mu + prior_sigma,
+  probability = exp(product - max(product)))
+
+grid_data %>% 
+  ggplot(aes(x = mu, y = sigma, z = probability)) +
+  geom_raster(aes(fill = probability)) +
+  geom_contour(color = rgb(1,1,1,.1)) +
+  coord_cartesian(xlim = range(grid_data$mu),
+              ylim = range(grid_data$sigma)) +
+  scale_fill_gradientn(colours = clr_grd5 %>% clr_alpha(alpha = .8),
+                       limits = c(0,1)) +
+  coord_cartesian(xlim = range(grid_data$mu),
+                  ylim = range(grid_data$sigma),
+                  expand = 0) +
+  guides(fill = guide_colorbar(title.position = "top",
+                               barwidth = unit(.9,"npc"),
+                               barheight = unit(5, "pt"))) +
+  labs(x = " *\U03BC*", y = glue("*{mth('\U03C3')}*"))+
+  theme(legend.position = "bottom",
+        axis.title.x = element_markdown(),
+        axis.title.y = element_markdown())
+```
+
+#### Sampling from the posterior distribution
+
+```{r, fig.asp = .7}
+n_posterior_sample <- 1e4
+samples <- grid_data %>% 
+  slice_sample(n = n_posterior_sample, weight_by = probability, replace = TRUE)
+
+p_samples <- samples %>% 
+  group_by(mu, sigma) %>% 
+  count() %>% 
+  ungroup() %>% 
+  ggplot(aes(x = mu, y = sigma, color = n)) +
+  geom_point(size = .4) +
+  scale_color_gradientn(colours = clr_grd5 %>% clr_alpha(alpha = .8)) +
+  coord_cartesian(xlim = buffer_range(grid_data$mu),
+                  ylim = buffer_range(grid_data$sigma),
+                  expand = 0) +
+  guides(color = guide_colorbar(title.position = "top",
+                               barwidth = unit(.2,"npc"),
+                               barheight = unit(5, "pt"))) +
+  labs(x = " *\U03BC*", y = glue("*{mth('\U03C3')}*"))+
+  theme(legend.position = "bottom",
+        axis.title.x = element_markdown(),
+        axis.title.y = element_markdown())
+  
+p_mu_dens <- samples %>% 
+  ggplot(aes(x = mu)) +
+  geom_density(color = clr0d, fill = fll0) +
+  scale_x_continuous(limits = buffer_range(grid_data$mu), expand = c(0, 0)) +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+p_sigma_dens <- samples %>% 
+  ggplot(aes(x = sigma)) +
+  geom_density(color = clr0d, fill = fll0) +
+  scale_x_continuous(limits = buffer_range(grid_data$sigma), expand = c(0, 0)) +
+  coord_flip() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank())
+
+p_mu_dens  + patchwork::guide_area() +
+  p_samples + p_sigma_dens +
+  plot_layout(guides = "collect", widths = c(1,.3), heights = c(.3,1))
+```
+
+Exploration of long tail for $\sigma$ when original sample size is small:
+
+```{r, fig.asp = .7}
+heights_subset <- sample(data_adults$height, size = 20)
+grid_data_subset <- cross_df(list(mu = seq(from = 145, to = 165, length.out = n_grid),
+                           sigma = seq(from = 4.5, to = 16, length.out = n_grid))) %>%
+  mutate(log_likelihood = map2_dbl(.x = mu, .y = sigma, .f = function(x, y){
+    dnorm(x = heights_subset, mean = x, sd = y, log = TRUE) %>% sum()
+  }),
+  prior_mu = dnorm(mu, mean = 178, sd = 20, log = TRUE),
+  prior_sigma = dunif(sigma, min = 0, max = 50, log = TRUE),
+  product = log_likelihood + prior_mu + prior_sigma,
+  probability = exp(product - max(product)))
+
+samples_subset <- grid_data_subset %>% 
+  slice_sample(n = n_posterior_sample, weight_by = probability, replace = TRUE)
+
+p_samples <- samples_subset %>% 
+  group_by(mu, sigma) %>% 
+  count() %>% 
+  ungroup() %>% 
+  ggplot(aes(x = mu, y = sigma, color = n)) +
+  geom_point(size = .4) +
+  scale_color_gradientn(colours = clr_grd4 %>% clr_alpha(alpha = .8)) +
+  coord_cartesian(xlim = buffer_range(grid_data_subset$mu),
+                  ylim = buffer_range(grid_data_subset$sigma),
+                  expand = 0) +
+  guides(color = guide_colorbar(title.position = "top",
+                               barwidth = unit(.2,"npc"),
+                               barheight = unit(5, "pt"))) +
+  labs(x = " *\U03BC*", y = glue("*{mth('\U03C3')}*"))+
+  theme(legend.position = "bottom",
+        axis.title.x = element_markdown(),
+        axis.title.y = element_markdown())
+  
+p_mu_dens <- samples_subset %>% 
+  ggplot(aes(x = mu)) +
+  geom_density(color = clr0d, fill = fll0) +
+  scale_x_continuous(limits = buffer_range(grid_data_subset$mu), expand = c(0, 0)) +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank())
+
+p_sigma_dens <- samples_subset %>% 
+  ggplot(aes(x = sigma)) +
+  geom_density(color = clr0d, fill = fll0) +
+  scale_x_continuous(limits = buffer_range(grid_data_subset$sigma), expand = c(0, 0)) +
+  coord_flip() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank())
+
+p_mu_dens  + patchwork::guide_area() +
+  p_samples + p_sigma_dens +
+  plot_layout(guides = "collect", widths = c(1,.3), heights = c(.3,1))
+```
 
 ---
 

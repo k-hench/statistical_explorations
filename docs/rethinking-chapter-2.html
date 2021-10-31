@@ -692,7 +692,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.5" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#homework-1"><i class="fa fa-check"></i><b>4.5</b> Homework</a></li>
 <li class="chapter" data-level="4.6" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#brms-section-1"><i class="fa fa-check"></i><b>4.6</b> {brms} section</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html"><i class="fa fa-check"></i><b>5</b> Rethinking: Chapter 4</a></li>
+<li class="chapter" data-level="5" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html"><i class="fa fa-check"></i><b>5</b> Rethinking: Chapter 4</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#why-normal-distributions-are-normal"><i class="fa fa-check"></i><b>5.1</b> Why normal distributions are normal</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#normal-by-addition"><i class="fa fa-check"></i><b>5.1.1</b> Normal by addition</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#normal-by-multiplication-and-by-log-multiplication"><i class="fa fa-check"></i><b>5.2</b> Normal by multiplication and by log-multiplication</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#using-the-gaussian-distribution"><i class="fa fa-check"></i><b>5.2.1</b> using the Gaussian distribution</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#a-language-for-describing-models"><i class="fa fa-check"></i><b>5.3</b> A language for describing models</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#gaussian-model-of-height"><i class="fa fa-check"></i><b>5.3.1</b> Gaussian model of height</a></li>
+</ul></li>
+</ul></li>
 <li class="chapter" data-level="6" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html"><i class="fa fa-check"></i><b>6</b> Bayesian Statistics the Fun Way</a>
 <ul>
 <li class="chapter" data-level="6.1" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#conditioning-probabilities"><i class="fa fa-check"></i><b>6.1</b> Conditioning Probabilities</a></li>
@@ -834,7 +848,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-2"><a href="rethinking-chapter-2.html#cb3-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">marbles =</span> <span class="dv">4</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb3-3"><a href="rethinking-chapter-2.html#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">possibilities =</span> marbles <span class="sc">^</span> draws) <span class="sc">%&gt;%</span> </span>
 <span id="cb3-4"><a href="rethinking-chapter-2.html#cb3-4" aria-hidden="true" tabindex="-1"></a>  flextable<span class="sc">::</span><span class="fu">flextable</span>()</span></code></pre></div>
-<template id="020f629d-669d-4320-9aa0-65146df7f8a6"><style>
+<template id="ef84ce37-4ecc-44b4-a71b-9f258751786e"><style>
 .tabwid table{
   border-spacing:0px !important;
   border-collapse:collapse;
@@ -868,12 +882,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 .tabwid table tr {
 background-color: transparent;
 }
-</style><div class="tabwid"><style>.cl-6a228b26{}.cl-6a1d8040{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-6a1d93aa{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-6a1dbf6a{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6a1dbf88{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6a1dbf9c{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-6a228b26'>
-<thead><tr style="overflow-wrap:break-word;"><td class="cl-6a1dbf9c"><p class="cl-6a1d93aa"><span class="cl-6a1d8040">draws</span></p></td><td class="cl-6a1dbf9c"><p class="cl-6a1d93aa"><span class="cl-6a1d8040">marbles</span></p></td><td class="cl-6a1dbf9c"><p class="cl-6a1d93aa"><span class="cl-6a1d8040">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-6a1dbf6a"><p class="cl-6a1d93aa"><span class="cl-6a1d8040">1</span></p></td><td class="cl-6a1dbf6a"><p class="cl-6a1d93aa"><span class="cl-6a1d8040">4</span></p></td><td class="cl-6a1dbf6a"><p class="cl-6a1d93aa"><span class="cl-6a1d8040">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-6a1dbf6a"><p class="cl-6a1d93aa"><span class="cl-6a1d8040">2</span></p></td><td class="cl-6a1dbf6a"><p class="cl-6a1d93aa"><span class="cl-6a1d8040">4</span></p></td><td class="cl-6a1dbf6a"><p class="cl-6a1d93aa"><span class="cl-6a1d8040">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-6a1dbf88"><p class="cl-6a1d93aa"><span class="cl-6a1d8040">3</span></p></td><td class="cl-6a1dbf88"><p class="cl-6a1d93aa"><span class="cl-6a1d8040">4</span></p></td><td class="cl-6a1dbf88"><p class="cl-6a1d93aa"><span class="cl-6a1d8040">64</span></p></td></tr></tbody></table></div></template>
-<div class="flextable-shadow-host" id="ad46bc4c-bfcb-41bd-8d37-5ffab7708c08"></div>
+</style><div class="tabwid"><style>.cl-91f4ffa4{}.cl-91efdc04{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-91efef96{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-91f01bc4{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-91f01be2{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-91f01bec{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-91f4ffa4'>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-91f01bec"><p class="cl-91efef96"><span class="cl-91efdc04">draws</span></p></td><td class="cl-91f01bec"><p class="cl-91efef96"><span class="cl-91efdc04">marbles</span></p></td><td class="cl-91f01bec"><p class="cl-91efef96"><span class="cl-91efdc04">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-91f01bc4"><p class="cl-91efef96"><span class="cl-91efdc04">1</span></p></td><td class="cl-91f01bc4"><p class="cl-91efef96"><span class="cl-91efdc04">4</span></p></td><td class="cl-91f01bc4"><p class="cl-91efef96"><span class="cl-91efdc04">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-91f01bc4"><p class="cl-91efef96"><span class="cl-91efdc04">2</span></p></td><td class="cl-91f01bc4"><p class="cl-91efef96"><span class="cl-91efdc04">4</span></p></td><td class="cl-91f01bc4"><p class="cl-91efef96"><span class="cl-91efdc04">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-91f01be2"><p class="cl-91efef96"><span class="cl-91efdc04">3</span></p></td><td class="cl-91f01be2"><p class="cl-91efef96"><span class="cl-91efdc04">4</span></p></td><td class="cl-91f01be2"><p class="cl-91efef96"><span class="cl-91efdc04">64</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="130f93e9-fd66-4777-91a6-34cca0a0537f"></div>
 <script>
-var dest = document.getElementById("ad46bc4c-bfcb-41bd-8d37-5ffab7708c08");
-var template = document.getElementById("020f629d-669d-4320-9aa0-65146df7f8a6");
+var dest = document.getElementById("130f93e9-fd66-4777-91a6-34cca0a0537f");
+var template = document.getElementById("ef84ce37-4ecc-44b4-a71b-9f258751786e");
 var caption = template.content.querySelector("caption");
 if(caption) {
   caption.style.cssText = "display:block;text-align:center;";
@@ -1256,7 +1270,7 @@ Posterior = \frac{Probability~of~the~Data \times Prior}{ Average~probability~of~
 #&gt; 
 #&gt; |      mean|        sd|      5.5%|     94.5%|qa         |
 #&gt; |---------:|---------:|---------:|---------:|:----------|
-#&gt; | 0.6666565| 0.1571362| 0.4155225| 0.9177904|W: 6, L: 3 |
+#&gt; | 0.6666666| 0.1571338| 0.4155364| 0.9177967|W: 6, L: 3 |
 #&gt; 
 #&gt; 
 #&gt; |      mean|        sd|      5.5%|     94.5%|qa          |
@@ -1266,7 +1280,7 @@ Posterior = \frac{Probability~of~the~Data \times Prior}{ Average~probability~of~
 #&gt; 
 #&gt; |      mean|        sd|      5.5%|     94.5%|qa           |
 #&gt; |---------:|---------:|---------:|---------:|:------------|
-#&gt; | 0.6666667| 0.0785669| 0.5411017| 0.7922318|W: 24, L: 12 |</code></pre>
+#&gt; | 0.6666669| 0.0785669| 0.5411019| 0.7922319|W: 24, L: 12 |</code></pre>
 <p><img src="rethinking_c2_files/figure-html/unnamed-chunk-17-1.svg" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="marcov-chain-monte-carlo-mcmc" class="section level2" number="3.6">

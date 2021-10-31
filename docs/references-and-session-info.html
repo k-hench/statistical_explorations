@@ -692,7 +692,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="4.5" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#homework-1"><i class="fa fa-check"></i><b>4.5</b> Homework</a></li>
 <li class="chapter" data-level="4.6" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#brms-section-1"><i class="fa fa-check"></i><b>4.6</b> {brms} section</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html"><i class="fa fa-check"></i><b>5</b> Rethinking: Chapter 4</a></li>
+<li class="chapter" data-level="5" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html"><i class="fa fa-check"></i><b>5</b> Rethinking: Chapter 4</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#why-normal-distributions-are-normal"><i class="fa fa-check"></i><b>5.1</b> Why normal distributions are normal</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#normal-by-addition"><i class="fa fa-check"></i><b>5.1.1</b> Normal by addition</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#normal-by-multiplication-and-by-log-multiplication"><i class="fa fa-check"></i><b>5.2</b> Normal by multiplication and by log-multiplication</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#using-the-gaussian-distribution"><i class="fa fa-check"></i><b>5.2.1</b> using the Gaussian distribution</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#a-language-for-describing-models"><i class="fa fa-check"></i><b>5.3</b> A language for describing models</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#gaussian-model-of-height"><i class="fa fa-check"></i><b>5.3.1</b> Gaussian model of height</a></li>
+</ul></li>
+</ul></li>
 <li class="chapter" data-level="6" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html"><i class="fa fa-check"></i><b>6</b> Bayesian Statistics the Fun Way</a>
 <ul>
 <li class="chapter" data-level="6.1" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#conditioning-probabilities"><i class="fa fa-check"></i><b>6.1</b> Conditioning Probabilities</a></li>
@@ -764,7 +778,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1><span class="header-section-number">8</span> References and Session Info</h1>
 <div id="session-info" class="section level2" number="8.1">
 <h2><span class="header-section-number">8.1</span> Session Info</h2>
-<div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb208-1"><a href="references-and-session-info.html#cb208-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb218-1"><a href="references-and-session-info.html#cb218-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
 <pre><code>#&gt; R version 4.0.3 (2020-10-10)
 #&gt; Platform: x86_64-pc-linux-gnu (64-bit)
 #&gt; Running under: Ubuntu 20.04.3 LTS
@@ -785,12 +799,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     
 #&gt; 
 #&gt; other attached packages:
-#&gt;  [1] brms_2.16.1          Rcpp_1.0.6           EnvStats_2.4.0      
-#&gt;  [4] ggraph_2.0.5.9000    tidygraph_1.2.0      glue_1.4.2          
-#&gt;  [7] patchwork_1.1.0.9000 prismatic_1.0.0.9000 forcats_0.5.1       
-#&gt; [10] stringr_1.4.0        dplyr_1.0.6          purrr_0.3.4         
-#&gt; [13] readr_1.4.0          tidyr_1.1.3          tibble_3.1.2        
-#&gt; [16] ggplot2_3.3.4.9000   tidyverse_1.3.0.9000
+#&gt;  [1] ggtext_0.1.1         brms_2.16.1          Rcpp_1.0.6          
+#&gt;  [4] EnvStats_2.4.0       ggraph_2.0.5.9000    tidygraph_1.2.0     
+#&gt;  [7] glue_1.4.2           patchwork_1.1.0.9000 prismatic_1.0.0.9000
+#&gt; [10] forcats_0.5.1        stringr_1.4.0        dplyr_1.0.6         
+#&gt; [13] purrr_0.3.4          readr_1.4.0          tidyr_1.1.3         
+#&gt; [16] tibble_3.1.2         ggplot2_3.3.4.9000   tidyverse_1.3.0.9000
 #&gt; 
 #&gt; loaded via a namespace (and not attached):
 #&gt;   [1] readxl_1.3.1         backports_1.2.1      plyr_1.8.6          
@@ -807,35 +821,35 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt;  [34] V8_3.4.0             distributional_0.2.2 pkgbuild_1.2.0      
 #&gt;  [37] rstan_2.21.2         abind_1.4-5          scales_1.1.1        
 #&gt;  [40] mvtnorm_1.1-2        DBI_1.1.1            miniUI_0.1.1.1      
-#&gt;  [43] viridisLite_0.4.0    xtable_1.8-4         StanHeaders_2.21.0-7
-#&gt;  [46] stats4_4.0.3         DT_0.17              htmlwidgets_1.5.3   
-#&gt;  [49] httr_1.4.2           threejs_0.3.3        posterior_1.1.0     
-#&gt;  [52] ellipsis_0.3.2       pkgconfig_2.0.3      loo_2.4.1           
-#&gt;  [55] farver_2.1.0         sass_0.4.0.9000      dbplyr_2.1.1        
-#&gt;  [58] utf8_1.2.1           tidyselect_1.1.1     rlang_0.4.12        
-#&gt;  [61] reshape2_1.4.4       later_1.1.0.1        munsell_0.5.0       
-#&gt;  [64] cellranger_1.1.0     tools_4.0.3          cli_2.5.0           
-#&gt;  [67] generics_0.1.0       broom_0.7.6          ggridges_0.5.2      
-#&gt;  [70] evaluate_0.14        fastmap_1.1.0        yaml_2.2.1.99       
-#&gt;  [73] processx_3.5.1       knitr_1.33           fs_1.5.0            
-#&gt;  [76] nlme_3.1-149         mime_0.11            projpred_2.0.2      
-#&gt;  [79] xml2_1.3.2           compiler_4.0.3       bayesplot_1.8.1     
-#&gt;  [82] shinythemes_1.2.0    rstudioapi_0.13      curl_4.3            
-#&gt;  [85] gamm4_0.2-6          reprex_2.0.0         statmod_1.4.35      
-#&gt;  [88] tweenr_1.0.2         bslib_0.2.4          stringi_1.7.3       
-#&gt;  [91] ps_1.6.0             Brobdingnag_1.2-6    lattice_0.20-41     
-#&gt;  [94] Matrix_1.2-18        nloptr_1.2.2.2       markdown_1.1        
-#&gt;  [97] shinyjs_2.0.0        tensorA_0.36.1       vctrs_0.3.8         
-#&gt; [100] pillar_1.6.1         lifecycle_1.0.0      jquerylib_0.1.3     
-#&gt; [103] bridgesampling_1.1-2 httpuv_1.5.5         R6_2.5.0            
-#&gt; [106] bookdown_0.19        promises_1.2.0.1     gridExtra_2.3       
-#&gt; [109] codetools_0.2-16     boot_1.3-25          colourpicker_1.1.1  
-#&gt; [112] MASS_7.3-53          gtools_3.8.2         assertthat_0.2.1    
-#&gt; [115] withr_2.4.2          shinystan_2.5.0      mgcv_1.8-33         
-#&gt; [118] parallel_4.0.3       hms_1.1.0            grid_4.0.3          
-#&gt; [121] coda_0.19-4          minqa_1.2.4          rmarkdown_2.9.6     
-#&gt; [124] ggforce_0.3.2.9000   shiny_1.6.0          lubridate_1.7.10    
-#&gt; [127] base64enc_0.1-3      dygraphs_1.1.1.6</code></pre>
+#&gt;  [43] gridtext_0.1.4       viridisLite_0.4.0    xtable_1.8-4        
+#&gt;  [46] StanHeaders_2.21.0-7 stats4_4.0.3         DT_0.17             
+#&gt;  [49] htmlwidgets_1.5.3    httr_1.4.2           threejs_0.3.3       
+#&gt;  [52] posterior_1.1.0      ellipsis_0.3.2       pkgconfig_2.0.3     
+#&gt;  [55] loo_2.4.1            farver_2.1.0         sass_0.4.0.9000     
+#&gt;  [58] dbplyr_2.1.1         utf8_1.2.1           tidyselect_1.1.1    
+#&gt;  [61] rlang_0.4.12         reshape2_1.4.4       later_1.1.0.1       
+#&gt;  [64] munsell_0.5.0        cellranger_1.1.0     tools_4.0.3         
+#&gt;  [67] cli_2.5.0            generics_0.1.0       broom_0.7.6         
+#&gt;  [70] ggridges_0.5.2       evaluate_0.14        fastmap_1.1.0       
+#&gt;  [73] yaml_2.2.1.99        processx_3.5.1       knitr_1.33          
+#&gt;  [76] fs_1.5.0             nlme_3.1-149         mime_0.11           
+#&gt;  [79] projpred_2.0.2       xml2_1.3.2           compiler_4.0.3      
+#&gt;  [82] bayesplot_1.8.1      shinythemes_1.2.0    rstudioapi_0.13     
+#&gt;  [85] curl_4.3             gamm4_0.2-6          reprex_2.0.0        
+#&gt;  [88] statmod_1.4.35       tweenr_1.0.2         bslib_0.2.4         
+#&gt;  [91] stringi_1.7.3        ps_1.6.0             Brobdingnag_1.2-6   
+#&gt;  [94] lattice_0.20-41      Matrix_1.2-18        nloptr_1.2.2.2      
+#&gt;  [97] markdown_1.1         shinyjs_2.0.0        tensorA_0.36.1      
+#&gt; [100] vctrs_0.3.8          pillar_1.6.1         lifecycle_1.0.0     
+#&gt; [103] jquerylib_0.1.3      bridgesampling_1.1-2 httpuv_1.5.5        
+#&gt; [106] R6_2.5.0             bookdown_0.19        promises_1.2.0.1    
+#&gt; [109] gridExtra_2.3        codetools_0.2-16     boot_1.3-25         
+#&gt; [112] colourpicker_1.1.1   MASS_7.3-53          gtools_3.8.2        
+#&gt; [115] assertthat_0.2.1     withr_2.4.2          shinystan_2.5.0     
+#&gt; [118] mgcv_1.8-33          parallel_4.0.3       hms_1.1.0           
+#&gt; [121] grid_4.0.3           coda_0.19-4          minqa_1.2.4         
+#&gt; [124] rmarkdown_2.9.6      ggforce_0.3.2.9000   shiny_1.6.0         
+#&gt; [127] lubridate_1.7.10     base64enc_0.1-3      dygraphs_1.1.1.6</code></pre>
 </div>
 <div id="references" class="section level2" number="8.2">
 <h2><span class="header-section-number">8.2</span> References</h2>
