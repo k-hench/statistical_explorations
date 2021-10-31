@@ -407,31 +407,51 @@ conpare_qa(w_in = 24, l_in = 12)
 ## Marcov Chain Monte Carlo (MCMC)
 
 ```{r}
-n_samples <- 10^4
-p <- rep( NA, n_samples )
-p[1] <- .5
-W <- 6
-L <- 3
-for ( i in 2:n_samples ) {
+n_samples <- 1e4
+p_init <- rep( NA, n_samples )
+p_init[1] <- .5
+
+manual_mcmc <- function(p, W = 6, L = 3){
+  for ( i in 2:n_samples ) {
   p_new <- rnorm( n = 1, mean = p[ i - 1], sd =  0.1)
   if ( p_new < 0 ){ p_new <- abs( p_new ) }
   if ( p_new > 1 ){ p_new <- 2 - p_new }
   q0 <- dbinom( W, W + L, p[ i - 1 ] )
   q1 <- dbinom( W, W + L, p_new )
   p[i] <- if_else( runif(1) < q1 / q0, p_new, p[i - 1] )
+  }
+  p
 }
 
-tibble(x = p) %>% 
+p <- manual_mcmc(p_init)
+p_36 <- manual_mcmc(p_init, W = 24, L = 12)
+
+p_p <- tibble(x = p) %>% 
   ggplot() +
-  stat_function(fun = function(x){ dbeta( shape1 =  W + 1, shape2 = L + 1, x =  x ) / 
-      integrate(f = function(x){ dbeta( shape1 = W + 1, shape2 = L + 1, x = x )},
+  stat_function(fun = function(x){ dbeta( shape1 =  6 + 1, shape2 = 3 + 1, x =  x ) / 
+      integrate(f = function(x){ dbeta( shape1 = 6 + 1, shape2 = 3 + 1, x = x )},
                 lower = 0, upper = 1)[[1]] },
       xlim = c(0,1), n = 500, geom = "area",
       aes(color = "posterior", fill = after_scale(clr_alpha(color))))+
   geom_density(aes(x = x, color = "MCMC")) +
   scale_color_manual("approach", values = c(posterior = clr0, MCMC = clr2)) +
-  labs(y = "density", x = "proportion water") +
+  labs(y = "density", x = "proportion water", title = "n = 12") +
   theme(legend.position = "bottom")
+
+
+p_p36 <- tibble(x = p_36) %>% 
+  ggplot() +
+  stat_function(fun = function(x){ dbeta( shape1 =  24 + 1, shape2 = 12 + 1, x =  x ) / 
+      integrate(f = function(x){ dbeta( shape1 = 24 + 1, shape2 = 12 + 1, x = x )},
+                lower = 0, upper = 1)[[1]] },
+      xlim = c(0,1), n = 500, geom = "area",
+      aes(color = "posterior", fill = after_scale(clr_alpha(color))))+
+  geom_density(aes(x = x, color = "MCMC")) +
+  scale_color_manual("approach", values = c(posterior = clr0, MCMC = clr2)) +
+  labs(y = "density", x = "proportion water", title = "n = 36") +
+  theme(legend.position = "bottom")
+
+p_p + p_p36
 ```
 
 ---
@@ -634,6 +654,32 @@ tibble(pr_a_on_twn_updated = pr_a_on_twn_updated,
   knitr::kable()
 
 ```
+
+## {brms} section
+
+```{r}
+brms_c2_36_tosses <- brm( data = list(w = 24), 
+                          family = binomial(link = "identity"),
+                          w | trials(36) ~ 0 + Intercept,
+                          prior(beta(1, 1), class = b, lb = 0, ub = 1),
+                          seed = 42,
+                          file = "brms/brms_c2_36_tosses" )
+
+brms_c2_36_tosses %>% summary()
+
+posterior_summary(brms_c2_36_tosses) %>% 
+  round(digits = 3) %>% 
+  knitr::kable()
+
+as_draws_df(brms_c2_36_tosses) %>% 
+  as_tibble() %>% 
+  ggplot(aes(x = b_Intercept)) +
+  geom_density(color = clr1, fill = fll1) +
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(y = "density", x = "proportion water",
+       title = "{brms} posterior predictive deistribution (n = 36")
+```
+
 
 ---
 

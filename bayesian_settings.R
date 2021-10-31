@@ -5,6 +5,7 @@ library(glue)
 library(tidygraph)
 library(ggraph)
 library(EnvStats)
+library(brms)
 
 clr0 <- "#E9E5D9" # "#A9A9A9"
 clr0d <- clr_darken(clr0, .1)
@@ -18,4 +19,4 @@ fll1 <- clr_alpha(clr1)
 fll2 <- clr_alpha(clr2)
 
 fnt_sel <- "Josefin Sans"
-theme_set(theme_minimal(base_family = fnt_sel))
+theme_set(theme_minimal(base_family = fnt_sel) + theme(plot.title = element_text(hjust = .5)))

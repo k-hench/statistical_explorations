@@ -93,7 +93,7 @@ sum(samples$proportion_water < .5) / length(samples$proportion_water)
 ```
 
 ```
-#> [1] 0.1761
+#> [1] 0.1743
 ```
 
 ```r
@@ -101,7 +101,7 @@ sum(samples$proportion_water > .5 & samples$proportion_water < .75) / length(sam
 ```
 
 ```
-#> [1] 0.6023
+#> [1] 0.602
 ```
 
 ```r
@@ -265,7 +265,7 @@ rbinom( 10, size = 2, prob = .7)
 ```
 
 ```
-#>  [1] 1 2 2 1 1 1 2 0 2 2
+#>  [1] 2 1 1 2 2 2 2 1 1 1
 ```
 
 ```r
@@ -383,7 +383,7 @@ sum( samples$w == 6 ) / length( samples$w )
 ```
 
 ```
-#> [1] 0.20118
+#> [1] 0.19841
 ```
 
 
@@ -942,6 +942,47 @@ random_births %>%
 
 <img src="rethinking_c3_files/figure-html/unnamed-chunk-37-1.svg" width="672" style="display: block; margin: auto;" />
 
+## {brms} section
+
+
+```r
+brms_c3_6in9 <- brm(data = list(w = 6),
+                    family = binomial(link = "identity"),
+                    w | trials(9) ~ 0 + Intercept,
+                    # this is a flat prior
+                    prior(beta(1, 1), class = b, lb = 0, ub = 1),
+                    iter = 5000, warmup = 1000,
+                    seed = 42,
+                    file = "brms/brms_c3_6in9")
+
+posterior_summary(brms_c3_6in9) %>% 
+  round(digits = 3) %>% 
+  knitr::kable()
+```
+
+
+
+|            | Estimate| Est.Error|   Q2.5|  Q97.5|
+|:-----------|--------:|---------:|------:|------:|
+|b_Intercept |    0.637|     0.140|  0.346|  0.879|
+|lp__        |   -3.310|     0.748| -5.392| -2.780|
+
+```r
+samples_brms <- fitted(brms_c3_6in9, 
+                       summary = FALSE,
+                       scale = "linear") %>% 
+  as_tibble() %>% 
+  set_names(nm = "p")
+
+samples_brms %>% 
+  ggplot(aes(x = p)) +
+  geom_density(color = clr1, fill = fll1) +
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(y = "density", x = "proportion water",
+       title = "{brms} posterior predictive deistribution (6 in 9)")
+```
+
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-38-1.svg" width="672" style="display: block; margin: auto;" />
 
 ---
 

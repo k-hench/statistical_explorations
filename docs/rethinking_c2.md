@@ -67,7 +67,7 @@ tibble(draws = 1:3,
 ```
 
 ```{=html}
-<template id="fc211777-0d1e-4161-8af4-a59803fdfc2e"><style>
+<template id="a0d3517f-7755-42da-9b7c-cdba1dd2a048"><style>
 .tabwid table{
   border-spacing:0px !important;
   border-collapse:collapse;
@@ -101,15 +101,15 @@ tibble(draws = 1:3,
 .tabwid table tr {
 background-color: transparent;
 }
-</style><div class="tabwid"><style>.cl-24f0e986{}.cl-24ebaaca{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-24ebbf4c{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-24ebee7c{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-24ebeea4{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-24ebeeae{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-24f0e986'>
+</style><div class="tabwid"><style>.cl-03702612{}.cl-036b4444{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-036b57cc{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-036b8454{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-036b8472{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-036b8486{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-03702612'>
 ```
 
 ```{=html}
-<thead><tr style="overflow-wrap:break-word;"><td class="cl-24ebeeae"><p class="cl-24ebbf4c"><span class="cl-24ebaaca">draws</span></p></td><td class="cl-24ebeeae"><p class="cl-24ebbf4c"><span class="cl-24ebaaca">marbles</span></p></td><td class="cl-24ebeeae"><p class="cl-24ebbf4c"><span class="cl-24ebaaca">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-24ebee7c"><p class="cl-24ebbf4c"><span class="cl-24ebaaca">1</span></p></td><td class="cl-24ebee7c"><p class="cl-24ebbf4c"><span class="cl-24ebaaca">4</span></p></td><td class="cl-24ebee7c"><p class="cl-24ebbf4c"><span class="cl-24ebaaca">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-24ebee7c"><p class="cl-24ebbf4c"><span class="cl-24ebaaca">2</span></p></td><td class="cl-24ebee7c"><p class="cl-24ebbf4c"><span class="cl-24ebaaca">4</span></p></td><td class="cl-24ebee7c"><p class="cl-24ebbf4c"><span class="cl-24ebaaca">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-24ebeea4"><p class="cl-24ebbf4c"><span class="cl-24ebaaca">3</span></p></td><td class="cl-24ebeea4"><p class="cl-24ebbf4c"><span class="cl-24ebaaca">4</span></p></td><td class="cl-24ebeea4"><p class="cl-24ebbf4c"><span class="cl-24ebaaca">64</span></p></td></tr></tbody></table></div></template>
-<div class="flextable-shadow-host" id="86ef7f3f-ff79-44f1-a149-606f1b9bd75c"></div>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-036b8486"><p class="cl-036b57cc"><span class="cl-036b4444">draws</span></p></td><td class="cl-036b8486"><p class="cl-036b57cc"><span class="cl-036b4444">marbles</span></p></td><td class="cl-036b8486"><p class="cl-036b57cc"><span class="cl-036b4444">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-036b8454"><p class="cl-036b57cc"><span class="cl-036b4444">1</span></p></td><td class="cl-036b8454"><p class="cl-036b57cc"><span class="cl-036b4444">4</span></p></td><td class="cl-036b8454"><p class="cl-036b57cc"><span class="cl-036b4444">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-036b8454"><p class="cl-036b57cc"><span class="cl-036b4444">2</span></p></td><td class="cl-036b8454"><p class="cl-036b57cc"><span class="cl-036b4444">4</span></p></td><td class="cl-036b8454"><p class="cl-036b57cc"><span class="cl-036b4444">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-036b8472"><p class="cl-036b57cc"><span class="cl-036b4444">3</span></p></td><td class="cl-036b8472"><p class="cl-036b57cc"><span class="cl-036b4444">4</span></p></td><td class="cl-036b8472"><p class="cl-036b57cc"><span class="cl-036b4444">64</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="cbd5aaf5-80eb-4e5f-b9eb-1647babdb0d5"></div>
 <script>
-var dest = document.getElementById("86ef7f3f-ff79-44f1-a149-606f1b9bd75c");
-var template = document.getElementById("fc211777-0d1e-4161-8af4-a59803fdfc2e");
+var dest = document.getElementById("cbd5aaf5-80eb-4e5f-b9eb-1647babdb0d5");
+var template = document.getElementById("a0d3517f-7755-42da-9b7c-cdba1dd2a048");
 var caption = template.content.querySelector("caption");
 if(caption) {
   caption.style.cssText = "display:block;text-align:center;";
@@ -518,7 +518,7 @@ conpare_qa(w_in = 24, l_in = 12)
 #> 
 #> |      mean|        sd|      5.5%|     94.5%|qa         |
 #> |---------:|---------:|---------:|---------:|:----------|
-#> | 0.6666664| 0.1571338| 0.4155362| 0.9177966|W: 6, L: 3 |
+#> | 0.6666665| 0.1571338| 0.4155363| 0.9177967|W: 6, L: 3 |
 #> 
 #> 
 #> |      mean|        sd|      5.5%|     94.5%|qa          |
@@ -528,7 +528,7 @@ conpare_qa(w_in = 24, l_in = 12)
 #> 
 #> |      mean|        sd|      5.5%|     94.5%|qa           |
 #> |---------:|---------:|---------:|---------:|:------------|
-#> | 0.6666662| 0.0785669| 0.5411011| 0.7922314|W: 24, L: 12 |
+#> | 0.6666665| 0.0785669| 0.5411014| 0.7922316|W: 24, L: 12 |
 ```
 
 <img src="rethinking_c2_files/figure-html/unnamed-chunk-17-1.svg" width="672" style="display: block; margin: auto;" />
@@ -537,31 +537,51 @@ conpare_qa(w_in = 24, l_in = 12)
 
 
 ```r
-n_samples <- 10^4
-p <- rep( NA, n_samples )
-p[1] <- .5
-W <- 6
-L <- 3
-for ( i in 2:n_samples ) {
+n_samples <- 1e4
+p_init <- rep( NA, n_samples )
+p_init[1] <- .5
+
+manual_mcmc <- function(p, W = 6, L = 3){
+  for ( i in 2:n_samples ) {
   p_new <- rnorm( n = 1, mean = p[ i - 1], sd =  0.1)
   if ( p_new < 0 ){ p_new <- abs( p_new ) }
   if ( p_new > 1 ){ p_new <- 2 - p_new }
   q0 <- dbinom( W, W + L, p[ i - 1 ] )
   q1 <- dbinom( W, W + L, p_new )
   p[i] <- if_else( runif(1) < q1 / q0, p_new, p[i - 1] )
+  }
+  p
 }
 
-tibble(x = p) %>% 
+p <- manual_mcmc(p_init)
+p_36 <- manual_mcmc(p_init, W = 24, L = 12)
+
+p_p <- tibble(x = p) %>% 
   ggplot() +
-  stat_function(fun = function(x){ dbeta( shape1 =  W + 1, shape2 = L + 1, x =  x ) / 
-      integrate(f = function(x){ dbeta( shape1 = W + 1, shape2 = L + 1, x = x )},
+  stat_function(fun = function(x){ dbeta( shape1 =  6 + 1, shape2 = 3 + 1, x =  x ) / 
+      integrate(f = function(x){ dbeta( shape1 = 6 + 1, shape2 = 3 + 1, x = x )},
                 lower = 0, upper = 1)[[1]] },
       xlim = c(0,1), n = 500, geom = "area",
       aes(color = "posterior", fill = after_scale(clr_alpha(color))))+
   geom_density(aes(x = x, color = "MCMC")) +
   scale_color_manual("approach", values = c(posterior = clr0, MCMC = clr2)) +
-  labs(y = "density", x = "proportion water") +
+  labs(y = "density", x = "proportion water", title = "n = 12") +
   theme(legend.position = "bottom")
+
+
+p_p36 <- tibble(x = p_36) %>% 
+  ggplot() +
+  stat_function(fun = function(x){ dbeta( shape1 =  24 + 1, shape2 = 12 + 1, x =  x ) / 
+      integrate(f = function(x){ dbeta( shape1 = 24 + 1, shape2 = 12 + 1, x = x )},
+                lower = 0, upper = 1)[[1]] },
+      xlim = c(0,1), n = 500, geom = "area",
+      aes(color = "posterior", fill = after_scale(clr_alpha(color))))+
+  geom_density(aes(x = x, color = "MCMC")) +
+  scale_color_manual("approach", values = c(posterior = clr0, MCMC = clr2)) +
+  labs(y = "density", x = "proportion water", title = "n = 36") +
+  theme(legend.position = "bottom")
+
+p_p + p_p36
 ```
 
 <img src="rethinking_c2_files/figure-html/unnamed-chunk-18-1.svg" width="672" style="display: block; margin: auto;" />
@@ -837,6 +857,63 @@ tibble(pr_a_on_twn_updated = pr_a_on_twn_updated,
 | pr_a_on_twn_updated| pr_b_on_twn_updated| control|
 |-------------------:|-------------------:|-------:|
 |              0.8205|              0.1795|       1|
+
+## {brms} section
+
+
+```r
+brms_c2_36_tosses <- brm( data = list(w = 24), 
+                          family = binomial(link = "identity"),
+                          w | trials(36) ~ 0 + Intercept,
+                          prior(beta(1, 1), class = b, lb = 0, ub = 1),
+                          seed = 42,
+                          file = "brms/brms_c2_36_tosses" )
+
+brms_c2_36_tosses %>% summary()
+```
+
+```
+#>  Family: binomial 
+#>   Links: mu = identity 
+#> Formula: w | trials(36) ~ 0 + Intercept 
+#>    Data: list(w = 24) (Number of observations: 1) 
+#>   Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+#>          total post-warmup draws = 4000
+#> 
+#> Population-Level Effects: 
+#>           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+#> Intercept     0.66      0.08     0.49     0.80 1.00     1123     1813
+#> 
+#> Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+#> and Tail_ESS are effective sample size measures, and Rhat is the potential
+#> scale reduction factor on split chains (at convergence, Rhat = 1).
+```
+
+```r
+posterior_summary(brms_c2_36_tosses) %>% 
+  round(digits = 3) %>% 
+  knitr::kable()
+```
+
+
+
+|            | Estimate| Est.Error|   Q2.5|  Q97.5|
+|:-----------|--------:|---------:|------:|------:|
+|b_Intercept |    0.657|     0.078|  0.492|  0.798|
+|lp__        |   -3.994|     0.744| -6.055| -3.465|
+
+```r
+as_draws_df(brms_c2_36_tosses) %>% 
+  as_tibble() %>% 
+  ggplot(aes(x = b_Intercept)) +
+  geom_density(color = clr1, fill = fll1) +
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(y = "density", x = "proportion water",
+       title = "{brms} posterior predictive deistribution (n = 36")
+```
+
+<img src="rethinking_c2_files/figure-html/unnamed-chunk-30-1.svg" width="672" style="display: block; margin: auto;" />
+
 
 ---
 

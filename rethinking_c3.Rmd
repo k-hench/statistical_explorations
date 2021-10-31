@@ -728,6 +728,35 @@ random_births %>%
 
 ```
 
+## {brms} section
+
+```{r, fig.asp = .45}
+brms_c3_6in9 <- brm(data = list(w = 6),
+                    family = binomial(link = "identity"),
+                    w | trials(9) ~ 0 + Intercept,
+                    # this is a flat prior
+                    prior(beta(1, 1), class = b, lb = 0, ub = 1),
+                    iter = 5000, warmup = 1000,
+                    seed = 42,
+                    file = "brms/brms_c3_6in9")
+
+posterior_summary(brms_c3_6in9) %>% 
+  round(digits = 3) %>% 
+  knitr::kable()
+
+samples_brms <- fitted(brms_c3_6in9, 
+                       summary = FALSE,
+                       scale = "linear") %>% 
+  as_tibble() %>% 
+  set_names(nm = "p")
+
+samples_brms %>% 
+  ggplot(aes(x = p)) +
+  geom_density(color = clr1, fill = fll1) +
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(y = "density", x = "proportion water",
+       title = "{brms} posterior predictive deistribution (6 in 9)")
+```
 
 ---
 
