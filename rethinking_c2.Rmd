@@ -677,7 +677,7 @@ as_draws_df(brms_c2_36_tosses) %>%
   geom_density(color = clr1, fill = fll1) +
   scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
   labs(y = "density", x = "proportion water",
-       title = "{brms} posterior predictive deistribution (n = 36")
+       title = "{brms} posterior probability (n = 36")
 ```
 
 

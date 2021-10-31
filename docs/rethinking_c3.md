@@ -93,7 +93,7 @@ sum(samples$proportion_water < .5) / length(samples$proportion_water)
 ```
 
 ```
-#> [1] 0.1743
+#> [1] 0.1684
 ```
 
 ```r
@@ -101,7 +101,7 @@ sum(samples$proportion_water > .5 & samples$proportion_water < .75) / length(sam
 ```
 
 ```
-#> [1] 0.602
+#> [1] 0.6002
 ```
 
 ```r
@@ -265,7 +265,7 @@ rbinom( 10, size = 2, prob = .7)
 ```
 
 ```
-#>  [1] 2 1 1 2 2 2 2 1 1 1
+#>  [1] 1 2 2 1 1 2 0 2 2 2
 ```
 
 ```r
@@ -383,7 +383,7 @@ sum( samples$w == 6 ) / length( samples$w )
 ```
 
 ```
-#> [1] 0.19841
+#> [1] 0.20122
 ```
 
 
@@ -968,18 +968,32 @@ posterior_summary(brms_c3_6in9) %>%
 |lp__        |   -3.310|     0.748| -5.392| -2.780|
 
 ```r
+n_trials <- 9
 samples_brms <- fitted(brms_c3_6in9, 
                        summary = FALSE,
                        scale = "linear") %>% 
   as_tibble() %>% 
-  set_names(nm = "p")
+  set_names(nm = "p") %>% 
+  mutate(w = rbinom(n(), size = n_trials,  prob = p))
 
-samples_brms %>% 
+p_brms_posterior <- samples_brms %>% 
   ggplot(aes(x = p)) +
   geom_density(color = clr1, fill = fll1) +
   scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
   labs(y = "density", x = "proportion water",
-       title = "{brms} posterior predictive deistribution (6 in 9)")
+       title = "{brms} posterior probability (6 in 9)")
+
+p_brms_posterior_predictive <- samples_brms %>% 
+  ggplot(aes(x = factor(w))) +
+    geom_bar(stat = "count",
+           aes(color = w == 6 ,
+               fill = after_scale(clr_alpha(color, .3))),
+           width = .6) +
+  scale_color_manual(values = c(`TRUE` = clr1, `FALSE` = clr0d), guide = "none") +
+  labs(y = "count", x = "number of water samples",
+       title = "posterior predictive distribution")
+
+p_brms_posterior + p_brms_posterior_predictive
 ```
 
 <img src="rethinking_c3_files/figure-html/unnamed-chunk-38-1.svg" width="672" style="display: block; margin: auto;" />
