@@ -288,7 +288,7 @@ grid_data %>%
 
 <img src="rethinking_c4_files/figure-html/unnamed-chunk-8-1.svg" width="672" style="display: block; margin: auto;" />
 
-#### Sampling from the posterior distribution
+**Sampling from the posterior distribution**
 
 
 ```r
@@ -318,13 +318,16 @@ p_mu_dens <- samples %>%
   ggplot(aes(x = mu)) +
   geom_density(color = clr0d, fill = fll0) +
   scale_x_continuous(limits = buffer_range(grid_data$mu), expand = c(0, 0)) +
+  labs(y = "marginal<br>density") +
   theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+        axis.text.x = element_blank(),
+        axis.title.y = element_markdown())
 
 p_sigma_dens <- samples %>% 
   ggplot(aes(x = sigma)) +
   geom_density(color = clr0d, fill = fll0) +
   scale_x_continuous(limits = buffer_range(grid_data$sigma), expand = c(0, 0)) +
+  labs(y = "marginal density") +
   coord_flip() +
   theme(axis.title.y = element_blank(),
         axis.text.y = element_blank())
@@ -376,13 +379,16 @@ p_mu_dens <- samples_subset %>%
   ggplot(aes(x = mu)) +
   geom_density(color = clr0d, fill = fll0) +
   scale_x_continuous(limits = buffer_range(grid_data_subset$mu), expand = c(0, 0)) +
+  labs(y = "marginal<br>density") +
   theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank())
+        axis.text.x = element_blank(),
+        axis.title.y = element_markdown())
 
 p_sigma_dens <- samples_subset %>% 
   ggplot(aes(x = sigma)) +
   geom_density(color = clr0d, fill = fll0) +
   scale_x_continuous(limits = buffer_range(grid_data_subset$sigma), expand = c(0, 0)) +
+    labs(y = "marginal density") +
   coord_flip() +
   theme(axis.title.y = element_blank(),
         axis.text.y = element_blank())
@@ -393,6 +399,44 @@ p_mu_dens  + patchwork::guide_area() +
 ```
 
 <img src="rethinking_c4_files/figure-html/unnamed-chunk-10-1.svg" width="672" style="display: block; margin: auto;" />
+
+#### Quadratic approximation of the posterior distribution
+
+$$
+\begin{array}{cccr} 
+h_i & \stackrel{iid}{\sim} & Normal(\mu, \sigma) & \verb|height ~ dnorm(mu, sigma)|\\
+\mu & \sim & Normal(178, 20) & \verb|mu ~ dnorm(178, 20)|\\
+\sigma & \sim & Uniform(0,50) & \verb|sigma ~ dunif(0, 50)|
+\end{array}
+$$
+
+
+```r
+model_spec <- alist(
+  height ~ dnorm(mu, sigma),
+  mu ~ dnorm(178, 20),
+  sigma ~ dunif(0, 50)
+)
+
+# "maximum a priori estimate"
+map_starting_points <-  list(
+  mu = mean(data_adults$height),
+  sigma = sd(data_adults$height)
+)
+
+model_heights_quap_weak_prior <- quap(flist = model_spec,
+                                      data =  data_adults,
+                                      start = map_starting_points)
+precis(model_heights_quap_weak_prior) %>%  as_tibble(rownames = NA) %>%  knitr::kable()
+```
+
+
+
+|      |       mean|        sd|       5.5%|      94.5%|
+|:-----|----------:|---------:|----------:|----------:|
+|mu    | 154.607023| 0.4119947| 153.948577| 155.265471|
+|sigma |   7.731333| 0.2913860|   7.265642|   8.197024|
+
 
 ---
 
