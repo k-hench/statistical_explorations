@@ -631,7 +631,6 @@ pr_testb_on_b <- .65
 pr_testa_on_b <- 1 - pr_testb_on_b
 
 prior_a <- .5
-# pr_testa <- pr_testa_on_a * Pr(a) / 
   
 pr_testa <- (prior_a * pr_testa_on_a) + ((1- prior_a) * pr_testa_on_b)
 
