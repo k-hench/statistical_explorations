@@ -566,8 +566,8 @@ Pr(spec_b | twin) = \frac{Pr(spec_b) \times Pr(twin | spec_b)}{Pr(twin)}
 $$
 
 ```{r}
-pr_twn_on_a <- .2
-pr_twn_on_b <- .1
+pr_twn_on_a <- .1
+pr_twn_on_b <- .2
 pr_twn <- (pr_twn_on_a + pr_twn_on_b) /2 
 
 prior_a <- .5
@@ -582,7 +582,7 @@ pr_b_on_twn <- ((1 - prior_a) * pr_twn_on_b) / pr_twn
 **H2**
 
 $$
-Pr(spec_a | twin) = \frac{2}{3}
+Pr(spec_a | twin) = \frac{1}{3}
 $$
 
 ```{r}
@@ -631,28 +631,21 @@ pr_testb_on_b <- .65
 pr_testa_on_b <- 1 - pr_testb_on_b
 
 prior_a <- .5
-
-pr_testa <- weighted.mean(x = c(pr_testa_on_a, pr_testa_on_b),
-                        w = c(prior_a, 1- prior_a))
+# pr_testa <- pr_testa_on_a * Pr(a) / 
+  
+pr_testa <- (prior_a * pr_testa_on_a) + ((1- prior_a) * pr_testa_on_b)
 
 tibble(pr_on_testa = c("A","B"),
        genetic_test = c((prior_a * pr_testa_on_a) / pr_testa,
                         ((1 - prior_a) * pr_testa_on_b) / pr_testa))
 
+prior_a_updated <- pr_a_on_sgl
+pr_testa_updated <- (prior_a_updated * pr_testa_on_a) + ((1- prior_a_updated) * pr_testa_on_b)
 
-prior_a_updated <- (prior_a * pr_testa_on_a) / pr_testa
-pr_twn_updated <-  weighted.mean(x = c(pr_twn_on_a, pr_twn_on_b),
-                        w = c(prior_a_updated, 1- prior_a_updated))
 
-pr_a_on_twn_updated <- (prior_a_updated * pr_twn_on_a) / pr_twn_updated
-pr_b_on_twn_updated <- ((1 - prior_a_updated) * pr_twn_on_b) / pr_twn_updated
-
-tibble(pr_a_on_twn_updated = pr_a_on_twn_updated,
-       pr_b_on_twn_updated = pr_b_on_twn_updated,
-       control = pr_a_on_twn_updated + pr_b_on_twn_updated) %>%
-  round(digits = 4) %>%
-  knitr::kable()
-
+tibble(pr_on_testa = c("A","B"),
+       genetic_test = c((prior_a_updated * pr_testa_on_a) / pr_testa_updated,
+                        ((1 - prior_a_updated) * pr_testa_on_b) / pr_testa_updated))
 ```
 
 ## {brms} section

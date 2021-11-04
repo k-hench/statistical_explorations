@@ -67,7 +67,7 @@ tibble(draws = 1:3,
 ```
 
 ```{=html}
-<template id="bc47dc4a-45b8-458a-95e4-010f2cbfba2c"><style>
+<template id="8c156bc1-fd13-45f4-a1c9-527c0b6af1b2"><style>
 .tabwid table{
   border-spacing:0px !important;
   border-collapse:collapse;
@@ -101,15 +101,15 @@ tibble(draws = 1:3,
 .tabwid table tr {
 background-color: transparent;
 }
-</style><div class="tabwid"><style>.cl-469bf3f2{}.cl-4695bb2c{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-4695d08a{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-4696046a{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-46960492{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-4696049c{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-469bf3f2'>
+</style><div class="tabwid"><style>.cl-f0a66354{}.cl-f0a14ba8{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-f0a15ee0{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-f0a18a82{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-f0a18aa0{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-f0a18aaa{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-f0a66354'>
 ```
 
 ```{=html}
-<thead><tr style="overflow-wrap:break-word;"><td class="cl-4696049c"><p class="cl-4695d08a"><span class="cl-4695bb2c">draws</span></p></td><td class="cl-4696049c"><p class="cl-4695d08a"><span class="cl-4695bb2c">marbles</span></p></td><td class="cl-4696049c"><p class="cl-4695d08a"><span class="cl-4695bb2c">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-4696046a"><p class="cl-4695d08a"><span class="cl-4695bb2c">1</span></p></td><td class="cl-4696046a"><p class="cl-4695d08a"><span class="cl-4695bb2c">4</span></p></td><td class="cl-4696046a"><p class="cl-4695d08a"><span class="cl-4695bb2c">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-4696046a"><p class="cl-4695d08a"><span class="cl-4695bb2c">2</span></p></td><td class="cl-4696046a"><p class="cl-4695d08a"><span class="cl-4695bb2c">4</span></p></td><td class="cl-4696046a"><p class="cl-4695d08a"><span class="cl-4695bb2c">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-46960492"><p class="cl-4695d08a"><span class="cl-4695bb2c">3</span></p></td><td class="cl-46960492"><p class="cl-4695d08a"><span class="cl-4695bb2c">4</span></p></td><td class="cl-46960492"><p class="cl-4695d08a"><span class="cl-4695bb2c">64</span></p></td></tr></tbody></table></div></template>
-<div class="flextable-shadow-host" id="8e824eac-91e4-444b-9795-4e61a341a842"></div>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-f0a18aaa"><p class="cl-f0a15ee0"><span class="cl-f0a14ba8">draws</span></p></td><td class="cl-f0a18aaa"><p class="cl-f0a15ee0"><span class="cl-f0a14ba8">marbles</span></p></td><td class="cl-f0a18aaa"><p class="cl-f0a15ee0"><span class="cl-f0a14ba8">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-f0a18a82"><p class="cl-f0a15ee0"><span class="cl-f0a14ba8">1</span></p></td><td class="cl-f0a18a82"><p class="cl-f0a15ee0"><span class="cl-f0a14ba8">4</span></p></td><td class="cl-f0a18a82"><p class="cl-f0a15ee0"><span class="cl-f0a14ba8">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-f0a18a82"><p class="cl-f0a15ee0"><span class="cl-f0a14ba8">2</span></p></td><td class="cl-f0a18a82"><p class="cl-f0a15ee0"><span class="cl-f0a14ba8">4</span></p></td><td class="cl-f0a18a82"><p class="cl-f0a15ee0"><span class="cl-f0a14ba8">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-f0a18aa0"><p class="cl-f0a15ee0"><span class="cl-f0a14ba8">3</span></p></td><td class="cl-f0a18aa0"><p class="cl-f0a15ee0"><span class="cl-f0a14ba8">4</span></p></td><td class="cl-f0a18aa0"><p class="cl-f0a15ee0"><span class="cl-f0a14ba8">64</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="6dadfc71-fc8b-492f-ab1f-021369150080"></div>
 <script>
-var dest = document.getElementById("8e824eac-91e4-444b-9795-4e61a341a842");
-var template = document.getElementById("bc47dc4a-45b8-458a-95e4-010f2cbfba2c");
+var dest = document.getElementById("6dadfc71-fc8b-492f-ab1f-021369150080");
+var template = document.getElementById("8c156bc1-fd13-45f4-a1c9-527c0b6af1b2");
 var caption = template.content.querySelector("caption");
 if(caption) {
   caption.style.cssText = "display:block;text-align:center;";
@@ -516,19 +516,19 @@ conpare_qa(w_in = 24, l_in = 12)
 ```
 #> 
 #> 
-#> |      mean|        sd|      5.5%|    94.5%|qa         |
-#> |---------:|---------:|---------:|--------:|:----------|
-#> | 0.6666671| 0.1571337| 0.4155371| 0.917797|W: 6, L: 3 |
+#> |      mean|        sd|      5.5%|     94.5%|qa         |
+#> |---------:|---------:|---------:|---------:|:----------|
+#> | 0.6666664| 0.1571339| 0.4155361| 0.9177966|W: 6, L: 3 |
 #> 
 #> 
 #> |      mean|        sd|      5.5%|     94.5%|qa          |
 #> |---------:|---------:|---------:|---------:|:-----------|
-#> | 0.6666603| 0.1111114| 0.4890828| 0.8442378|W: 12, L: 6 |
+#> | 0.6666662| 0.1111104| 0.4890902| 0.8442421|W: 12, L: 6 |
 #> 
 #> 
 #> |      mean|        sd|      5.5%|     94.5%|qa           |
 #> |---------:|---------:|---------:|---------:|:------------|
-#> | 0.6666665| 0.0785669| 0.5411014| 0.7922316|W: 24, L: 12 |
+#> | 0.6666671| 0.0785668| 0.5411021| 0.7922321|W: 24, L: 12 |
 ```
 
 <img src="rethinking_c2_files/figure-html/unnamed-chunk-17-1.svg" width="672" style="display: block; margin: auto;" />
@@ -738,8 +738,8 @@ $$
 
 
 ```r
-pr_twn_on_a <- .2
-pr_twn_on_b <- .1
+pr_twn_on_a <- .1
+pr_twn_on_b <- .2
 pr_twn <- (pr_twn_on_a + pr_twn_on_b) /2 
 
 prior_a <- .5
@@ -758,7 +758,7 @@ pr_b_on_twn <- ((1 - prior_a) * pr_twn_on_b) / pr_twn
 **H2**
 
 $$
-Pr(spec_a | twin) = \frac{2}{3}
+Pr(spec_a | twin) = \frac{1}{3}
 $$
 
 
@@ -767,7 +767,7 @@ pr_a_on_twn
 ```
 
 ```
-#> [1] 0.6666667
+#> [1] 0.3333333
 ```
 
 **H3**
@@ -802,7 +802,7 @@ tibble(pr_a_on_sgl = pr_a_on_sgl, pr_b_on_sgl = pr_b_on_sgl,
 
 | pr_a_on_sgl| pr_b_on_sgl| control|
 |-----------:|-----------:|-------:|
-|        0.64|        0.36|       1|
+|        0.36|        0.64|       1|
 
 **H4**
 
@@ -820,9 +820,9 @@ pr_testb_on_b <- .65
 pr_testa_on_b <- 1 - pr_testb_on_b
 
 prior_a <- .5
-
-pr_testa <- weighted.mean(x = c(pr_testa_on_a, pr_testa_on_b),
-                        w = c(prior_a, 1- prior_a))
+# pr_testa <- pr_testa_on_a * Pr(a) / 
+  
+pr_testa <- (prior_a * pr_testa_on_a) + ((1- prior_a) * pr_testa_on_b)
 
 tibble(pr_on_testa = c("A","B"),
        genetic_test = c((prior_a * pr_testa_on_a) / pr_testa,
@@ -838,25 +838,22 @@ tibble(pr_on_testa = c("A","B"),
 ```
 
 ```r
-prior_a_updated <- (prior_a * pr_testa_on_a) / pr_testa
-pr_twn_updated <-  weighted.mean(x = c(pr_twn_on_a, pr_twn_on_b),
-                        w = c(prior_a_updated, 1- prior_a_updated))
+prior_a_updated <- pr_a_on_sgl
+pr_testa_updated <- (prior_a_updated * pr_testa_on_a) + ((1- prior_a_updated) * pr_testa_on_b)
 
-pr_a_on_twn_updated <- (prior_a_updated * pr_twn_on_a) / pr_twn_updated
-pr_b_on_twn_updated <- ((1 - prior_a_updated) * pr_twn_on_b) / pr_twn_updated
 
-tibble(pr_a_on_twn_updated = pr_a_on_twn_updated,
-       pr_b_on_twn_updated = pr_b_on_twn_updated,
-       control = pr_a_on_twn_updated + pr_b_on_twn_updated) %>%
-  round(digits = 4) %>%
-  knitr::kable()
+tibble(pr_on_testa = c("A","B"),
+       genetic_test = c((prior_a_updated * pr_testa_on_a) / pr_testa_updated,
+                        ((1 - prior_a_updated) * pr_testa_on_b) / pr_testa_updated))
 ```
 
-
-
-| pr_a_on_twn_updated| pr_b_on_twn_updated| control|
-|-------------------:|-------------------:|-------:|
-|              0.8205|              0.1795|       1|
+```
+#> # A tibble: 2 x 2
+#>   pr_on_testa genetic_test
+#>   <chr>              <dbl>
+#> 1 A                  0.562
+#> 2 B                  0.438
+```
 
 ## {brms} section
 
