@@ -337,10 +337,10 @@ ggplot() +
 ## Motors: Grid Approximation
 
 ```{r}
-grid_approx <- function(n_grid = 20, L = 6, W = 3, prior = function(x){rep(1, length(x))}){
+grid_approx <- function(n_grid = 20, W = 6, L = 3, prior = function(x){rep(1, length(x))}){
   tibble(p_grid = seq(0, 1, length.out = n_grid),
          prior = prior(p_grid),
-         likelihood = dbinom(L, size = W + L, prob = p_grid),
+         likelihood = dbinom(W, size = W + L, prob = p_grid),
          posterior_unstand = likelihood * prior,
          posterior = posterior_unstand / sum(posterior_unstand))
 }

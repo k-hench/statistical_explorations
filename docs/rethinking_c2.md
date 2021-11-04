@@ -67,7 +67,7 @@ tibble(draws = 1:3,
 ```
 
 ```{=html}
-<template id="f59c0710-010d-4e86-80ed-9f752779f4e2"><style>
+<template id="bc47dc4a-45b8-458a-95e4-010f2cbfba2c"><style>
 .tabwid table{
   border-spacing:0px !important;
   border-collapse:collapse;
@@ -101,15 +101,15 @@ tibble(draws = 1:3,
 .tabwid table tr {
 background-color: transparent;
 }
-</style><div class="tabwid"><style>.cl-659a92b0{}.cl-659577c6{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-65958c0c{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-6595b952{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6595b97a{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6595b98e{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-659a92b0'>
+</style><div class="tabwid"><style>.cl-469bf3f2{}.cl-4695bb2c{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-4695d08a{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-4696046a{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-46960492{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-4696049c{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-469bf3f2'>
 ```
 
 ```{=html}
-<thead><tr style="overflow-wrap:break-word;"><td class="cl-6595b98e"><p class="cl-65958c0c"><span class="cl-659577c6">draws</span></p></td><td class="cl-6595b98e"><p class="cl-65958c0c"><span class="cl-659577c6">marbles</span></p></td><td class="cl-6595b98e"><p class="cl-65958c0c"><span class="cl-659577c6">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-6595b952"><p class="cl-65958c0c"><span class="cl-659577c6">1</span></p></td><td class="cl-6595b952"><p class="cl-65958c0c"><span class="cl-659577c6">4</span></p></td><td class="cl-6595b952"><p class="cl-65958c0c"><span class="cl-659577c6">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-6595b952"><p class="cl-65958c0c"><span class="cl-659577c6">2</span></p></td><td class="cl-6595b952"><p class="cl-65958c0c"><span class="cl-659577c6">4</span></p></td><td class="cl-6595b952"><p class="cl-65958c0c"><span class="cl-659577c6">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-6595b97a"><p class="cl-65958c0c"><span class="cl-659577c6">3</span></p></td><td class="cl-6595b97a"><p class="cl-65958c0c"><span class="cl-659577c6">4</span></p></td><td class="cl-6595b97a"><p class="cl-65958c0c"><span class="cl-659577c6">64</span></p></td></tr></tbody></table></div></template>
-<div class="flextable-shadow-host" id="3e110cec-17ed-4252-8e74-a2c5bae256bc"></div>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-4696049c"><p class="cl-4695d08a"><span class="cl-4695bb2c">draws</span></p></td><td class="cl-4696049c"><p class="cl-4695d08a"><span class="cl-4695bb2c">marbles</span></p></td><td class="cl-4696049c"><p class="cl-4695d08a"><span class="cl-4695bb2c">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-4696046a"><p class="cl-4695d08a"><span class="cl-4695bb2c">1</span></p></td><td class="cl-4696046a"><p class="cl-4695d08a"><span class="cl-4695bb2c">4</span></p></td><td class="cl-4696046a"><p class="cl-4695d08a"><span class="cl-4695bb2c">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-4696046a"><p class="cl-4695d08a"><span class="cl-4695bb2c">2</span></p></td><td class="cl-4696046a"><p class="cl-4695d08a"><span class="cl-4695bb2c">4</span></p></td><td class="cl-4696046a"><p class="cl-4695d08a"><span class="cl-4695bb2c">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-46960492"><p class="cl-4695d08a"><span class="cl-4695bb2c">3</span></p></td><td class="cl-46960492"><p class="cl-4695d08a"><span class="cl-4695bb2c">4</span></p></td><td class="cl-46960492"><p class="cl-4695d08a"><span class="cl-4695bb2c">64</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="8e824eac-91e4-444b-9795-4e61a341a842"></div>
 <script>
-var dest = document.getElementById("3e110cec-17ed-4252-8e74-a2c5bae256bc");
-var template = document.getElementById("f59c0710-010d-4e86-80ed-9f752779f4e2");
+var dest = document.getElementById("8e824eac-91e4-444b-9795-4e61a341a842");
+var template = document.getElementById("bc47dc4a-45b8-458a-95e4-010f2cbfba2c");
 var caption = template.content.querySelector("caption");
 if(caption) {
   caption.style.cssText = "display:block;text-align:center;";
@@ -441,10 +441,10 @@ ggplot() +
 
 
 ```r
-grid_approx <- function(n_grid = 20, L = 6, W = 3, prior = function(x){rep(1, length(x))}){
+grid_approx <- function(n_grid = 20, W = 6, L = 3, prior = function(x){rep(1, length(x))}){
   tibble(p_grid = seq(0, 1, length.out = n_grid),
          prior = prior(p_grid),
-         likelihood = dbinom(L, size = W + L, prob = p_grid),
+         likelihood = dbinom(W, size = W + L, prob = p_grid),
          posterior_unstand = likelihood * prior,
          posterior = posterior_unstand / sum(posterior_unstand))
 }
@@ -516,19 +516,19 @@ conpare_qa(w_in = 24, l_in = 12)
 ```
 #> 
 #> 
-#> |      mean|        sd|      5.5%|     94.5%|qa         |
-#> |---------:|---------:|---------:|---------:|:----------|
-#> | 0.6666664| 0.1571339| 0.4155361| 0.9177966|W: 6, L: 3 |
+#> |      mean|        sd|      5.5%|    94.5%|qa         |
+#> |---------:|---------:|---------:|--------:|:----------|
+#> | 0.6666671| 0.1571337| 0.4155371| 0.917797|W: 6, L: 3 |
 #> 
 #> 
 #> |      mean|        sd|      5.5%|     94.5%|qa          |
 #> |---------:|---------:|---------:|---------:|:-----------|
-#> | 0.6666662| 0.1111104| 0.4890902| 0.8442421|W: 12, L: 6 |
+#> | 0.6666603| 0.1111114| 0.4890828| 0.8442378|W: 12, L: 6 |
 #> 
 #> 
 #> |      mean|        sd|      5.5%|     94.5%|qa           |
 #> |---------:|---------:|---------:|---------:|:------------|
-#> | 0.6666668| 0.0785669| 0.5411017| 0.7922318|W: 24, L: 12 |
+#> | 0.6666665| 0.0785669| 0.5411014| 0.7922316|W: 24, L: 12 |
 ```
 
 <img src="rethinking_c2_files/figure-html/unnamed-chunk-17-1.svg" width="672" style="display: block; margin: auto;" />

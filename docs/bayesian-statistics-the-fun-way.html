@@ -24,7 +24,7 @@
 <meta name="author" content="Kosmas Hench" />
 
 
-<meta name="date" content="2021-10-31" />
+<meta name="date" content="2021-11-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1129,7 +1129,7 @@ N(\mu, \sigma) = \frac{1}{\sqrt{2\pi    \sigma^2}} \times e ^{- \frac{(x - \mu) 
 <span id="cb162-5"><a href="bayesian-statistics-the-fun-way.html#cb162-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb162-6"><a href="bayesian-statistics-the-fun-way.html#cb162-6" aria-hidden="true" tabindex="-1"></a>p_b_superior <span class="ot">&lt;-</span> <span class="fu">sum</span>(mc_simulation<span class="sc">$</span>samples_b <span class="sc">&gt;</span> mc_simulation<span class="sc">$</span>samples_a)<span class="sc">/</span>n_trials</span>
 <span id="cb162-7"><a href="bayesian-statistics-the-fun-way.html#cb162-7" aria-hidden="true" tabindex="-1"></a>p_b_superior</span></code></pre></div>
-<pre><code>#&gt; [1] 0.9594</code></pre>
+<pre><code>#&gt; [1] 0.95987</code></pre>
 <div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb164-1"><a href="bayesian-statistics-the-fun-way.html#cb164-1" aria-hidden="true" tabindex="-1"></a>p_hist <span class="ot">&lt;-</span> mc_simulation <span class="sc">%&gt;%</span> </span>
 <span id="cb164-2"><a href="bayesian-statistics-the-fun-way.html#cb164-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> samples_ratio)) <span class="sc">+</span></span>
 <span id="cb164-3"><a href="bayesian-statistics-the-fun-way.html#cb164-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">color =</span> clr2, <span class="at">fill =</span> fll2, <span class="at">size =</span> .<span class="dv">2</span>, <span class="at">bins =</span> <span class="dv">20</span>,<span class="at">boundary =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
