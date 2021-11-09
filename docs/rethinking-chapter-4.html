@@ -24,7 +24,7 @@
 <meta name="author" content="Kosmas Hench" />
 
 
-<meta name="date" content="2021-11-04" />
+<meta name="date" content="2021-11-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -705,6 +705,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.3" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#a-language-for-describing-models"><i class="fa fa-check"></i><b>5.3</b> A language for describing models</a>
 <ul>
 <li class="chapter" data-level="5.3.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#gaussian-model-of-height"><i class="fa fa-check"></i><b>5.3.1</b> Gaussian model of height</a></li>
+<li class="chapter" data-level="5.3.2" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#linear-prediction"><i class="fa fa-check"></i><b>5.3.2</b> Linear Prediction</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html"><i class="fa fa-check"></i><b>6</b> Bayesian Statistics the Fun Way</a>
@@ -1212,7 +1213,209 @@ h_i &amp; \stackrel{iid}{\sim} &amp; Normal(\mu, \sigma) &amp; \verb|height ~ dn
 <span id="cb132-13"><a href="rethinking-chapter-4.html#cb132-13" aria-hidden="true" tabindex="-1"></a>model_heights_quap_weak_prior <span class="ot">&lt;-</span> <span class="fu">quap</span>(<span class="at">flist =</span> model_spec,</span>
 <span id="cb132-14"><a href="rethinking-chapter-4.html#cb132-14" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">data =</span>  data_adults,</span>
 <span id="cb132-15"><a href="rethinking-chapter-4.html#cb132-15" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">start =</span> map_starting_points)</span>
-<span id="cb132-16"><a href="rethinking-chapter-4.html#cb132-16" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(model_heights_quap_weak_prior) <span class="sc">%&gt;%</span>  <span class="fu">as_tibble</span>(<span class="at">rownames =</span> <span class="cn">NA</span>) <span class="sc">%&gt;%</span>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<span id="cb132-16"><a href="rethinking-chapter-4.html#cb132-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb132-17"><a href="rethinking-chapter-4.html#cb132-17" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(model_heights_quap_weak_prior) <span class="sc">%&gt;%</span></span>
+<span id="cb132-18"><a href="rethinking-chapter-4.html#cb132-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>(<span class="at">rownames =</span> <span class="cn">NA</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb132-19"><a href="rethinking-chapter-4.html#cb132-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="at">digits =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb132-20"><a href="rethinking-chapter-4.html#cb132-20" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">5.5%</th>
+<th align="right">94.5%</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">154.61</td>
+<td align="right">0.41</td>
+<td align="right">153.95</td>
+<td align="right">155.27</td>
+</tr>
+<tr class="even">
+<td align="right">7.73</td>
+<td align="right">0.29</td>
+<td align="right">7.27</td>
+<td align="right">8.20</td>
+</tr>
+</tbody>
+</table>
+<p>Comparing how a stronger prior for <span class="math inline">\(\mu\)</span> (narrower distribution) forces a larger estimate of <span class="math inline">\(\sigma\)</span> to compensate for this.</p>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="rethinking-chapter-4.html#cb133-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quap</span>(</span>
+<span id="cb133-2"><a href="rethinking-chapter-4.html#cb133-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">flist =</span> <span class="fu">alist</span>(</span>
+<span id="cb133-3"><a href="rethinking-chapter-4.html#cb133-3" aria-hidden="true" tabindex="-1"></a>    height <span class="sc">~</span> <span class="fu">dnorm</span>( mu , sigma ),</span>
+<span id="cb133-4"><a href="rethinking-chapter-4.html#cb133-4" aria-hidden="true" tabindex="-1"></a>    mu <span class="sc">~</span> <span class="fu">dnorm</span>( <span class="dv">178</span>, <span class="fl">0.1</span> ),</span>
+<span id="cb133-5"><a href="rethinking-chapter-4.html#cb133-5" aria-hidden="true" tabindex="-1"></a>    sigma <span class="sc">~</span> <span class="fu">dunif</span>( <span class="dv">0</span>, <span class="dv">50</span> )</span>
+<span id="cb133-6"><a href="rethinking-chapter-4.html#cb133-6" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb133-7"><a href="rethinking-chapter-4.html#cb133-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span>  data_adults,</span>
+<span id="cb133-8"><a href="rethinking-chapter-4.html#cb133-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">start =</span> map_starting_points) <span class="sc">%&gt;%</span></span>
+<span id="cb133-9"><a href="rethinking-chapter-4.html#cb133-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">precis</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb133-10"><a href="rethinking-chapter-4.html#cb133-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>(<span class="at">rownames =</span> <span class="cn">NA</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb133-11"><a href="rethinking-chapter-4.html#cb133-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="at">digits =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb133-12"><a href="rethinking-chapter-4.html#cb133-12" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">5.5%</th>
+<th align="right">94.5%</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">177.86</td>
+<td align="right">0.10</td>
+<td align="right">177.70</td>
+<td align="right">178.02</td>
+</tr>
+<tr class="even">
+<td align="right">24.52</td>
+<td align="right">0.93</td>
+<td align="right">23.03</td>
+<td align="right">26.00</td>
+</tr>
+</tbody>
+</table>
+<p>The <em>variance-covariance</em> matrix of the quadratic aprroximation for sampling the multi-dimensional gaussian distribution:</p>
+<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="rethinking-chapter-4.html#cb134-1" aria-hidden="true" tabindex="-1"></a>vcov_mod_heights <span class="ot">&lt;-</span> <span class="fu">vcov</span>(model_heights_quap_weak_prior)</span>
+<span id="cb134-2"><a href="rethinking-chapter-4.html#cb134-2" aria-hidden="true" tabindex="-1"></a>vcov_mod_heights <span class="sc">%&gt;%</span></span>
+<span id="cb134-3"><a href="rethinking-chapter-4.html#cb134-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="at">digits =</span> <span class="dv">6</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb134-4"><a href="rethinking-chapter-4.html#cb134-4" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">mu</th>
+<th align="right">sigma</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">mu</td>
+<td align="right">0.169740</td>
+<td align="right">0.000218</td>
+</tr>
+<tr class="even">
+<td align="left">sigma</td>
+<td align="right">0.000218</td>
+<td align="right">0.084906</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="rethinking-chapter-4.html#cb135-1" aria-hidden="true" tabindex="-1"></a><span class="fu">diag</span>(vcov_mod_heights)</span></code></pre></div>
+<pre><code>#&gt;         mu      sigma 
+#&gt; 0.16973961 0.08490582</code></pre>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="rethinking-chapter-4.html#cb137-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">cov2cor</span>(vcov_mod_heights), <span class="at">digits =</span> <span class="dv">5</span>)</span></code></pre></div>
+<p><span class="math display">\[\begin{bmatrix} 1 &amp;0.00182 \\0.00182 &amp;1 \\ \end{bmatrix}\]</span></p>
+<p>sampling from the multi-dimensional posterior distribution</p>
+<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb138-1"><a href="rethinking-chapter-4.html#cb138-1" aria-hidden="true" tabindex="-1"></a>posterior_sample <span class="ot">&lt;-</span> <span class="fu">extract.samples</span>(model_heights_quap_weak_prior, <span class="at">n =</span> <span class="fl">1e4</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb138-2"><a href="rethinking-chapter-4.html#cb138-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span>
+<span id="cb138-3"><a href="rethinking-chapter-4.html#cb138-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb138-4"><a href="rethinking-chapter-4.html#cb138-4" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(posterior_sample) <span class="sc">%&gt;%</span></span>
+<span id="cb138-5"><a href="rethinking-chapter-4.html#cb138-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb138-6"><a href="rethinking-chapter-4.html#cb138-6" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">5.5%</th>
+<th align="right">94.5%</th>
+<th align="left">histogram</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">154.612324</td>
+<td align="right">0.4138706</td>
+<td align="right">153.948054</td>
+<td align="right">155.262747</td>
+<td align="left">▁▁▅▇▂▁▁</td>
+</tr>
+<tr class="even">
+<td align="right">7.728911</td>
+<td align="right">0.2926062</td>
+<td align="right">7.268824</td>
+<td align="right">8.196356</td>
+<td align="left">▁▁▁▁▂▅▇▇▃▁▁▁▁</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="linear-prediction" class="section level3" number="5.3.2">
+<h3><span class="header-section-number">5.3.2</span> Linear Prediction</h3>
+<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb139-1"><a href="rethinking-chapter-4.html#cb139-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data_adults,</span>
+<span id="cb139-2"><a href="rethinking-chapter-4.html#cb139-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(height, weight)) <span class="sc">+</span></span>
+<span id="cb139-3"><a href="rethinking-chapter-4.html#cb139-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">shape =</span> <span class="dv">21</span>, <span class="at">size =</span> <span class="fl">1.5</span>, <span class="at">color =</span> clr1, <span class="at">fill =</span> fll1)</span></code></pre></div>
+<p><img src="rethinking_c4_files/figure-html/unnamed-chunk-15-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><span class="math display">\[
+\begin{array}{cccr} 
+h_i &amp; {\sim} &amp; Normal(\mu, \sigma) &amp; \textrm{[likelihood]}\\
+\mu_i &amp; = &amp; \alpha + \beta (x_i - \bar{x}) &amp; \textrm{[linear model]}\\ % alternatively \overline{x}
+\alpha &amp; \sim &amp; Normal(178, 20) &amp; \textrm{[$\alpha$ prior]}\\
+\beta &amp; \sim &amp; Normal(0, 10) &amp; \textrm{[$\beta$ prior]}\\
+\sigma &amp; \sim &amp; Uniform(0,50) &amp; \textrm{[$\sigma$ prior]}
+\end{array}
+\]</span></p>
+<p>The current prior for <span class="math inline">\(\beta\)</span> is a bad choice, because it allows <em>negative</em> as well as unreasonably high and low dependencies of <span class="math inline">\(h\)</span> (height) on <span class="math inline">\(x\)</span> (weight):</p>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="rethinking-chapter-4.html#cb140-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2971</span>)</span>
+<span id="cb140-2"><a href="rethinking-chapter-4.html#cb140-2" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb140-3"><a href="rethinking-chapter-4.html#cb140-3" aria-hidden="true" tabindex="-1"></a>linear_priors <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span>N,</span>
+<span id="cb140-4"><a href="rethinking-chapter-4.html#cb140-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">alpha =</span> <span class="fu">rnorm</span>( <span class="at">n =</span> N, <span class="at">mean =</span>  <span class="dv">178</span>, <span class="at">sd =</span> <span class="dv">20</span> ),</span>
+<span id="cb140-5"><a href="rethinking-chapter-4.html#cb140-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">beta_1 =</span> <span class="fu">rnorm</span>( <span class="at">n =</span> N, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">10</span>),</span>
+<span id="cb140-6"><a href="rethinking-chapter-4.html#cb140-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">beta_2 =</span> <span class="fu">rlnorm</span>( <span class="at">n =</span> N, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb140-7"><a href="rethinking-chapter-4.html#cb140-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand</span>(<span class="fu">nesting</span>(n, alpha, beta_1, beta_2), <span class="at">weight =</span> <span class="fu">range</span>(data_adults<span class="sc">$</span>weight)) <span class="sc">%&gt;%</span> </span>
+<span id="cb140-8"><a href="rethinking-chapter-4.html#cb140-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">height_1 =</span> alpha <span class="sc">+</span> beta_1 <span class="sc">*</span> (weight <span class="sc">-</span> <span class="fu">mean</span>(data_adults<span class="sc">$</span>weight)),</span>
+<span id="cb140-9"><a href="rethinking-chapter-4.html#cb140-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">height_2 =</span> alpha <span class="sc">+</span> beta_2 <span class="sc">*</span> (weight <span class="sc">-</span> <span class="fu">mean</span>(data_adults<span class="sc">$</span>weight)))</span>
+<span id="cb140-10"><a href="rethinking-chapter-4.html#cb140-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb140-11"><a href="rethinking-chapter-4.html#cb140-11" aria-hidden="true" tabindex="-1"></a>p_lin_pr <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(linear_priors, <span class="fu">aes</span>(<span class="at">x =</span> weight, <span class="at">y =</span> height_1, <span class="at">group =</span> n)) <span class="sc">+</span></span>
+<span id="cb140-12"><a href="rethinking-chapter-4.html#cb140-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">glue</span>(<span class="st">&quot;{mth(&#39;*\U03B2* ~&#39;)} Normal(0, 10)&quot;</span>), <span class="at">y =</span> <span class="st">&quot;height&quot;</span>) </span>
+<span id="cb140-13"><a href="rethinking-chapter-4.html#cb140-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb140-14"><a href="rethinking-chapter-4.html#cb140-14" aria-hidden="true" tabindex="-1"></a>p_log_pr <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(linear_priors, <span class="fu">aes</span>(<span class="at">x =</span> weight, <span class="at">y =</span> height_2, <span class="at">group =</span> n)) <span class="sc">+</span></span>
+<span id="cb140-15"><a href="rethinking-chapter-4.html#cb140-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">glue</span>(<span class="st">&quot;{mth(&#39;*\U03B2* ~&#39;)} Log-Normal(0, 1)&quot;</span>), <span class="at">y =</span> <span class="st">&quot;height&quot;</span>) </span>
+<span id="cb140-16"><a href="rethinking-chapter-4.html#cb140-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb140-17"><a href="rethinking-chapter-4.html#cb140-17" aria-hidden="true" tabindex="-1"></a>p_lnorm <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb140-18"><a href="rethinking-chapter-4.html#cb140-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> <span class="cf">function</span>(x){<span class="fu">dlnorm</span>(<span class="at">x =</span> x, <span class="at">meanlog =</span> <span class="dv">0</span>, <span class="at">sdlog =</span> <span class="dv">1</span>)},</span>
+<span id="cb140-19"><a href="rethinking-chapter-4.html#cb140-19" aria-hidden="true" tabindex="-1"></a>                <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">5</span>), <span class="at">geom =</span> <span class="st">&quot;area&quot;</span>, <span class="at">color =</span> clr2, <span class="at">fill =</span> fll2, <span class="at">n =</span> <span class="dv">501</span>) <span class="sc">+</span></span>
+<span id="cb140-20"><a href="rethinking-chapter-4.html#cb140-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Log-Norm(0, 0.1)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;density&quot;</span>)</span>
+<span id="cb140-21"><a href="rethinking-chapter-4.html#cb140-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb140-22"><a href="rethinking-chapter-4.html#cb140-22" aria-hidden="true" tabindex="-1"></a>(p_lin_pr <span class="sc">+</span> p_log_pr <span class="sc">&amp;</span></span>
+<span id="cb140-23"><a href="rethinking-chapter-4.html#cb140-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_hline</span>(<span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">height =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">272</span>), <span class="at">type =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>),</span>
+<span id="cb140-24"><a href="rethinking-chapter-4.html#cb140-24" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">yintercept =</span> height, <span class="at">linetype =</span> <span class="fu">factor</span>(type)), <span class="at">size =</span> .<span class="dv">4</span>) <span class="sc">&amp;</span></span>
+<span id="cb140-25"><a href="rethinking-chapter-4.html#cb140-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">color =</span> clr2, <span class="at">alpha =</span> .<span class="dv">25</span>) <span class="sc">&amp;</span></span>
+<span id="cb140-26"><a href="rethinking-chapter-4.html#cb140-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">3</span>, <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">1</span>), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">&amp;</span></span>
+<span id="cb140-27"><a href="rethinking-chapter-4.html#cb140-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">range</span>(data_adults<span class="sc">$</span>weight), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">400</span>)) <span class="sc">&amp;</span></span>
+<span id="cb140-28"><a href="rethinking-chapter-4.html#cb140-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_markdown</span>())) <span class="sc">+</span></span>
+<span id="cb140-29"><a href="rethinking-chapter-4.html#cb140-29" aria-hidden="true" tabindex="-1"></a>  p_lnorm</span></code></pre></div>
+<p><img src="rethinking_c4_files/figure-html/unnamed-chunk-16-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p>The log-normal prior seems more sensible, so we update the model priors as such:</p>
+<p><span class="math display">\[
+\begin{array}{cccr} 
+\beta &amp; \sim &amp; Log-Normal(0, 1) &amp; \textrm{[$\beta$ prior]}\\
+\end{array}
+\]</span></p>
+<div id="finding-the-posterior-distribution" class="section level4" number="5.3.2.1">
+<h4><span class="header-section-number">5.3.2.1</span> Finding the posterior Distribution</h4>
+<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="rethinking-chapter-4.html#cb141-1" aria-hidden="true" tabindex="-1"></a>xbar <span class="ot">&lt;-</span> <span class="fu">mean</span>(data_adults<span class="sc">$</span>weight)</span>
+<span id="cb141-2"><a href="rethinking-chapter-4.html#cb141-2" aria-hidden="true" tabindex="-1"></a>model_hight <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
+<span id="cb141-3"><a href="rethinking-chapter-4.html#cb141-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">flist =</span> <span class="fu">alist</span>(</span>
+<span id="cb141-4"><a href="rethinking-chapter-4.html#cb141-4" aria-hidden="true" tabindex="-1"></a>    height <span class="sc">~</span> <span class="fu">dnorm</span>( mu, sigma ),</span>
+<span id="cb141-5"><a href="rethinking-chapter-4.html#cb141-5" aria-hidden="true" tabindex="-1"></a>    mu <span class="ot">&lt;-</span> alpha <span class="sc">+</span> beta <span class="sc">*</span> ( weight <span class="sc">-</span> xbar ),</span>
+<span id="cb141-6"><a href="rethinking-chapter-4.html#cb141-6" aria-hidden="true" tabindex="-1"></a>    alpha <span class="sc">~</span> <span class="fu">dnorm</span>( <span class="dv">178</span>, <span class="dv">20</span> ),</span>
+<span id="cb141-7"><a href="rethinking-chapter-4.html#cb141-7" aria-hidden="true" tabindex="-1"></a>    beta <span class="sc">~</span> <span class="fu">dlnorm</span>( <span class="dv">0</span>, <span class="dv">1</span> ),</span>
+<span id="cb141-8"><a href="rethinking-chapter-4.html#cb141-8" aria-hidden="true" tabindex="-1"></a>    sigma <span class="sc">~</span> <span class="fu">dunif</span>( <span class="dv">0</span>, <span class="dv">50</span>)</span>
+<span id="cb141-9"><a href="rethinking-chapter-4.html#cb141-9" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb141-10"><a href="rethinking-chapter-4.html#cb141-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_adults</span>
+<span id="cb141-11"><a href="rethinking-chapter-4.html#cb141-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Table of marginal distributions of the parameters after training the model on the data</p>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="rethinking-chapter-4.html#cb142-1" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(model_hight) <span class="sc">%&gt;%</span> </span>
+<span id="cb142-2"><a href="rethinking-chapter-4.html#cb142-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="at">digits =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb142-3"><a href="rethinking-chapter-4.html#cb142-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>(<span class="at">rownames =</span> <span class="cn">NA</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb142-4"><a href="rethinking-chapter-4.html#cb142-4" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1225,21 +1428,154 @@ h_i &amp; \stackrel{iid}{\sim} &amp; Normal(\mu, \sigma) &amp; \verb|height ~ dn
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">mu</td>
-<td align="right">154.607023</td>
-<td align="right">0.4119947</td>
-<td align="right">153.948577</td>
-<td align="right">155.265471</td>
+<td align="left">alpha</td>
+<td align="right">154.602</td>
+<td align="right">0.270</td>
+<td align="right">154.170</td>
+<td align="right">155.034</td>
 </tr>
 <tr class="even">
+<td align="left">beta</td>
+<td align="right">0.903</td>
+<td align="right">0.042</td>
+<td align="right">0.836</td>
+<td align="right">0.970</td>
+</tr>
+<tr class="odd">
 <td align="left">sigma</td>
-<td align="right">7.731333</td>
-<td align="right">0.2913860</td>
-<td align="right">7.265642</td>
-<td align="right">8.197024</td>
+<td align="right">5.072</td>
+<td align="right">0.191</td>
+<td align="right">4.766</td>
+<td align="right">5.377</td>
 </tr>
 </tbody>
 </table>
+<p>We also need thevariance-covariance matrix to fully describe the audratic approximation completely:</p>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="rethinking-chapter-4.html#cb143-1" aria-hidden="true" tabindex="-1"></a>model_hight <span class="sc">%&gt;%</span> </span>
+<span id="cb143-2"><a href="rethinking-chapter-4.html#cb143-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vcov</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb143-3"><a href="rethinking-chapter-4.html#cb143-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="at">digits =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb143-4"><a href="rethinking-chapter-4.html#cb143-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>(<span class="at">row.names =</span> <span class="fu">row.names</span>(.)) <span class="sc">%&gt;%</span> </span>
+<span id="cb143-5"><a href="rethinking-chapter-4.html#cb143-5" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">alpha</th>
+<th align="right">beta</th>
+<th align="right">sigma</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">alpha</td>
+<td align="right">0.07</td>
+<td align="right">0</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left">beta</td>
+<td align="right">0.00</td>
+<td align="right">0</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="odd">
+<td align="left">sigma</td>
+<td align="right">0.00</td>
+<td align="right">0</td>
+<td align="right">0.04</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="rethinking-chapter-4.html#cb144-1" aria-hidden="true" tabindex="-1"></a>model_hight_smp <span class="ot">&lt;-</span> <span class="fu">extract.samples</span>(model_hight)  <span class="sc">%&gt;%</span> </span>
+<span id="cb144-2"><a href="rethinking-chapter-4.html#cb144-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() </span>
+<span id="cb144-3"><a href="rethinking-chapter-4.html#cb144-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb144-4"><a href="rethinking-chapter-4.html#cb144-4" aria-hidden="true" tabindex="-1"></a>model_hight_smp_mean <span class="ot">&lt;-</span> model_hight_smp <span class="sc">%&gt;%</span> </span>
+<span id="cb144-5"><a href="rethinking-chapter-4.html#cb144-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="at">.cols =</span> <span class="fu">everything</span>(), mean))</span>
+<span id="cb144-6"><a href="rethinking-chapter-4.html#cb144-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb144-7"><a href="rethinking-chapter-4.html#cb144-7" aria-hidden="true" tabindex="-1"></a>model_hight_smp <span class="sc">%&gt;%</span></span>
+<span id="cb144-8"><a href="rethinking-chapter-4.html#cb144-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggpairs</span>(</span>
+<span id="cb144-9"><a href="rethinking-chapter-4.html#cb144-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">lower =</span> <span class="fu">list</span>(<span class="at">continuous =</span> <span class="fu">wrap</span>(ggally_points, <span class="at">colour =</span> clr1, <span class="at">size =</span> .<span class="dv">2</span>, <span class="at">alpha =</span> .<span class="dv">1</span>)),</span>
+<span id="cb144-10"><a href="rethinking-chapter-4.html#cb144-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">diag =</span> <span class="fu">list</span>(<span class="at">continuous =</span> <span class="fu">wrap</span>(<span class="st">&quot;densityDiag&quot;</span>, <span class="at">fill =</span> fll1, <span class="at">color =</span> clr1, <span class="at">adjust =</span> .<span class="dv">5</span>)),</span>
+<span id="cb144-11"><a href="rethinking-chapter-4.html#cb144-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">upper =</span> <span class="fu">list</span>(<span class="at">continuous =</span> <span class="fu">wrap</span>(ggally_cor, <span class="at">size =</span> <span class="dv">5</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">family =</span> <span class="st">&quot;Josefin sans&quot;</span>)))</span></code></pre></div>
+<p><img src="rethinking_c4_files/figure-html/unnamed-chunk-19-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p>Plotting the posterior distribution against the data</p>
+<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb145-1"><a href="rethinking-chapter-4.html#cb145-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data_adults, <span class="fu">aes</span>(<span class="at">x  =</span> weight, <span class="at">y =</span> height)) <span class="sc">+</span></span>
+<span id="cb145-2"><a href="rethinking-chapter-4.html#cb145-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> clr0d) <span class="sc">+</span></span>
+<span id="cb145-3"><a href="rethinking-chapter-4.html#cb145-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> <span class="cf">function</span>(x){model_hight_smp_mean<span class="sc">$</span>alpha <span class="sc">+</span> model_hight_smp_mean<span class="sc">$</span>beta <span class="sc">*</span> (x <span class="sc">-</span> xbar)},</span>
+<span id="cb145-4"><a href="rethinking-chapter-4.html#cb145-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">color =</span> clr2, <span class="at">n =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="rethinking_c4_files/figure-html/unnamed-chunk-20-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p>A demonstration of the the effect of sample size on the uncertainty of the linear fit</p>
+<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="rethinking-chapter-4.html#cb146-1" aria-hidden="true" tabindex="-1"></a>sub_model <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">N =</span> <span class="dv">10</span>){</span>
+<span id="cb146-2"><a href="rethinking-chapter-4.html#cb146-2" aria-hidden="true" tabindex="-1"></a>  data_inner <span class="ot">&lt;-</span> data_adults[<span class="dv">1</span><span class="sc">:</span>N,]</span>
+<span id="cb146-3"><a href="rethinking-chapter-4.html#cb146-3" aria-hidden="true" tabindex="-1"></a>  xbar <span class="ot">&lt;-</span> <span class="fu">mean</span>(data_inner<span class="sc">$</span>weight)</span>
+<span id="cb146-4"><a href="rethinking-chapter-4.html#cb146-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb146-5"><a href="rethinking-chapter-4.html#cb146-5" aria-hidden="true" tabindex="-1"></a>  model_hight_inner <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
+<span id="cb146-6"><a href="rethinking-chapter-4.html#cb146-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">flist =</span> <span class="fu">alist</span>(</span>
+<span id="cb146-7"><a href="rethinking-chapter-4.html#cb146-7" aria-hidden="true" tabindex="-1"></a>      height <span class="sc">~</span> <span class="fu">dnorm</span>( mu, sigma ),</span>
+<span id="cb146-8"><a href="rethinking-chapter-4.html#cb146-8" aria-hidden="true" tabindex="-1"></a>      mu <span class="ot">&lt;-</span> alpha <span class="sc">+</span> beta <span class="sc">*</span> ( weight <span class="sc">-</span> xbar ),</span>
+<span id="cb146-9"><a href="rethinking-chapter-4.html#cb146-9" aria-hidden="true" tabindex="-1"></a>      alpha <span class="sc">~</span> <span class="fu">dnorm</span>( <span class="dv">178</span>, <span class="dv">20</span> ),</span>
+<span id="cb146-10"><a href="rethinking-chapter-4.html#cb146-10" aria-hidden="true" tabindex="-1"></a>      beta <span class="sc">~</span> <span class="fu">dlnorm</span>( <span class="dv">0</span>, <span class="dv">1</span> ),</span>
+<span id="cb146-11"><a href="rethinking-chapter-4.html#cb146-11" aria-hidden="true" tabindex="-1"></a>      sigma <span class="sc">~</span> <span class="fu">dunif</span>( <span class="dv">0</span>, <span class="dv">50</span>)</span>
+<span id="cb146-12"><a href="rethinking-chapter-4.html#cb146-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb146-13"><a href="rethinking-chapter-4.html#cb146-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> data_inner</span>
+<span id="cb146-14"><a href="rethinking-chapter-4.html#cb146-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb146-15"><a href="rethinking-chapter-4.html#cb146-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb146-16"><a href="rethinking-chapter-4.html#cb146-16" aria-hidden="true" tabindex="-1"></a>  model_hight_smp_inner <span class="ot">&lt;-</span> <span class="fu">extract.samples</span>(model_hight_inner)  <span class="sc">%&gt;%</span> </span>
+<span id="cb146-17"><a href="rethinking-chapter-4.html#cb146-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>()  <span class="sc">%&gt;%</span> </span>
+<span id="cb146-18"><a href="rethinking-chapter-4.html#cb146-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sample_n</span>(<span class="dv">20</span>)</span>
+<span id="cb146-19"><a href="rethinking-chapter-4.html#cb146-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb146-20"><a href="rethinking-chapter-4.html#cb146-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(data_inner, <span class="fu">aes</span>(<span class="at">x =</span> weight, <span class="at">y =</span> height)) <span class="sc">+</span></span>
+<span id="cb146-21"><a href="rethinking-chapter-4.html#cb146-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">color =</span> clr0d) <span class="sc">+</span></span>
+<span id="cb146-22"><a href="rethinking-chapter-4.html#cb146-22" aria-hidden="true" tabindex="-1"></a>    (purrr<span class="sc">::</span><span class="fu">map</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>, <span class="cf">function</span>(i){<span class="fu">stat_function</span>(</span>
+<span id="cb146-23"><a href="rethinking-chapter-4.html#cb146-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">fun =</span> <span class="cf">function</span>(x){model_hight_smp_inner<span class="sc">$</span>alpha[i] <span class="sc">+</span> model_hight_smp_inner<span class="sc">$</span>beta[i] <span class="sc">*</span> (x <span class="sc">-</span> xbar)},</span>
+<span id="cb146-24"><a href="rethinking-chapter-4.html#cb146-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> clr2, <span class="at">n =</span> <span class="dv">2</span>, <span class="at">alpha =</span> .<span class="dv">1</span>)})) <span class="sc">+</span></span>
+<span id="cb146-25"><a href="rethinking-chapter-4.html#cb146-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">glue</span>(<span class="st">&quot;N: {N}&quot;</span>))</span>
+<span id="cb146-26"><a href="rethinking-chapter-4.html#cb146-26" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb146-27"><a href="rethinking-chapter-4.html#cb146-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb146-28"><a href="rethinking-chapter-4.html#cb146-28" aria-hidden="true" tabindex="-1"></a><span class="fu">sub_model</span>(<span class="dv">10</span>) <span class="sc">+</span> <span class="fu">sub_model</span>(<span class="dv">50</span>) <span class="sc">+</span></span>
+<span id="cb146-29"><a href="rethinking-chapter-4.html#cb146-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sub_model</span>(<span class="dv">150</span>)  <span class="sc">+</span> <span class="fu">sub_model</span>(<span class="dv">352</span>) </span></code></pre></div>
+<p><img src="rethinking_c4_files/figure-html/unnamed-chunk-21-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p>adding intervals</p>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="rethinking-chapter-4.html#cb147-1" aria-hidden="true" tabindex="-1"></a>mu_at_50 <span class="ot">&lt;-</span> model_hight_smp <span class="sc">%&gt;%</span> </span>
+<span id="cb147-2"><a href="rethinking-chapter-4.html#cb147-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mu_at_50 =</span> alpha <span class="sc">+</span> beta <span class="sc">*</span> (<span class="dv">50</span> <span class="sc">-</span> xbar))</span>
+<span id="cb147-3"><a href="rethinking-chapter-4.html#cb147-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb147-4"><a href="rethinking-chapter-4.html#cb147-4" aria-hidden="true" tabindex="-1"></a>p_density <span class="ot">&lt;-</span> mu_at_50 <span class="sc">%&gt;%</span> </span>
+<span id="cb147-5"><a href="rethinking-chapter-4.html#cb147-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> mu_at_50)) <span class="sc">+</span></span>
+<span id="cb147-6"><a href="rethinking-chapter-4.html#cb147-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">adjust =</span> .<span class="dv">5</span>, <span class="at">color =</span> clr0d, <span class="at">fill =</span> fll0) <span class="sc">+</span></span>
+<span id="cb147-7"><a href="rethinking-chapter-4.html#cb147-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> <span class="cf">function</span>(x){<span class="fu">demp</span>(x, <span class="at">obs =</span> mu_at_50<span class="sc">$</span>mu_at_50, <span class="at">density.arg.list =</span> <span class="fu">list</span>(<span class="at">adjust =</span> .<span class="dv">5</span>))},</span>
+<span id="cb147-8"><a href="rethinking-chapter-4.html#cb147-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">xlim =</span> mu_at_50<span class="sc">$</span>mu_at_50 <span class="sc">%&gt;%</span> <span class="fu">PI</span>(), <span class="at">geom =</span> <span class="st">&quot;area&quot;</span>, <span class="at">fill =</span> fll2, <span class="at">color =</span> clr2) <span class="sc">+</span></span>
+<span id="cb147-9"><a href="rethinking-chapter-4.html#cb147-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">weights =</span> mu_at_50<span class="sc">$</span>mu_at_50 <span class="sc">%&gt;%</span> <span class="fu">PI</span>()), <span class="fu">aes</span>(<span class="at">xintercept =</span> weights), <span class="at">linetype  =</span> <span class="dv">3</span>)<span class="sc">+</span></span>
+<span id="cb147-10"><a href="rethinking-chapter-4.html#cb147-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="fu">glue</span>(<span class="st">&quot;{mth(&#39;*\U03BC*&#39;)} | weight = 50&quot;</span>), <span class="at">limits =</span> <span class="fu">c</span>(<span class="fl">157.7</span>, <span class="fl">160.8</span>)) <span class="sc">+</span></span>
+<span id="cb147-11"><a href="rethinking-chapter-4.html#cb147-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.x =</span> <span class="fu">element_markdown</span>())</span>
+<span id="cb147-12"><a href="rethinking-chapter-4.html#cb147-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb147-13"><a href="rethinking-chapter-4.html#cb147-13" aria-hidden="true" tabindex="-1"></a>mu_at_50<span class="sc">$</span>mu_at_50 <span class="sc">%&gt;%</span> <span class="fu">PI</span>()</span></code></pre></div>
+<pre><code>#&gt;       5%      94% 
+#&gt; 158.5857 159.6717</code></pre>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="rethinking-chapter-4.html#cb149-1" aria-hidden="true" tabindex="-1"></a>weight_seq <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">25</span>, <span class="at">to =</span> <span class="dv">70</span>, <span class="at">by =</span> <span class="dv">1</span>)</span>
+<span id="cb149-2"><a href="rethinking-chapter-4.html#cb149-2" aria-hidden="true" tabindex="-1"></a>model_hight_mu <span class="ot">&lt;-</span> <span class="fu">link</span>(model_hight, <span class="at">data =</span> <span class="fu">data.frame</span>(<span class="at">weight =</span> weight_seq)) <span class="sc">%&gt;%</span> </span>
+<span id="cb149-3"><a href="rethinking-chapter-4.html#cb149-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb149-4"><a href="rethinking-chapter-4.html#cb149-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="at">nm =</span> weight_seq) <span class="sc">%&gt;%</span> </span>
+<span id="cb149-5"><a href="rethinking-chapter-4.html#cb149-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="st">`</span><span class="at">25</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">70</span><span class="st">`</span>,<span class="at">names_to =</span> <span class="st">&quot;weight&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;height&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb149-6"><a href="rethinking-chapter-4.html#cb149-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">weight =</span> <span class="fu">as.numeric</span>(weight)) </span>
+<span id="cb149-7"><a href="rethinking-chapter-4.html#cb149-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb149-8"><a href="rethinking-chapter-4.html#cb149-8" aria-hidden="true" tabindex="-1"></a>p_dots <span class="ot">&lt;-</span> model_hight_mu <span class="sc">%&gt;%</span> </span>
+<span id="cb149-9"><a href="rethinking-chapter-4.html#cb149-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> weight, <span class="at">y =</span> height)) <span class="sc">+</span></span>
+<span id="cb149-10"><a href="rethinking-chapter-4.html#cb149-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> weight <span class="sc">==</span> <span class="dv">50</span>), <span class="at">alpha =</span> .<span class="dv">1</span>, <span class="at">size =</span> .<span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb149-11"><a href="rethinking-chapter-4.html#cb149-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">TRUE</span><span class="st">`</span> <span class="ot">=</span> clr2, <span class="st">`</span><span class="at">FALSE</span><span class="st">`</span> <span class="ot">=</span> clr0d), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>)</span>
+<span id="cb149-12"><a href="rethinking-chapter-4.html#cb149-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb149-13"><a href="rethinking-chapter-4.html#cb149-13" aria-hidden="true" tabindex="-1"></a>p_interval <span class="ot">&lt;-</span> model_hight_mu <span class="sc">%&gt;%</span> </span>
+<span id="cb149-14"><a href="rethinking-chapter-4.html#cb149-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(weight) <span class="sc">%&gt;%</span> </span>
+<span id="cb149-15"><a href="rethinking-chapter-4.html#cb149-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean =</span> <span class="fu">mean</span>(height),</span>
+<span id="cb149-16"><a href="rethinking-chapter-4.html#cb149-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">PI_lower =</span> <span class="fu">PI</span>(height)[<span class="dv">1</span>],</span>
+<span id="cb149-17"><a href="rethinking-chapter-4.html#cb149-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">PI_upper =</span> <span class="fu">PI</span>(height)[<span class="dv">2</span>]) <span class="sc">%&gt;%</span> </span>
+<span id="cb149-18"><a href="rethinking-chapter-4.html#cb149-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb149-19"><a href="rethinking-chapter-4.html#cb149-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> weight)) <span class="sc">+</span></span>
+<span id="cb149-20"><a href="rethinking-chapter-4.html#cb149-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> data_adults, <span class="fu">aes</span>(<span class="at">y =</span> height), <span class="at">color =</span> clr0, <span class="at">size =</span> .<span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb149-21"><a href="rethinking-chapter-4.html#cb149-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> PI_lower, <span class="at">ymax =</span> PI_upper), <span class="at">fill =</span> clr2, <span class="at">alpha =</span> .<span class="dv">35</span>) <span class="sc">+</span></span>
+<span id="cb149-22"><a href="rethinking-chapter-4.html#cb149-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> mean))</span>
+<span id="cb149-23"><a href="rethinking-chapter-4.html#cb149-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb149-24"><a href="rethinking-chapter-4.html#cb149-24" aria-hidden="true" tabindex="-1"></a>p_density <span class="sc">+</span> p_dots <span class="sc">+</span> p_interval</span></code></pre></div>
+<p><img src="rethinking_c4_files/figure-html/unnamed-chunk-23-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <hr />
 <div id="myModal" class="modal">
 <span class="close">×</span>

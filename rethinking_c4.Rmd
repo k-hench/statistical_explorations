@@ -22,6 +22,7 @@ knitr::opts_chunk$set(echo = TRUE,
                       warning = FALSE)
 
 source("bayesian_settings.R")
+source("knitr_matrix.R")
 ```
 
 by [Richard McElreath](https://xcelab.net/rm/statistical-rethinking/), building on the Summary by [Solomon Kurz](https://bookdown.org/content/4857/)
@@ -395,9 +396,249 @@ map_starting_points <-  list(
 model_heights_quap_weak_prior <- quap(flist = model_spec,
                                       data =  data_adults,
                                       start = map_starting_points)
-precis(model_heights_quap_weak_prior) %>%  as_tibble(rownames = NA) %>%  knitr::kable()
+
+precis(model_heights_quap_weak_prior) %>%
+  as_tibble(rownames = NA) %>%
+  round(digits = 2) %>% 
+  knitr::kable()
 ```
 
+Comparing how a stronger prior for $\mu$ (narrower distribution) forces a larger estimate of $\sigma$ to compensate for this.
+
+```{r}
+quap(
+  flist = alist(
+    height ~ dnorm( mu , sigma ),
+    mu ~ dnorm( 178, 0.1 ),
+    sigma ~ dunif( 0, 50 )
+  ),
+  data =  data_adults,
+  start = map_starting_points) %>%
+  precis() %>% 
+  as_tibble(rownames = NA) %>%
+  round(digits = 2) %>% 
+  knitr::kable()
+```
+
+The *variance-covariance* matrix of the quadratic aprroximation for sampling the multi-dimensional gaussian distribution:
+
+```{r}
+vcov_mod_heights <- vcov(model_heights_quap_weak_prior)
+vcov_mod_heights %>%
+  round(digits = 6) %>% 
+  knitr::kable()
+
+diag(vcov_mod_heights)
+round(cov2cor(vcov_mod_heights), digits = 5)
+```
+
+sampling from the multi-dimensional posterior distribution
+
+```{r}
+posterior_sample <- extract.samples(model_heights_quap_weak_prior, n = 1e4) %>% 
+  as_tibble()
+
+precis(posterior_sample) %>%
+  as_tibble() %>%
+  knitr::kable()
+```
+
+### Linear Prediction
+
+```{r}
+ggplot(data_adults,
+       aes(height, weight)) +
+  geom_point(shape = 21, size = 1.5, color = clr1, fill = fll1)
+```
+
+$$
+\begin{array}{cccr} 
+h_i & {\sim} & Normal(\mu, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & \alpha + \beta (x_i - \bar{x}) & \textrm{[linear model]}\\ % alternatively \overline{x}
+\alpha & \sim & Normal(178, 20) & \textrm{[$\alpha$ prior]}\\
+\beta & \sim & Normal(0, 10) & \textrm{[$\beta$ prior]}\\
+\sigma & \sim & Uniform(0,50) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+The current prior for $\beta$ is a bad choice, because it allows *negative* as well as unreasonably high and low dependencies of $h$ (height) on $x$ (weight):
+
+```{r, fig.asp = .4}
+set.seed(2971)
+N <- 100
+linear_priors <- tibble(n = 1:N,
+                        alpha = rnorm( n = N, mean =  178, sd = 20 ),
+                        beta_1 = rnorm( n = N, mean = 0, sd = 10),
+                        beta_2 = rlnorm( n = N, mean = 0, sd = 1)) %>% 
+  expand(nesting(n, alpha, beta_1, beta_2), weight = range(data_adults$weight)) %>% 
+  mutate(height_1 = alpha + beta_1 * (weight - mean(data_adults$weight)),
+         height_2 = alpha + beta_2 * (weight - mean(data_adults$weight)))
+
+p_lin_pr <- ggplot(linear_priors, aes(x = weight, y = height_1, group = n)) +
+  labs(title = glue("{mth('*\U03B2* ~')} Normal(0, 10)"), y = "height") 
+
+p_log_pr <- ggplot(linear_priors, aes(x = weight, y = height_2, group = n)) +
+  labs(title = glue("{mth('*\U03B2* ~')} Log-Normal(0, 1)"), y = "height") 
+
+p_lnorm <- ggplot() +
+  stat_function(fun = function(x){dlnorm(x = x, meanlog = 0, sdlog = 1)},
+                xlim = c(0,5), geom = "area", color = clr2, fill = fll2, n = 501) +
+  labs(title = "Log-Norm(0, 0.1)", y = "density")
+
+(p_lin_pr + p_log_pr &
+    geom_hline(data = tibble(height = c(0, 272), type = 1:2),
+               aes(yintercept = height, linetype = factor(type)), size = .4) &
+    geom_line(color = clr2, alpha = .25) &
+    scale_linetype_manual(values = c(`1` = 3, `2` = 1), guide = "none") &
+    coord_cartesian(xlim = range(data_adults$weight), ylim = c(-100, 400)) &
+    theme(plot.title = element_markdown())) +
+  p_lnorm
+```
+
+The log-normal prior seems more sensible, so we update the model priors as such:
+
+$$
+\begin{array}{cccr} 
+\beta & \sim & Log-Normal(0, 1) & \textrm{[$\beta$ prior]}\\
+\end{array}
+$$
+
+#### Finding the posterior Distribution
+
+```{r}
+xbar <- mean(data_adults$weight)
+model_hight <- quap(
+  flist = alist(
+    height ~ dnorm( mu, sigma ),
+    mu <- alpha + beta * ( weight - xbar ),
+    alpha ~ dnorm( 178, 20 ),
+    beta ~ dlnorm( 0, 1 ),
+    sigma ~ dunif( 0, 50)
+  ),
+  data = data_adults
+)
+```
+
+Table of marginal distributions of the parameters after training the model on the data
+
+```{r}
+precis(model_hight) %>% 
+  round(digits = 3) %>% 
+  as_tibble(rownames = NA) %>% 
+  knitr::kable()
+```
+
+We also need thevariance-covariance matrix to fully describe the audratic approximation completely:
+
+```{r, fig.asp = .7}
+model_hight %>% 
+  vcov() %>% 
+  round(digits = 2) %>% 
+  as.data.frame(row.names = row.names(.)) %>% 
+  knitr::kable()
+
+model_hight_smp <- extract.samples(model_hight)  %>% 
+  as_tibble() 
+
+model_hight_smp_mean <- model_hight_smp %>% 
+  summarise(across(.cols = everything(), mean))
+
+model_hight_smp %>%
+  ggpairs(
+        lower = list(continuous = wrap(ggally_points, colour = clr1, size = .2, alpha = .1)),
+        diag = list(continuous = wrap("densityDiag", fill = fll1, color = clr1, adjust = .5)),
+        upper = list(continuous = wrap(ggally_cor, size = 5, color = "black", family = "Josefin sans")))
+
+```
+
+Plotting the posterior distribution against the data
+
+```{r}
+ggplot(data_adults, aes(x  = weight, y = height)) +
+  geom_point(color = clr0d) +
+  stat_function(fun = function(x){model_hight_smp_mean$alpha + model_hight_smp_mean$beta * (x - xbar)},
+                color = clr2, n = 2)
+
+```
+
+A demonstration of the the effect of sample size on the uncertainty of the linear fit
+
+```{r}
+sub_model <- function(N = 10){
+  data_inner <- data_adults[1:N,]
+  xbar <- mean(data_inner$weight)
+  
+  model_hight_inner <- quap(
+    flist = alist(
+      height ~ dnorm( mu, sigma ),
+      mu <- alpha + beta * ( weight - xbar ),
+      alpha ~ dnorm( 178, 20 ),
+      beta ~ dlnorm( 0, 1 ),
+      sigma ~ dunif( 0, 50)
+    ),
+    data = data_inner
+  )
+  
+  model_hight_smp_inner <- extract.samples(model_hight_inner)  %>% 
+    as_tibble()  %>% 
+    sample_n(20)
+  
+  ggplot(data_inner, aes(x = weight, y = height)) +
+    geom_point(color = clr0d) +
+    (purrr::map(1:20, function(i){stat_function(
+      fun = function(x){model_hight_smp_inner$alpha[i] + model_hight_smp_inner$beta[i] * (x - xbar)},
+      color = clr2, n = 2, alpha = .1)})) +
+    labs(title = glue("N: {N}"))
+}
+
+sub_model(10) + sub_model(50) +
+  sub_model(150)  + sub_model(352) 
+```
+
+adding intervals
+
+```{r}
+mu_at_50 <- model_hight_smp %>% 
+  mutate(mu_at_50 = alpha + beta * (50 - xbar))
+
+p_density <- mu_at_50 %>% 
+  ggplot(aes(x = mu_at_50)) +
+  geom_density(adjust = .5, color = clr0d, fill = fll0) +
+  stat_function(fun = function(x){demp(x, obs = mu_at_50$mu_at_50, density.arg.list = list(adjust = .5))},
+                xlim = mu_at_50$mu_at_50 %>% PI(), geom = "area", fill = fll2, color = clr2) +
+  geom_vline(data = tibble(weights = mu_at_50$mu_at_50 %>% PI()), aes(xintercept = weights), linetype  = 3)+
+  scale_x_continuous(glue("{mth('*\U03BC*')} | weight = 50"), limits = c(157.7, 160.8)) +
+  theme(axis.title.x = element_markdown())
+
+mu_at_50$mu_at_50 %>% PI()
+```
+
+```{r, fig.asp = .4}
+weight_seq <- seq(from = 25, to = 70, by = 1)
+model_hight_mu <- link(model_hight, data = data.frame(weight = weight_seq)) %>% 
+  as_tibble() %>% 
+  set_names(nm = weight_seq) %>% 
+  pivot_longer(cols = `25`:`70`,names_to = "weight", values_to = "height") %>% 
+  mutate(weight = as.numeric(weight)) 
+
+p_dots <- model_hight_mu %>% 
+  ggplot(aes(x = weight, y = height)) +
+  geom_point(aes(color = weight == 50), alpha = .1, size = .3) +
+  scale_color_manual(values = c(`TRUE` = clr2, `FALSE` = clr0d), guide = "none")
+
+p_interval <- model_hight_mu %>% 
+  group_by(weight) %>% 
+  summarise(mean = mean(height),
+            PI_lower = PI(height)[1],
+            PI_upper = PI(height)[2]) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = weight)) +
+  geom_point(data = data_adults, aes(y = height), color = clr0, size = .3) +
+  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr2, alpha = .35) +
+  geom_line(aes(y = mean))
+
+p_density + p_dots + p_interval
+```
 
 ---
 

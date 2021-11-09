@@ -35,12 +35,13 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#>  [1] ggtext_0.1.1         brms_2.16.1          Rcpp_1.0.6          
-#>  [4] EnvStats_2.4.0       ggraph_2.0.5.9000    tidygraph_1.2.0     
-#>  [7] glue_1.4.2           patchwork_1.1.0.9000 prismatic_1.0.0.9000
-#> [10] forcats_0.5.1        stringr_1.4.0        dplyr_1.0.6         
-#> [13] purrr_0.3.4          readr_1.4.0          tidyr_1.1.3         
-#> [16] tibble_3.1.2         ggplot2_3.3.4.9000   tidyverse_1.3.0.9000
+#>  [1] GGally_1.5.0         ggtext_0.1.1         brms_2.16.1         
+#>  [4] Rcpp_1.0.6           EnvStats_2.4.0       ggraph_2.0.5.9000   
+#>  [7] tidygraph_1.2.0      glue_1.4.2           patchwork_1.1.0.9000
+#> [10] prismatic_1.0.0.9000 forcats_0.5.1        stringr_1.4.0       
+#> [13] dplyr_1.0.6          purrr_0.3.4          readr_1.4.0         
+#> [16] tidyr_1.1.3          tibble_3.1.2         ggplot2_3.3.4.9000  
+#> [19] tidyverse_1.3.0.9000
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] readxl_1.3.1         backports_1.2.1      plyr_1.8.6          
@@ -60,32 +61,33 @@ sessionInfo()
 #>  [43] gridtext_0.1.4       viridisLite_0.4.0    xtable_1.8-4        
 #>  [46] StanHeaders_2.21.0-7 stats4_4.0.3         DT_0.17             
 #>  [49] htmlwidgets_1.5.3    httr_1.4.2           threejs_0.3.3       
-#>  [52] posterior_1.1.0      ellipsis_0.3.2       pkgconfig_2.0.3     
-#>  [55] loo_2.4.1            farver_2.1.0         sass_0.4.0.9000     
-#>  [58] dbplyr_2.1.1         utf8_1.2.1           tidyselect_1.1.1    
-#>  [61] rlang_0.4.12         reshape2_1.4.4       later_1.1.0.1       
-#>  [64] munsell_0.5.0        cellranger_1.1.0     tools_4.0.3         
-#>  [67] cli_2.5.0            generics_0.1.0       broom_0.7.6         
-#>  [70] ggridges_0.5.2       evaluate_0.14        fastmap_1.1.0       
-#>  [73] yaml_2.2.1.99        processx_3.5.1       knitr_1.33          
-#>  [76] fs_1.5.0             nlme_3.1-149         mime_0.11           
-#>  [79] projpred_2.0.2       xml2_1.3.2           compiler_4.0.3      
-#>  [82] bayesplot_1.8.1      shinythemes_1.2.0    rstudioapi_0.13     
-#>  [85] curl_4.3             gamm4_0.2-6          reprex_2.0.0        
-#>  [88] statmod_1.4.35       tweenr_1.0.2         bslib_0.2.4         
-#>  [91] stringi_1.7.3        ps_1.6.0             Brobdingnag_1.2-6   
-#>  [94] lattice_0.20-41      Matrix_1.2-18        nloptr_1.2.2.2      
-#>  [97] markdown_1.1         shinyjs_2.0.0        tensorA_0.36.1      
-#> [100] vctrs_0.3.8          pillar_1.6.1         lifecycle_1.0.0     
-#> [103] jquerylib_0.1.3      bridgesampling_1.1-2 httpuv_1.5.5        
-#> [106] R6_2.5.0             bookdown_0.19        promises_1.2.0.1    
-#> [109] gridExtra_2.3        codetools_0.2-16     boot_1.3-25         
-#> [112] colourpicker_1.1.1   MASS_7.3-53          gtools_3.8.2        
-#> [115] assertthat_0.2.1     withr_2.4.2          shinystan_2.5.0     
-#> [118] mgcv_1.8-33          parallel_4.0.3       hms_1.1.0           
-#> [121] grid_4.0.3           coda_0.19-4          minqa_1.2.4         
-#> [124] rmarkdown_2.9.6      ggforce_0.3.2.9000   shiny_1.6.0         
-#> [127] lubridate_1.7.10     base64enc_0.1-3      dygraphs_1.1.1.6
+#>  [52] RColorBrewer_1.1-2   posterior_1.1.0      ellipsis_0.3.2      
+#>  [55] reshape_0.8.8        pkgconfig_2.0.3      loo_2.4.1           
+#>  [58] farver_2.1.0         sass_0.4.0.9000      dbplyr_2.1.1        
+#>  [61] utf8_1.2.1           tidyselect_1.1.1     rlang_0.4.12        
+#>  [64] reshape2_1.4.4       later_1.1.0.1        munsell_0.5.0       
+#>  [67] cellranger_1.1.0     tools_4.0.3          cli_2.5.0           
+#>  [70] generics_0.1.0       broom_0.7.6          ggridges_0.5.2      
+#>  [73] evaluate_0.14        fastmap_1.1.0        yaml_2.2.1.99       
+#>  [76] processx_3.5.1       knitr_1.33           fs_1.5.0            
+#>  [79] nlme_3.1-149         mime_0.11            projpred_2.0.2      
+#>  [82] xml2_1.3.2           compiler_4.0.3       bayesplot_1.8.1     
+#>  [85] shinythemes_1.2.0    rstudioapi_0.13      curl_4.3            
+#>  [88] gamm4_0.2-6          reprex_2.0.0         statmod_1.4.35      
+#>  [91] tweenr_1.0.2         bslib_0.2.4          stringi_1.7.3       
+#>  [94] ps_1.6.0             Brobdingnag_1.2-6    lattice_0.20-41     
+#>  [97] Matrix_1.2-18        nloptr_1.2.2.2       markdown_1.1        
+#> [100] shinyjs_2.0.0        tensorA_0.36.1       vctrs_0.3.8         
+#> [103] pillar_1.6.1         lifecycle_1.0.0      jquerylib_0.1.3     
+#> [106] bridgesampling_1.1-2 httpuv_1.5.5         R6_2.5.0            
+#> [109] bookdown_0.19        promises_1.2.0.1     gridExtra_2.3       
+#> [112] codetools_0.2-16     boot_1.3-25          colourpicker_1.1.1  
+#> [115] MASS_7.3-53          gtools_3.8.2         assertthat_0.2.1    
+#> [118] withr_2.4.2          shinystan_2.5.0      mgcv_1.8-33         
+#> [121] parallel_4.0.3       hms_1.1.0            grid_4.0.3          
+#> [124] coda_0.19-4          minqa_1.2.4          rmarkdown_2.9.6     
+#> [127] ggforce_0.3.2.9000   shiny_1.6.0          lubridate_1.7.10    
+#> [130] base64enc_0.1-3      dygraphs_1.1.1.6
 ```
 
 ## References

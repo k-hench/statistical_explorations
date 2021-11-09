@@ -7,6 +7,7 @@ library(ggraph)
 library(EnvStats)
 library(brms)
 library(ggtext)
+library(GGally)
 
 clr0 <- "#E9E5D9" # "#A9A9A9"
 clr0d <- clr_darken(clr0, .1)
