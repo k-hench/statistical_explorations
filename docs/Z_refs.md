@@ -40,7 +40,7 @@ sessionInfo()
 #>  [7] tidygraph_1.2.0      glue_1.4.2           patchwork_1.1.0.9000
 #> [10] prismatic_1.0.0.9000 forcats_0.5.1        stringr_1.4.0       
 #> [13] dplyr_1.0.6          purrr_0.3.4          readr_1.4.0         
-#> [16] tidyr_1.1.3          tibble_3.1.2         ggplot2_3.3.4.9000  
+#> [16] tidyr_1.1.3          tibble_3.1.2         ggplot2_3.3.5       
 #> [19] tidyverse_1.3.0.9000
 #> 
 #> loaded via a namespace (and not attached):

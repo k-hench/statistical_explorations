@@ -512,12 +512,12 @@ precis(posterior_sample) %>%
 
 
 
-|       mean|        sd|       5.5%|      94.5%|histogram     |
-|----------:|---------:|----------:|----------:|:-------------|
-| 154.612324| 0.4138706| 153.948054| 155.262747|▁▁▅▇▂▁▁       |
-|   7.728911| 0.2926062|   7.268824|   8.196356|▁▁▁▁▂▅▇▇▃▁▁▁▁ |
+|       mean|        sd|       5.5%|      94.5%|histogram    |
+|----------:|---------:|----------:|----------:|:------------|
+| 154.602738| 0.4162648| 153.942830| 155.276076|▁▁▅▇▂▁▁      |
+|   7.732087| 0.2910780|   7.266555|   8.194705|▁▁▁▂▅▇▇▃▁▁▁▁ |
 
-### Linear Prediction
+## Linear Prediction
 
 
 ```r
@@ -583,7 +583,7 @@ $$
 \end{array}
 $$
 
-#### Finding the posterior Distribution
+### Finding the posterior Distribution
 
 
 ```r
@@ -732,7 +732,7 @@ weight_seq <- seq(from = 25, to = 70, by = 1)
 model_hight_mu <- link(model_hight, data = data.frame(weight = weight_seq)) %>% 
   as_tibble() %>% 
   set_names(nm = weight_seq) %>% 
-  pivot_longer(cols = `25`:`70`,names_to = "weight", values_to = "height") %>% 
+  pivot_longer(cols = everything(), names_to = "weight", values_to = "height") %>% 
   mutate(weight = as.numeric(weight)) 
 
 p_dots <- model_hight_mu %>% 
@@ -740,12 +740,14 @@ p_dots <- model_hight_mu %>%
   geom_point(aes(color = weight == 50), alpha = .1, size = .3) +
   scale_color_manual(values = c(`TRUE` = clr2, `FALSE` = clr0d), guide = "none")
 
-p_interval <- model_hight_mu %>% 
+model_hight_mu_interval <- model_hight_mu %>% 
   group_by(weight) %>% 
   summarise(mean = mean(height),
             PI_lower = PI(height)[1],
             PI_upper = PI(height)[2]) %>% 
-  ungroup() %>% 
+  ungroup()
+
+p_interval <- model_hight_mu_interval %>% 
   ggplot(aes(x = weight)) +
   geom_point(data = data_adults, aes(y = height), color = clr0, size = .3) +
   geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr2, alpha = .35) +
@@ -755,6 +757,382 @@ p_density + p_dots + p_interval
 ```
 
 <img src="rethinking_c4_files/figure-html/unnamed-chunk-23-1.svg" width="672" style="display: block; margin: auto;" />
+
+Prediction intervals
+
+
+```r
+model_hight_sd <- sim(model_hight, data = data.frame(weight = weight_seq), n = 1e4) %>% 
+  as_tibble() %>% 
+  set_names(nm = weight_seq) %>% 
+  pivot_longer(cols = `25`:`70`, names_to = "weight", values_to = "height") %>% 
+  mutate(weight = as.numeric(weight)) 
+
+model_hight_sd %>% 
+  group_by(weight) %>% 
+  summarise(mean = mean(height),
+            PI_lower = PI(height)[1],
+            PI_upper = PI(height)[2]) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = weight)) +
+  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35)  +
+  geom_point(data = data_adults, aes(y = height), color = clr0, size = .3) +
+  geom_ribbon(data = model_hight_mu_interval,
+              aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35) +
+  geom_line(data = model_hight_mu_interval,
+              aes(y = mean))
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-24-1.svg" width="672" style="display: block; margin: auto;" />
+
+## Curves from lines
+
+The full data (including kids) is clearly curved in shape:
+
+
+```r
+ggplot(data = data, aes(x = weight, y = height)) +
+  geom_point(color = clr0d)
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-25-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+We will work on standardized $x$ values to prevent *"numerical glitches"* by transforming $x$ via $x_s = (\frac{x - \bar{x}}{sd(x)})$:
+
+:::columns
+:::column1st
+quadratic polynomial fit
+$$
+\begin{array}{cccr} 
+h_i & {\sim} & Normal(\mu, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & \alpha + \beta_1 x_i +  \beta_2 x_i ^ 2& \textrm{[linear model]}\\ % alternatively \overline{x}
+\alpha & \sim & Normal(178, 20) & \textrm{[$\alpha$ prior]}\\
+\beta_1 & \sim & Log-Normal(0, 1) & \textrm{[$\beta_1$ prior]}\\
+\beta_2 & \sim & Normal(0, 1) & \textrm{[$\beta_2$ prior]}\\
+\sigma & \sim & Uniform(0,50) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+:::   
+:::column2nd
+cubic polynomial fit
+$$
+\begin{array}{cccr} 
+h_i & {\sim} & Normal(\mu, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & \alpha + \beta_1 x_i + \beta_2 x_i ^ 2 + \beta_3 x_i ^ 3 & \textrm{[linear model]}\\ % alternatively \overline{x}
+\alpha & \sim & Normal(178, 20) & \textrm{[$\alpha$ prior]}\\
+\beta_1 & \sim & Log-Normal(0, 1) & \textrm{[$\beta_1$ prior]}\\
+\beta_2 & \sim & Normal(0, 1) & \textrm{[$\beta_2$ prior]}\\
+\beta_3 & \sim & Normal(0, 1) & \textrm{[$\beta_3$ prior]}\\
+\sigma & \sim & Uniform(0,50) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+:::
+:::
+
+
+```r
+plot_model_intervals <- function(mod, data,
+                                 weight_seq = list(weight_s = seq(from = min(data_model$weight_s),
+                                                                  to = max(data_model$weight_s),
+                                                                  length.out = 70))){
+  model_hight_mu_interval <- link(mod, data = weight_seq) %>% 
+    as_tibble() %>% 
+    set_names(nm = weight_seq$weight_s ) %>% 
+    pivot_longer(cols = everything(), names_to = "weight_s", values_to = "height") %>% 
+    mutate(weight_s = as.numeric(weight_s)) %>% 
+    group_by(weight_s) %>% 
+    summarise(mean = mean(height),
+              PI_lower = PI(height)[1],
+              PI_upper = PI(height)[2]) %>% 
+    ungroup()
+  
+  model_hight_sd <- sim(mod, data = weight_seq, n = 1e4) %>% 
+    as_tibble() %>% 
+    set_names(nm = weight_seq$weight_s) %>% 
+    pivot_longer(cols = everything(), names_to = "weight_s", values_to = "height") %>% 
+    mutate(weight_s = as.numeric(weight_s)) 
+  
+  model_hight_sd %>% 
+    group_by(weight_s) %>% 
+    summarise(mean = mean(height),
+              PI_lower = PI(height)[1],
+              PI_upper = PI(height)[2]) %>% 
+    ungroup() %>% 
+    ggplot(aes(x = weight_s)) +
+    geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35)  +
+    geom_point(data = data, aes(y = height), color = rgb(0,0,0,.3), size = .4) +
+    geom_ribbon(data = model_hight_mu_interval,
+                aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35) +
+    geom_line(data = model_hight_mu_interval,
+              aes(y = mean))
+}
+
+data_model <-  data %>% 
+  mutate(weight_s = (weight - mean(weight))/sd(weight),
+         weight_s2 = weight_s ^ 2,
+         weight_s3 = weight_s ^ 3)
+
+model_hight_s1 <- quap(
+  flist = alist(
+    height ~ dnorm( mu, sigma ),
+    mu <- alpha + beta *  weight_s ,
+    alpha ~ dnorm( 178, 20 ),
+    beta ~ dlnorm( 0, 1 ),
+    sigma ~ dunif( 0, 50)
+  ),
+  data = data_model
+)
+
+model_hight_s2 <- quap(
+  flist = alist(
+    height ~ dnorm( mu, sigma ),
+    mu <- alpha + beta1 *  weight_s + beta2 *  weight_s2,
+    alpha ~ dnorm( 178, 20 ),
+    beta1 ~ dlnorm( 0, 1 ),
+    beta2 ~ dnorm( 0, 1 ),
+    sigma ~ dunif( 0, 50)
+  ),
+  data = data_model
+)
+
+model_hight_s3 <- quap(
+  flist = alist(
+    height ~ dnorm( mu, sigma ),
+    mu <- alpha + beta1 *  weight_s + beta2 *  weight_s2 + beta3 *  weight_s3,
+    alpha ~ dnorm( 178, 20 ),
+    beta1 ~ dlnorm( 0, 1 ),
+    beta2 ~ dnorm( 0, 1 ),
+    beta3 ~ dnorm( 0, 1 ),
+    sigma ~ dunif( 0, 50)
+  ),
+  data = data_model
+)
+```
+
+
+
+```r
+plot_model_intervals(model_hight_s1, data_model) +
+plot_model_intervals(model_hight_s2, data_model,
+                     weight_seq = tibble(weight_s = seq(from = min(data_model$weight_s),
+                                                      to = max(data_model$weight_s),
+                                                      length.out = 70),
+                                       weight_s2 = weight_s ^ 2)) +
+plot_model_intervals(model_hight_s3, data_model,
+                     weight_seq = tibble(weight_s = seq(from = min(data_model$weight_s),
+                                                      to = max(data_model$weight_s),
+                                                      length.out = 70),
+                                       weight_s2 = weight_s ^ 2,
+                                       weight_s3 = weight_s ^ 3))
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-27-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+plot_model_intervals(model_hight_s3, data_model,
+                     weight_seq = tibble(weight_s = seq(from = min(data_model$weight_s),
+                                                      to = max(data_model$weight_s),
+                                                      length.out = 70),
+                                       weight_s2 = weight_s ^ 2,
+                                       weight_s3 = weight_s ^ 3)) +
+  scale_x_continuous("weight [kg]", 
+                     breaks = (seq(5,65, length.out = 5) - mean(data_model$weight)) /  sd(data_model$weight),
+    labels = seq(5,65, length.out = 5)) +
+  labs(y = "height [cm]")
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-28-1.svg" width="672" style="display: block; margin: auto;" />
+
+## Splines
+
+Loading the *Hanami* data (<span style='fontfamily:UnYetgul'>花見</span>), containing the historical dates of first annual cherry tree blossom.
+
+
+```r
+data(cherry_blossoms)
+precis(cherry_blossoms) %>% as_tibble() %>% knitr::kable()
+```
+
+
+
+|        mean|          sd|      5.5%|      94.5%|histogram       |
+|-----------:|-----------:|---------:|----------:|:---------------|
+| 1408.000000| 350.8845964| 867.77000| 1948.23000|▇▇▇▇▇▇▇▇▇▇▇▇▁   |
+|  104.540508|   6.4070362|  94.43000|  115.00000|▁▂▅▇▇▃▁▁        |
+|    6.141886|   0.6636479|   5.15000|    7.29470|▁▃▅▇▃▂▁▁        |
+|    7.185151|   0.9929206|   5.89765|    8.90235|▁▂▅▇▇▅▂▂▁▁▁▁▁▁▁ |
+|    5.098941|   0.8503496|   3.78765|    6.37000|▁▁▁▁▁▁▁▃▅▇▃▂▁▁▁ |
+
+
+```r
+cherry_blossoms %>% 
+  ggplot(aes(x = year, y = doy)) +
+  geom_point(color = clr2, alpha = .3) +
+  labs(y = "Day of first blossom")
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-30-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+data_cherry <- cherry_blossoms %>% 
+  filter(complete.cases(doy)) %>%
+  as_tibble()
+
+n_knots <- 15
+knot_list <- quantile(data_cherry$year, probs = seq(0, 1, length.out = n_knots))
+```
+
+
+
+```r
+library(splines)
+b_spline_cherry <- bs(data_cherry$year,
+                      knots = knot_list[-c(1, n_knots)],
+                      degree = 3,
+                      intercept = TRUE)
+
+b_spline_tib <- b_spline_cherry %>% 
+  as_tibble() %>%
+  set_names(nm = str_pad(1:17, width = 2, pad = 0)) %>% 
+  bind_cols(select(data_cherry, year)) %>% 
+  pivot_longer(cols = -year, names_to = "bias_function", values_to = "bias")
+
+ggplot() +
+  geom_vline(data = tibble(year = knot_list),
+             aes(xintercept = year),
+             linetype = 3, color = "black") +
+  geom_line(data = b_spline_tib, aes(x = year, y = bias,
+                                     color = as.numeric(bias_function)
+                                     , group = bias_function), 
+            size = 1, alpha = .75) +
+  scale_color_gradientn(colours = c("black", clr0d, clr2), guide = "none")+
+  theme(panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank())
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-32-1.svg" width="672" style="display: block; margin: auto;" />
+
+B-spline model:
+
+$$
+\begin{array}{cccr} 
+D_i & \sim & Normal( \mu_i, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & \alpha + \sum_{k=1}^K w_k B_{k,i} & \textrm{[linear model]}\\
+\alpha & \sim & Normal(100, 10) & \textrm{[$\alpha$ prior]}\\
+w_i & \sim & Normal(0, 10) & \textrm{[w prior]}\\
+\sigma & \sim & Exponential(1) & \textrm{[$\sigma$ prior]}
+
+\end{array}
+$$
+
+
+```r
+model_cherry <- quap(
+  alist(
+    D ~ dnorm(mu, sigma),
+    mu <- a + B %*% w,
+    a ~ dnorm(100, 10),
+    w ~ dnorm(0, 10),
+    sigma ~ dexp(1)
+  ),
+  data = list(D = data_cherry$doy, B = b_spline_cherry),
+  start = list(w = rep(0, ncol(b_spline_cherry)))
+)
+
+precis(model_cherry, depth = 2) %>% round(digits = 2) %>% as_tibble(rownames = NA) %>%  knitr::kable()
+```
+
+
+
+|      |   mean|   sd|   5.5%|  94.5%|
+|:-----|------:|----:|------:|------:|
+|w[1]  |  -3.02| 3.86|  -9.19|   3.15|
+|w[2]  |  -0.83| 3.87|  -7.01|   5.36|
+|w[3]  |  -1.06| 3.58|  -6.79|   4.67|
+|w[4]  |   4.85| 2.88|   0.25|   9.44|
+|w[5]  |  -0.84| 2.87|  -5.43|   3.76|
+|w[6]  |   4.32| 2.91|  -0.33|   8.98|
+|w[7]  |  -5.32| 2.80|  -9.79|  -0.84|
+|w[8]  |   7.85| 2.80|   3.37|  12.33|
+|w[9]  |  -1.00| 2.88|  -5.61|   3.60|
+|w[10] |   3.04| 2.91|  -1.61|   7.69|
+|w[11] |   4.67| 2.89|   0.05|   9.29|
+|w[12] |  -0.15| 2.87|  -4.74|   4.43|
+|w[13] |   5.56| 2.89|   0.95|  10.18|
+|w[14] |   0.72| 3.00|  -4.08|   5.51|
+|w[15] |  -0.80| 3.29|  -6.06|   4.46|
+|w[16] |  -6.96| 3.38| -12.36|  -1.57|
+|w[17] |  -7.67| 3.22| -12.82|  -2.52|
+|a     | 103.35| 2.37|  99.56| 107.13|
+|sigma |   5.88| 0.14|   5.65|   6.11|
+
+
+```r
+cherry_samples <- extract.samples(model_cherry) %>% 
+  as.data.frame() %>% 
+  as_tibble() %>% 
+  set_names(nm = c("a", "sigma", str_pad(1:17, 2,pad = 0)))
+
+cherry_samples_mu <- cherry_samples %>% 
+  summarise(across(everything(), mean)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "bias_function", values_to ="weight")
+```
+
+
+
+```r
+ggplot() +
+  geom_vline(data = tibble(year = knot_list),
+             aes(xintercept = year),
+             linetype = 3, color = "black") +
+  geom_line(data = b_spline_tib %>% left_join(cherry_samples_mu),
+            aes(x = year, y = bias * weight,
+                color = as.numeric(bias_function)
+                , group = bias_function), 
+            size = 1, alpha = .75) +
+  scale_color_gradientn(colours = c("black", clr0d, clr2), guide = "none") +
+  theme(panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank())
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-35-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+model_cherry_samples <- link(model_cherry) %>% 
+  as_tibble()%>% 
+  set_names(nm = data_cherry$year) %>% 
+  pivot_longer(cols = everything(), names_to = "year", values_to = "doy") %>% 
+  mutate(year = as.numeric(year))  %>% 
+  arrange(year)
+
+model_cherry_stats <- model_cherry_samples %>% 
+  group_by(year) %>% 
+  nest() %>% 
+  mutate(mean = map_dbl(data, function(data){mean(data$doy)}),
+         PI_lower = map_dbl(data, function(data){PI(data$doy)[1]}),
+         PI_upper = map_dbl(data, function(data){PI(data$doy)[2]}))
+
+model_cherry_stats %>% 
+  ggplot(aes(x = year)) +
+  geom_vline(data = tibble(year = knot_list),
+             aes(xintercept = year),
+             linetype = 3, color = "black") +
+    geom_point(data = cherry_blossoms, aes(y = doy), color = clr2, alpha = .3) +
+  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr2, alpha = .35) +
+  geom_line(aes(y = mean)) +
+  labs(y = "Day of first blossom") +
+  theme(panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank())
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-36-1.svg" width="672" style="display: block; margin: auto;" />
 
 ---
 
