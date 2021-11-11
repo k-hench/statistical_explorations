@@ -1,0 +1,79 @@
+---
+output:
+  html_document:
+  theme: yeti
+pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+# Rethinking: Chapter X
+
+**Geocentric Models**
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      comment = "#>", 
+                      dev = "svg",         # for html rendering
+                      # dev = "cairo_pdf", # for pdf rendering
+                      fig.asp = .5, 
+                      fig.align = "center",
+                      message = FALSE,
+                      warning = FALSE)
+
+source("bayesian_settings.R")
+source("knitr_matrix.R")
+```
+
+by [Richard McElreath](https://xcelab.net/rm/statistical-rethinking/), building on the Summary by [Solomon Kurz](https://bookdown.org/content/4857/)
+
+## Homework
+
+**E1**
+
+**E2**
+
+**E3**
+
+**E4**
+
+**E5**
+
+**E6**
+
+**E7**
+
+**M1**
+
+**M2**
+
+**M3**
+
+**M4**
+
+**M5**
+
+**M6**
+
+**H1**
+
+**H2**
+
+**H3**
+
+**H4**
+
+**H5**
+
+
+## {brms} section
+
+---
+
+<div id="myModal" class="modal">
+  <span class="close">&times;</span>
+  <img class="modal-content" id="img01">
+  <div id="caption"></div>
+</div>
+
+<script src="./js/zoom.js"></script>

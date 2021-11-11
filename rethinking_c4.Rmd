@@ -522,9 +522,11 @@ model_hight <- quap(
 Table of marginal distributions of the parameters after training the model on the data
 
 ```{r}
-precis(model_hight) %>% 
+centered_remember_hw <- precis(model_hight) %>% 
   round(digits = 3) %>% 
-  as_tibble(rownames = NA) %>% 
+  as_tibble(rownames = NA)
+
+centered_remember_hw %>% 
   knitr::kable()
 ```
 
@@ -955,6 +957,371 @@ model_cherry_stats %>%
   theme(panel.grid.minor.x = element_blank(),
         panel.grid.major.x = element_blank())
 ```
+
+---
+
+## Homework
+
+**E1**
+
+$$
+\begin{array}{cccr} 
+y_i & \sim & Normal( \mu, \sigma) & \textrm{[likelihood]}\\
+\mu & \sim & Normal(0, 10) & \textrm{[$\mu$ prior]}\\
+\sigma & \sim & Exponential(1) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+**E2**
+
+There are two parameters:
+
+- $\mu$
+- $\sigma$
+
+**E3**
+
+$$
+\begin{array}{rcl} 
+Pr( \mu, \sigma | y ) & = & \frac{Normal( y | \mu, \sigma ) Pr(y)}{Pr(\mu, \sigma)} \\
+Pr( \mu, \sigma | y ) & = & \frac{\prod_i Pr( y_i | \mu, \sigma) Normal( \mu | 0, 10) Exponential(\sigma | 1) }{ \int\int\prod_i Pr( y_i | \mu, \sigma) Normal( \mu | 0, 10) Exponential(\sigma | 1)d\mu d\sigma}
+\end{array}
+$$
+
+**E4**
+
+$$
+\begin{array}{cccr} 
+y_i & \sim & Normal( \mu, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & \alpha + \beta x_i & \textrm{[linear model]}\\
+\alpha & \sim & Normal(0, 10) & \textrm{[$\alpha$ prior]}\\
+\beta & \sim & Normal(0, 1) & \textrm{[$\beta$ prior]}\\
+\sigma & \sim & Exponential(2) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+**E5**
+
+There are three parameters
+
+- $\alpha$
+- $\beta$
+- $\sigma$
+
+**M1**
+
+$$
+\begin{array}{cccr} 
+y_i & \sim & Normal( \mu, \sigma) & \textrm{[likelihood]}\\
+\mu & \sim & Normal(0, 10) & \textrm{[$\mu$ prior]}\\
+\sigma & \sim & Exponential(1) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+Using grid approximation
+
+```{r}
+n <- 5e3
+sample_data <- tibble(y = rnorm(n = n, # sample size 
+                                mean = rnorm(n = n, mean = 0, sd = 10), # mu prior
+                                sd = rexp(n = n, rate = 1))) # sigma prior
+
+sample_data %>% 
+  ggplot(aes(x = y)) +
+  geom_density(color = clr0d, fill = fll0) +
+  stat_function(fun = function(x){dnorm(x = x, mean = 0, sd = 10 )}, geom = "line", linetype = 3, color = clr1) +
+  scale_x_continuous(limits = c(-50, 50)) +
+  labs(y = "density")
+```
+
+**M2**
+
+```{r, fig.asp = .3}
+quap_formula <- alist(
+    y ~ dnorm(mu, sigma),  # likelihood
+    mu ~ dnorm(0, 10),     # mu prior
+    sigma ~ exp(1)         # sigma prior
+  )
+```
+
+**M3**
+
+$$
+\begin{array}{cccr} 
+y_i & \sim & Normal( \mu, \sigma) & \textrm{[likelihood]}\\
+\mu & = & \alpha + \beta x_i & \textrm{[linear model]}\\
+\alpha & \sim & Normal(0, 10) & \textrm{[$\alpha$ prior]}\\
+\beta & \sim & Uniform(0, 1) & \textrm{[$\beta$ prior]}\\
+\sigma & \sim & Exponential(1) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+**M4**
+
+$$
+\begin{array}{cccr} 
+h_i & \sim & Normal( \mu, \sigma) & \textrm{[likelihood]} \\
+\mu & = & \alpha + \beta h_i & \textrm{[linear model]} \\
+\alpha & \sim & Normal(150, 5) & \textrm{[$\alpha$ prior, starting size]} \\
+\beta & \sim & Uniform(0, 10) & \textrm{[$\beta$ prior, yearly growth]} \\
+\sigma & \sim & Normal(0, 8) & \textrm{[$\sigma$ prior, size variation]}
+\end{array}
+$$
+
+**M5**
+
+No, the chosen prior for $\beta$ already covers this information: $\beta \sim Uniform(0, 10)$ is always positive, forcing a positive growth per year.
+
+**M6**
+
+Limiting the variance of height to 64cm could be done in different ways: by choosing a uniform prior with fixed boundaries [eg. $Uniform(0,64)$], or by limiting the variance of an unbound distribution [eg. $\sigma$ for a normal distribution. 99.7% of the mass is within $3 \sigma$, so $Normal(32, 10)$ would do as well].
+
+**M7**
+
+```{r}
+model_uncentered <- quap(
+  flist = alist(
+    height ~ dnorm( mu, sigma ),
+    mu <- alpha + beta * weight,
+    alpha ~ dnorm( 178, 20),
+    beta ~ dlnorm( 0, 1 ),
+    sigma ~ dunif( 0, 50 )
+  ),
+  data = data_adults
+)
+
+
+precis(model_uncentered) %>% 
+  round(digits = 3) %>% 
+  as_tibble(rownames = NA) %>%
+  knitr::kable()
+
+model_uncentered %>% 
+  vcov() %>% 
+  round(digits = 2) %>% 
+  as.data.frame(row.names = row.names(.)) %>% 
+  knitr::kable()
+```
+
+compare to the centered version:
+
+```{r}
+centered_remember_hw %>%
+  knitr::kable()
+
+model_hight %>% 
+  vcov() %>% 
+  round(digits = 2) %>% 
+  as.data.frame(row.names = row.names(.)) %>% 
+  knitr::kable()
+```
+
+The un-centered model shows higher covariances between $\alpha$ and all other parameters.
+
+```{r}
+model_uncentered_mu <- link(model_uncentered, data = data.frame(weight = weight_seq)) %>% 
+  as_tibble() %>% 
+  set_names(nm = weight_seq) %>% 
+  pivot_longer(cols = everything(), names_to = "weight", values_to = "height") %>% 
+  mutate(weight = as.numeric(weight)) 
+
+model_uncentered_mu_interval <- model_uncentered_mu %>% 
+  group_by(weight) %>% 
+  summarise(mean = mean(height),
+            PI_lower = PI(height)[1],
+            PI_upper = PI(height)[2]) %>% 
+  ungroup()
+
+model_uncentered_sd <- sim(model_uncentered, data = data.frame(weight = weight_seq), n = 5e3) %>% 
+  as_tibble() %>% 
+  set_names(nm = weight_seq) %>% 
+  pivot_longer(cols = `25`:`70`, names_to = "weight", values_to = "height") %>% 
+  mutate(weight = as.numeric(weight)) 
+
+p_1 <- model_uncentered_sd %>% 
+  group_by(weight) %>% 
+  summarise(mean = mean(height),
+            PI_lower = PI(height)[1],
+            PI_upper = PI(height)[2]) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = weight)) +
+  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35)  +
+  geom_point(data = data_adults, aes(y = height), color = clr0, size = .3) +
+  geom_ribbon(data = model_uncentered_mu_interval,
+              aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35) +
+  geom_line(data = model_uncentered_mu_interval,
+              aes(y = mean))+
+  labs(title = " uncentered")
+
+p_2 <- model_hight_sd %>% 
+  group_by(weight) %>% 
+  summarise(mean = mean(height),
+            PI_lower = PI(height)[1],
+            PI_upper = PI(height)[2]) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = weight)) +
+  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35)  +
+  geom_point(data = data_adults, aes(y = height), color = clr0, size = .3) +
+  geom_ribbon(data = model_hight_mu_interval,
+              aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35) +
+  geom_line(data = model_hight_mu_interval,
+              aes(y = mean))+
+  labs(title = " centered")
+
+p_1 + p_2
+```
+
+Hmm `r emo::ji("thinking")``: I can't see a difference - maybe that is the point?
+
+**M8**
+
+```{r}
+spline_check <- function(n_knots = 15, inner = TRUE){
+  knot_list <- quantile(data_cherry$year, probs = seq(0, 1, length.out = n_knots))
+  
+  b_spline_cherry <- bs(data_cherry$year,
+                        knots = knot_list[-c(1, n_knots)],
+                        degree = 3,
+                        intercept = TRUE)
+  
+  b_spline_tib <- b_spline_cherry %>% 
+    as_tibble() %>%
+    set_names(nm = str_pad(1:(n_knots+2), width = 2, pad = 0)) %>% 
+    bind_cols(select(data_cherry, year)) %>% 
+    pivot_longer(cols = -year, names_to = "bias_function", values_to = "bias")
+  
+  model_cherry <- quap(
+    alist(
+      D ~ dnorm(mu, sigma),
+      mu <- a + B %*% w,
+      a ~ dnorm(100, prior_sd_a),
+      w ~ dnorm(0, prior_sd_w),
+      sigma ~ dexp(1)
+    ),
+    data = list(D = data_cherry$doy, B = b_spline_cherry),
+    start = list(w = rep(0, ncol(b_spline_cherry)))
+  )
+  
+  cherry_samples <- extract.samples(model_cherry) %>% 
+    as.data.frame() %>% 
+    as_tibble() %>% 
+    set_names(nm = c("a", "sigma", str_pad(1:(n_knots+2), 2,pad = 0)))
+  
+  cherry_samples_mu <- cherry_samples %>% 
+    summarise(across(everything(), mean)) %>% 
+    pivot_longer(cols = everything(),
+                 names_to = "bias_function", values_to ="weight")
+  
+  model_cherry_samples <- link(model_cherry) %>% 
+    as_tibble()%>% 
+    set_names(nm = data_cherry$year) %>% 
+    pivot_longer(cols = everything(), names_to = "year", values_to = "doy") %>% 
+    mutate(year = as.numeric(year))  %>% 
+    arrange(year)
+  
+  model_cherry_stats <- model_cherry_samples %>% 
+    group_by(year) %>% 
+    nest() %>% 
+    mutate(mean = map_dbl(data, function(data){mean(data$doy)}),
+           PI_lower = map_dbl(data, function(data){PI(data$doy)[1]}),
+           PI_upper = map_dbl(data, function(data){PI(data$doy)[2]}))
+  
+  p_splines_pure <- ggplot() +
+    geom_vline(data = tibble(year = knot_list),
+               aes(xintercept = year),
+               linetype = 3, color = rgb(0,0,0,.5)) +
+    geom_line(data = b_spline_tib %>% left_join(cherry_samples_mu),
+              aes(x = year, y = bias * weight,
+                  color = as.numeric(bias_function)
+                  , group = bias_function), 
+              size = .3, alpha = .75) +
+    scale_color_gradientn(colours = c("black", clr0d, clr1), guide = "none") +
+    theme(panel.grid.minor.x = element_blank(),
+          panel.grid.major.x = element_blank(), 
+          axis.title.x = element_blank(),
+          axis.text.x = element_blank()) +
+    labs(title = glue("{n_knots} kn, sd a: {prior_sd_a}, sd w: {prior_sd_w}"))
+  
+  p_splines_fitted <- model_cherry_stats %>% 
+    ggplot(aes(x = year)) +
+    geom_vline(data = tibble(year = knot_list),
+               aes(xintercept = year),
+               linetype = 3, color = rgb(0,0,0,.5)) +
+    geom_point(data = cherry_blossoms, aes(y = doy), color = clr1, alpha = .1, size = .2) +
+    geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .65) +
+    geom_line(aes(y = mean)) +
+    labs(y = "Day of first blossom") +
+    theme(panel.grid.minor.x = element_blank(),
+          panel.grid.major.x = element_blank(),
+          axis.title.x = element_blank(),
+          axis.text.x = element_blank())
+  
+  if(inner){ 
+    p_splines_pure <- p_splines_pure + theme(axis.title.y = element_blank())
+    p_splines_fitted <- p_splines_fitted + theme(axis.title.y = element_blank())
+  }
+  
+  p_splines_pure + p_splines_fitted + plot_layout(ncol = 1, heights = c(.5, 1))
+}
+
+set.seed(14)
+prior_sd_a = 10
+prior_sd_w <- 10
+p1 <- spline_check(n_knots = 3, inner = FALSE)
+
+prior_sd_w <-  50
+p2 <- spline_check(n_knots = 3, inner = TRUE)
+set.seed(42)
+prior_sd_w <-  100
+p3 <- spline_check(n_knots = 3, inner = TRUE)
+
+p1 | p2 | p3
+```
+
+
+```{r}
+set.seed(41)
+prior_sd_w <- 10
+p1 <- spline_check(n_knots = 10, inner = FALSE)
+
+prior_sd_w <-  50
+p2 <- spline_check(n_knots = 10, inner = TRUE)
+
+prior_sd_w <-  100
+p3 <- spline_check(n_knots = 10, inner = TRUE)
+
+p1 | p2 | p3
+```
+
+
+```{r}
+set.seed(42)
+prior_sd_w <- 10
+p1 <- spline_check(n_knots = 30, inner = FALSE)
+
+prior_sd_w <-  50
+p2 <- spline_check(n_knots = 30, inner = TRUE)
+
+prior_sd_w <-  100
+p3 <- spline_check(n_knots = 30, inner = TRUE)
+
+p1 | p2 | p3
+```
+
+They control the division of data and the initial scale for the weighting
+
+**H1**
+
+**H2**
+
+**H3**
+
+**H4**
+
+**H5**
+
+
+## {brms} section
 
 ---
 
