@@ -350,20 +350,18 @@ p_run_length + p_switches
 ## Homework
 
 ```{r}
-n <- 10^4
-set.seed( 100 )
+n <- 1e4
 easy_data <- tibble(p_grid = seq( from = 0, to = 1, length.out = n ),
                     prior = rep(1 , n),
                     likelihood = dbinom( 6, size = 9, prob = p_grid),
                     posterior_unscaled = likelihood * prior,
                     posterior = posterior_unscaled / sum(posterior_unscaled),
-                    samples = sample( p_grid, prob = posterior, size = n, replace = TRUE),
                     cummulative_posterior = cumsum(posterior))
 ```
 
 ```{r}
 easy_data %>% 
-ggplot(aes(x = p_grid)) +
+  ggplot(aes(x = p_grid)) +
   geom_line(aes(y = prior / sum(prior), color = "prior")) +
   geom_line(aes(y = likelihood / sum(likelihood),
                 color = "likelihood")) +
@@ -377,68 +375,79 @@ ggplot(aes(x = p_grid)) +
         legend.position = "bottom")
 ```
 
+
+```{r, fig.asp = .4}
+set.seed( 100 )
+easy_samples <- easy_data %>% 
+  slice_sample(n = n, weight_by = posterior, replace = TRUE)
+
+easy_samples  %>% 
+  ggplot(aes(x = p_grid)) +
+  geom_density(color = clr0d, fill = fll0) +
+  scale_x_continuous(limits = c(0,1)) +
+  geom_vline(data = tibble(x = c(.2, .8)), aes(xintercept = x), linetype = 3)
+```
+
 **E1**
 
 ```{r}
-sum( easy_data$posterior[easy_data$p_grid < .2] )
+mean(easy_samples$p_grid <= .2)
 ```
 
 **E2**
 
 ```{r}
-sum( easy_data$posterior[easy_data$p_grid > .8] )
+mean(easy_samples$p_grid > .8)
 ```
 
 **E3**
 
 ```{r}
-sum( easy_data$posterior[easy_data$p_grid > .2 & easy_data$p_grid < .8] )
+mean( easy_samples$p_grid > .2 &  easy_samples$p_grid < .8)
 ```
 
 **E4**
 
 ```{r}
-quantile(easy_data$samples, probs = .2)
-max( easy_data$p_grid[easy_data$cummulative_posterior <= .2] )
+quantile(easy_samples$p_grid , probs = .2)
 ```
 
 **E5**
 
 ```{r}
-quantile(easy_data$samples, probs = .8)
-min( easy_data$p_grid[easy_data$cummulative_posterior >= .8] )
+quantile(easy_samples$p_grid , probs = .8)
 ```
 
 **E6**
 
 ```{r}
-HPDI(easy_data$samples, prob = .66)
+HPDI(easy_samples$p_grid, prob = .66)
 
-p_e6 <- easy_data %>% 
+p_e6 <- easy_samples %>% 
   ggplot(aes(x = p_grid)) +
-  geom_line(aes(y = posterior, color = "posterior")) +
-  geom_vline(data = tibble(x = HPDI(easy_data$samples, prob = .66)),
-             aes(xintercept = x), linetype = 3) +
+  geom_density(color = clr0d, fill = fll0) +
+  stat_function(fun = function(x){demp(x = x, obs = easy_samples$p_grid)},
+                geom = "area",
+                xlim = HPDI(easy_samples$p_grid, prob = .66),
+                color = clr2, fill = fll2) +
   scale_color_manual(values = c(posterior = clr2), guide = "none") +
-  theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        legend.position = "bottom")
+  theme(legend.position = "bottom")
 ```
 
 **E7**
 
 ```{r, fig.asp = .4}
-PI(easy_data$samples, prob = .66)
+PI(easy_samples$p_grid, prob = .66)
 
-p_e7 <- easy_data %>% 
+p_e7 <- easy_samples %>% 
   ggplot(aes(x = p_grid)) +
-  geom_line(aes(y = posterior, color = "posterior")) +
-  geom_vline(data = tibble(x = PI(easy_data$samples, prob = .66)),
-             aes(xintercept = x), linetype = 3) +
+  geom_density(color = clr0d, fill = fll0) +
+  stat_function(fun = function(x){demp(x = x, obs = easy_samples$p_grid)},
+                geom = "area",
+                xlim = PI(easy_samples$p_grid, prob = .66),
+                color = clr2, fill = fll2) +
   scale_color_manual(values = c(posterior = clr2), guide = "none") +
-  theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        legend.position = "bottom")
+  theme(legend.position = "bottom")
 
 p_e6 + p_e7
 ```

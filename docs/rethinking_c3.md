@@ -93,7 +93,7 @@ sum(samples$proportion_water < .5) / length(samples$proportion_water)
 ```
 
 ```
-#> [1] 0.1675
+#> [1] 0.1699
 ```
 
 ```r
@@ -101,7 +101,7 @@ sum(samples$proportion_water > .5 & samples$proportion_water < .75) / length(sam
 ```
 
 ```
-#> [1] 0.6031
+#> [1] 0.6012
 ```
 
 ```r
@@ -265,7 +265,7 @@ rbinom( 10, size = 2, prob = .7)
 ```
 
 ```
-#>  [1] 1 1 2 2 2 2 1 1 1 2
+#>  [1] 1 1 1 2 2 2 2 1 2 1
 ```
 
 ```r
@@ -383,7 +383,7 @@ sum( samples$w == 6 ) / length( samples$w )
 ```
 
 ```
-#> [1] 0.19999
+#> [1] 0.20206
 ```
 
 
@@ -416,21 +416,19 @@ p_run_length + p_switches
 
 
 ```r
-n <- 10^4
-set.seed( 100 )
+n <- 1e4
 easy_data <- tibble(p_grid = seq( from = 0, to = 1, length.out = n ),
                     prior = rep(1 , n),
                     likelihood = dbinom( 6, size = 9, prob = p_grid),
                     posterior_unscaled = likelihood * prior,
                     posterior = posterior_unscaled / sum(posterior_unscaled),
-                    samples = sample( p_grid, prob = posterior, size = n, replace = TRUE),
                     cummulative_posterior = cumsum(posterior))
 ```
 
 
 ```r
 easy_data %>% 
-ggplot(aes(x = p_grid)) +
+  ggplot(aes(x = p_grid)) +
   geom_line(aes(y = prior / sum(prior), color = "prior")) +
   geom_line(aes(y = likelihood / sum(likelihood),
                 color = "likelihood")) +
@@ -446,44 +444,60 @@ ggplot(aes(x = p_grid)) +
 
 <img src="rethinking_c3_files/figure-html/unnamed-chunk-16-1.svg" width="672" style="display: block; margin: auto;" />
 
+
+
+```r
+set.seed( 100 )
+easy_samples <- easy_data %>% 
+  slice_sample(n = n, weight_by = posterior, replace = TRUE)
+
+easy_samples  %>% 
+  ggplot(aes(x = p_grid)) +
+  geom_density(color = clr0d, fill = fll0) +
+  scale_x_continuous(limits = c(0,1)) +
+  geom_vline(data = tibble(x = c(.2, .8)), aes(xintercept = x), linetype = 3)
+```
+
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-17-1.svg" width="672" style="display: block; margin: auto;" />
+
 **E1**
 
 
 ```r
-sum( easy_data$posterior[easy_data$p_grid < .2] )
+mean(easy_samples$p_grid <= .2)
 ```
 
 ```
-#> [1] 0.0008635326
+#> [1] 5e-04
 ```
 
 **E2**
 
 
 ```r
-sum( easy_data$posterior[easy_data$p_grid > .8] )
+mean(easy_samples$p_grid > .8)
 ```
 
 ```
-#> [1] 0.120821
+#> [1] 0.1219
 ```
 
 **E3**
 
 
 ```r
-sum( easy_data$posterior[easy_data$p_grid > .2 & easy_data$p_grid < .8] )
+mean( easy_samples$p_grid > .2 &  easy_samples$p_grid < .8)
 ```
 
 ```
-#> [1] 0.8783154
+#> [1] 0.8776
 ```
 
 **E4**
 
 
 ```r
-quantile(easy_data$samples, probs = .2)
+quantile(easy_samples$p_grid , probs = .2)
 ```
 
 ```
@@ -491,19 +505,11 @@ quantile(easy_data$samples, probs = .2)
 #> 0.5145315
 ```
 
-```r
-max( easy_data$p_grid[easy_data$cummulative_posterior <= .2] )
-```
-
-```
-#> [1] 0.5162516
-```
-
 **E5**
 
 
 ```r
-quantile(easy_data$samples, probs = .8)
+quantile(easy_samples$p_grid , probs = .8)
 ```
 
 ```
@@ -511,19 +517,11 @@ quantile(easy_data$samples, probs = .8)
 #> 0.7618962
 ```
 
-```r
-min( easy_data$p_grid[easy_data$cummulative_posterior >= .8] )
-```
-
-```
-#> [1] 0.7605761
-```
-
 **E6**
 
 
 ```r
-HPDI(easy_data$samples, prob = .66)
+HPDI(easy_samples$p_grid, prob = .66)
 ```
 
 ```
@@ -532,22 +530,22 @@ HPDI(easy_data$samples, prob = .66)
 ```
 
 ```r
-p_e6 <- easy_data %>% 
+p_e6 <- easy_samples %>% 
   ggplot(aes(x = p_grid)) +
-  geom_line(aes(y = posterior, color = "posterior")) +
-  geom_vline(data = tibble(x = HPDI(easy_data$samples, prob = .66)),
-             aes(xintercept = x), linetype = 3) +
+  geom_density(color = clr0d, fill = fll0) +
+  stat_function(fun = function(x){demp(x = x, obs = easy_samples$p_grid)},
+                geom = "area",
+                xlim = HPDI(easy_samples$p_grid, prob = .66),
+                color = clr2, fill = fll2) +
   scale_color_manual(values = c(posterior = clr2), guide = "none") +
-  theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        legend.position = "bottom")
+  theme(legend.position = "bottom")
 ```
 
 **E7**
 
 
 ```r
-PI(easy_data$samples, prob = .66)
+PI(easy_samples$p_grid, prob = .66)
 ```
 
 ```
@@ -556,20 +554,20 @@ PI(easy_data$samples, prob = .66)
 ```
 
 ```r
-p_e7 <- easy_data %>% 
+p_e7 <- easy_samples %>% 
   ggplot(aes(x = p_grid)) +
-  geom_line(aes(y = posterior, color = "posterior")) +
-  geom_vline(data = tibble(x = PI(easy_data$samples, prob = .66)),
-             aes(xintercept = x), linetype = 3) +
+  geom_density(color = clr0d, fill = fll0) +
+  stat_function(fun = function(x){demp(x = x, obs = easy_samples$p_grid)},
+                geom = "area",
+                xlim = PI(easy_samples$p_grid, prob = .66),
+                color = clr2, fill = fll2) +
   scale_color_manual(values = c(posterior = clr2), guide = "none") +
-  theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        legend.position = "bottom")
+  theme(legend.position = "bottom")
 
 p_e6 + p_e7
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-23-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-24-1.svg" width="672" style="display: block; margin: auto;" />
 
 **M1**
 
@@ -586,7 +584,7 @@ grid_data %>%
   theme(legend.position = "bottom")
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-24-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-25-1.svg" width="672" style="display: block; margin: auto;" />
 
 **M2**
 
@@ -647,7 +645,7 @@ p_posterior /
   p_posterior_predictive
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-27-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-28-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
 sum( samples$w == 8 ) / length( samples$w )
@@ -675,7 +673,7 @@ samples %>%
   labs(x = "number of water samples", title = "Posterior Predictive Distribution")
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-28-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-29-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
 sum( samples$w == 6 ) / length( samples$w )
@@ -749,7 +747,7 @@ p_posterior /
   p_posterior_predictive
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-32-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-33-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
 sum( samples$w == 8 ) / length( samples$w )
@@ -793,7 +791,7 @@ c(c(1:10),((1:100) *30)) %>%
                      guide = "none")
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-33-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-34-1.svg" width="672" style="display: block; margin: auto;" />
 
 **H1**
 
@@ -829,7 +827,7 @@ grid_data %>%
   geom_vline(xintercept = mode_posterior, color = clr2, linetype = 3)
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-34-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-35-1.svg" width="672" style="display: block; margin: auto;" />
 
 **H2**
 
@@ -865,7 +863,7 @@ grid_data %>%
                 xlim = percentile_intervals$p97, n = 501)
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-35-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-36-1.svg" width="672" style="display: block; margin: auto;" />
 
 **H3**
 
@@ -904,7 +902,7 @@ p_first <- random_births %>%
 p_all + p_first
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-36-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-37-1.svg" width="672" style="display: block; margin: auto;" />
 
 **H5**
 
@@ -940,7 +938,7 @@ random_births %>%
                      expand = c(0, 0)) 
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-37-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-38-1.svg" width="672" style="display: block; margin: auto;" />
 
 ## {brms} section
 
@@ -996,7 +994,7 @@ p_brms_posterior_predictive <- samples_brms %>%
 p_brms_posterior + p_brms_posterior_predictive
 ```
 
-<img src="rethinking_c3_files/figure-html/unnamed-chunk-38-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-39-1.svg" width="672" style="display: block; margin: auto;" />
 
 ---
 
