@@ -518,8 +518,8 @@ precis(posterior_sample) %>%
 
 |       mean|        sd|       5.5%|      94.5%|histogram    |
 |----------:|---------:|----------:|----------:|:------------|
-| 154.603393| 0.4106169| 153.954298| 155.271425|▁▁▅▇▂▁▁      |
-|   7.727159| 0.2925501|   7.257169|   8.194232|▁▁▁▂▅▇▇▃▁▁▁▁ |
+| 154.605922| 0.4088275| 153.958645| 155.258434|▁▁▁▅▇▂▁▁     |
+|   7.728789| 0.2911092|   7.257293|   8.191026|▁▁▁▂▅▇▇▃▁▁▁▁ |
 
 ## Linear Prediction
 
@@ -1548,14 +1548,300 @@ They control the division of data and the initial scale for the weighting
 
 **H1**
 
+
+```r
+model_hight_smp %>% 
+  mutate(mu_at_50 = alpha + beta * (50 - xbar),
+         `46.95` = alpha + beta * (46.95 - xbar),
+         `43.72` = alpha + beta * (43.72 - xbar),
+         `64.78` = alpha + beta * (64.78 - xbar),
+         `32.59` = alpha + beta * (32.59 - xbar),
+         `54.63` = alpha + beta * (54.63 - xbar)) %>% 
+  dplyr::select(`46.95`:`54.63` ) %>% 
+  pivot_longer(cols = everything(), names_to = "weight", values_to = "height") %>% 
+  group_by(weight) %>% 
+  nest() %>% 
+  ungroup() %>% 
+  mutate(median_weight = map_dbl(data, function(x){median(x$height)}),
+         mean_weight = map_dbl(data, function(x){mean(x$height)}),
+         lower_89 = map_dbl(data, function(x){PI(x$height)[[1]]}),
+         upper_89 = map_dbl(data, function(x){PI(x$height)[[2]]}),
+         individual = 1:5) %>% 
+  dplyr::select(individual, weight,median_weight:upper_89) %>% 
+  mutate(across(everything(), .fns = ~ round(as.numeric(.x), digits = 5))) %>% 
+  knitr::kable()
+```
+
+
+
+| individual| weight| median_weight| mean_weight| lower_89| upper_89|
+|----------:|------:|-------------:|-----------:|--------:|--------:|
+|          1|  46.95|      156.3742|    156.3739| 155.9302| 156.8173|
+|          2|  43.72|      153.4580|    153.4585| 153.0147| 153.8970|
+|          3|  64.78|      172.4641|    172.4671| 171.0703| 173.8520|
+|          4|  32.59|      143.4179|    143.4127| 142.4567| 144.3474|
+|          5|  54.63|      163.3039|    163.3058| 162.5306| 164.0879|
+
 **H2**
 
+
+```r
+data_children <- data %>% 
+  filter(age < 18)
+
+ggplot(data_children,
+       aes(weight, height)) +
+  geom_point(shape = 21, size = 1.5, color = clr1, fill = fll1)
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-46-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+xbar_children <- mean(data_children$weight)
+model_hight_children <- quap(
+  flist = alist(
+    height ~ dnorm( mu, sigma ),
+    mu <- alpha + beta * ( weight - xbar_children ),
+    alpha ~ dnorm( 178, 20 ),
+    beta ~ dlnorm( 0, 1 ),
+    sigma ~ dunif( 0, 50)
+  ),
+  data = data_children
+)
+
+precis(model_hight_children) %>% 
+  round(digits = 3) %>% 
+  as_tibble(rownames = NA)
+```
+
+```
+#> # A tibble: 3 x 4
+#>     mean    sd `5.5%` `94.5%`
+#> *  <dbl> <dbl>  <dbl>   <dbl>
+#> 1 108.   0.609 107.    109.  
+#> 2   2.72 0.068   2.61    2.83
+#> 3   8.44 0.431   7.75    9.13
+```
+
+```r
+model_hight_children %>% 
+  vcov() %>% 
+  cov2cor() %>% 
+  round(digits = 2) %>% 
+  as.data.frame(row.names = row.names(.)) %>% 
+  knitr::kable()
+```
+
+
+
+|      | alpha|  beta| sigma|
+|:-----|-----:|-----:|-----:|
+|alpha |  1.00|  0.00|  0.01|
+|beta  |  0.00|  1.00| -0.01|
+|sigma |  0.01| -0.01|  1.00|
+
+a)
+
+
+```r
+model_hight_smp_children <- extract.samples(model_hight_children)  %>% 
+  as_tibble() 
+
+model_hight_smp_mean_children <- model_hight_smp_children %>% 
+  summarise(across(.cols = everything(), mean))
+
+ggplot(data_children, aes(x  = weight, y = height)) +
+  geom_point(color = clr0d) +
+  stat_function(fun = function(x){model_hight_smp_mean_children$alpha + model_hight_smp_mean_children$beta * (x - xbar_children)},
+                color = clr2, n = 2)
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-48-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+model_hight_smp_mean_children %>% 
+  knitr::kable()
+```
+
+
+
+|    alpha|     beta|   sigma|
+|--------:|--------:|-------:|
+| 108.3763| 2.716742| 8.44416|
+
+A child get  27.1674225128912 cm taller per 10 kg weight.
+
+b)
+
+
+```r
+weight_seq_children <- seq(from = 2, to = 45, by = 1)
+model_hight_mu_children <- link(model_hight_children, data = data.frame(weight = weight_seq_children)) %>% 
+  as_tibble() %>% 
+  set_names(nm = weight_seq_children) %>% 
+  pivot_longer(cols = everything(), names_to = "weight", values_to = "height") %>% 
+  mutate(weight = as.numeric(weight)) 
+
+model_hight_mu_interval_children <- model_hight_mu_children %>% 
+  group_by(weight) %>% 
+  summarise(mean = mean(height),
+            PI_lower = PI(height)[1],
+            PI_upper = PI(height)[2]) %>% 
+  ungroup()
+
+model_hight_sd_children <- sim(model_hight_children, data = data.frame(weight = weight_seq_children), n = 1e4) %>% 
+  as_tibble() %>% 
+  set_names(nm = weight_seq_children) %>% 
+  pivot_longer(cols = `2`:`45`, names_to = "weight", values_to = "height") %>% 
+  mutate(weight = as.numeric(weight)) 
+
+model_hight_sd_children %>% 
+  group_by(weight) %>% 
+  summarise(mean = mean(height),
+            PI_lower = PI(height)[1],
+            PI_upper = PI(height)[2]) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = weight)) +
+  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr0d, alpha = .35)  +
+  geom_point(data = data_children, aes(y = height), color = rgb(0,0,0,.5), size = .6) +
+  geom_ribbon(data = model_hight_mu_interval_children,
+              aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35) +
+  geom_line(data = model_hight_mu_interval_children,
+              aes(y = mean))
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-49-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+c)
+
+The model seems to be systematically overestimate the height for the more extreme weights (very light and rather heavy).
+The relationship does not appear to be linear in the first place, so a non-lnear fit would be better - ideally one that is biologically motivated.
+
 **H3**
+
+
+```r
+data_log <- data %>% 
+  mutate(weight_log = log10(weight))
+data_log$weight_log %>%  dens()
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-50-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+xbar_log <- mean(data_log$weight_log)
+
+model_hight_log <- quap(
+  flist = alist(
+    height ~ dnorm( mu, sigma ),
+    mu <- alpha + beta * ( weight_log - xbar_log ),
+    alpha ~ dnorm( 179, 20 ),
+    beta ~ dlnorm( 0, 1 ),
+    sigma ~ dunif( 0, 50)
+  ),
+  data = data_log
+)
+
+precis(model_hight_log) %>% 
+  round(digits = 3) %>% 
+  as_tibble(rownames = NA)
+```
+
+```
+#> # A tibble: 3 x 4
+#>     mean    sd `5.5%` `94.5%`
+#> *  <dbl> <dbl>  <dbl>   <dbl>
+#> 1 138.   0.22  138.    139.  
+#> 2 108.   0.881 107.    110.  
+#> 3   5.14 0.156   4.89    5.38
+```
+
+```r
+model_hight_log %>% 
+  vcov() %>% 
+  cov2cor() %>% 
+  round(digits = 2) %>% 
+  as.data.frame(row.names = row.names(.)) %>% 
+  knitr::kable()
+```
+
+
+
+|      | alpha| beta| sigma|
+|:-----|-----:|----:|-----:|
+|alpha |     1|    0|     0|
+|beta  |     0|    1|     0|
+|sigma |     0|    0|     1|
+
+a)
+
+
+```r
+model_hight_smp_log <- extract.samples(model_hight_log)  %>% 
+  as_tibble() 
+
+model_hight_smp_mean_log <- model_hight_smp_log %>% 
+  summarise(across(.cols = everything(), mean))
+
+ggplot(data_log, aes(x  = weight_log, y = height)) +
+  geom_point(color = clr0d) +
+  stat_function(fun = function(x){model_hight_smp_mean_log$alpha + model_hight_smp_mean_log$beta * (x - xbar_log)},
+                color = clr2, n = 2)
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-51-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+weight_seq_log <- log10(seq(from = 2, to = 70, by = 1))
+model_hight_mu_log <- link(model_hight_log, data = data.frame(weight_log = weight_seq_log)) %>% 
+  as_tibble() %>% 
+  set_names(nm = weight_seq_log) %>% 
+  pivot_longer(cols = everything(), names_to = "weight_log", values_to = "height") %>% 
+  mutate(weight_log = as.numeric(weight_log)) 
+
+model_hight_mu_interval_log <- model_hight_mu_log %>% 
+  group_by(weight_log) %>% 
+  summarise(mean = mean(height),
+            PI_lower = PI(height, prob = .97)[1],
+            PI_upper = PI(height, prob = .97)[2]) %>% 
+  ungroup()
+
+model_hight_sd_log <- sim(model_hight_log, data = data.frame(weight_log = weight_seq_log), n = 1e4) %>% 
+  as_tibble() %>% 
+  set_names(nm = weight_seq_log) %>% 
+  pivot_longer(cols = everything(), names_to = "weight_log", values_to = "height") %>% 
+  mutate(weight_log = as.numeric(weight_log)) 
+
+model_hight_sd_log %>% 
+  group_by(weight_log) %>% 
+  summarise(mean = mean(height),
+            PI_lower = PI(height, prob = .97)[1],
+            PI_upper = PI(height, prob = .97)[2]) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = 10^(weight_log))) +
+  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr0d, alpha = .35)  +
+  geom_point(data = data, aes(x = weight, y = height), color = rgb(0,0,0,.5), size = .6) +
+  geom_ribbon(data = model_hight_mu_interval_log,
+              aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35) +
+  geom_line(data = model_hight_mu_interval_log,
+              aes(y = mean), linetype = 3)
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-52-1.svg" width="672" style="display: block; margin: auto;" />
 
 **H4**
 
 **H5**
 
+**H6**
+
+**H7**
+
+**H8**
 
 ## {brms} section
 
