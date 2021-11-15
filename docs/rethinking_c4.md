@@ -202,6 +202,10 @@ $$
 
 where, $iid$ means *"independent and identically distributed"*.
 
+**Prior predictive simulation**
+
+(*'what does the model think before seeing the data?'*)
+
 
 ```r
 n_samples <- 1e4
@@ -514,8 +518,8 @@ precis(posterior_sample) %>%
 
 |       mean|        sd|       5.5%|      94.5%|histogram    |
 |----------:|---------:|----------:|----------:|:------------|
-| 154.603423| 0.4131466| 153.940127| 155.265998|▁▁▁▅▇▂▁▁     |
-|   7.728201| 0.2909754|   7.265575|   8.188093|▁▁▁▁▂▅▇▇▃▁▁▁ |
+| 154.603393| 0.4106169| 153.954298| 155.271425|▁▁▅▇▂▁▁      |
+|   7.727159| 0.2925501|   7.257169|   8.194232|▁▁▁▂▅▇▇▃▁▁▁▁ |
 
 ## Linear Prediction
 

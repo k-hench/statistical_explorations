@@ -183,6 +183,10 @@ $$
 
 where, $iid$ means *"independent and identically distributed"*.
 
+**Prior predictive simulation**
+
+(*'what does the model think before seeing the data?'*)
+
 ```{r, fig.asp = .7}
 n_samples <- 1e4
 prior_simulation <- tibble(

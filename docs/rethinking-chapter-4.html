@@ -24,7 +24,7 @@
 <meta name="author" content="Kosmas Hench" />
 
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2021-11-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1018,6 +1018,8 @@ h_i &amp; \stackrel{iid}{\sim} &amp; Normal(\mu, \sigma) &amp; \textrm{[likeliho
 \end{array}
 \]</span></p>
 <p>where, <span class="math inline">\(iid\)</span> means <em>“independent and identically distributed”</em>.</p>
+<p><strong>Prior predictive simulation</strong></p>
+<p>(<em>‘what does the model think before seeing the data?’</em>)</p>
 <div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="rethinking-chapter-4.html#cb125-1" aria-hidden="true" tabindex="-1"></a>n_samples <span class="ot">&lt;-</span> <span class="fl">1e4</span></span>
 <span id="cb125-2"><a href="rethinking-chapter-4.html#cb125-2" aria-hidden="true" tabindex="-1"></a>prior_simulation <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
 <span id="cb125-3"><a href="rethinking-chapter-4.html#cb125-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_mu =</span> <span class="fu">rnorm</span>(n_samples, <span class="dv">178</span>, <span class="dv">20</span>),</span>
@@ -1336,18 +1338,18 @@ h_i &amp; \stackrel{iid}{\sim} &amp; Normal(\mu, \sigma) &amp; \verb|height ~ dn
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">154.603423</td>
-<td align="right">0.4131466</td>
-<td align="right">153.940127</td>
-<td align="right">155.265998</td>
-<td align="left">▁▁▁▅▇▂▁▁</td>
+<td align="right">154.603393</td>
+<td align="right">0.4106169</td>
+<td align="right">153.954298</td>
+<td align="right">155.271425</td>
+<td align="left">▁▁▅▇▂▁▁</td>
 </tr>
 <tr class="even">
-<td align="right">7.728201</td>
-<td align="right">0.2909754</td>
-<td align="right">7.265575</td>
-<td align="right">8.188093</td>
-<td align="left">▁▁▁▁▂▅▇▇▃▁▁▁</td>
+<td align="right">7.727159</td>
+<td align="right">0.2925501</td>
+<td align="right">7.257169</td>
+<td align="right">8.194232</td>
+<td align="left">▁▁▁▂▅▇▇▃▁▁▁▁</td>
 </tr>
 </tbody>
 </table>
