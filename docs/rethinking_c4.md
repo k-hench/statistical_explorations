@@ -516,10 +516,10 @@ precis(posterior_sample) %>%
 
 
 
-|       mean|        sd|       5.5%|      94.5%|histogram    |
-|----------:|---------:|----------:|----------:|:------------|
-| 154.605922| 0.4088275| 153.958645| 155.258434|▁▁▁▅▇▂▁▁     |
-|   7.728789| 0.2911092|   7.257293|   8.191026|▁▁▁▂▅▇▇▃▁▁▁▁ |
+|     mean|        sd|      5.5%|      94.5%|histogram   |
+|--------:|---------:|---------:|----------:|:-----------|
+| 154.6015| 0.4085892| 153.95098| 155.260642|▁▁▅▇▂▁▁     |
+|   7.7307| 0.2892113|   7.27144|   8.196509|▁▁▂▅▇▇▃▁▁▁▁ |
 
 ## Linear Prediction
 
@@ -781,8 +781,8 @@ model_hight_sd %>%
             PI_upper = PI(height)[2]) %>% 
   ungroup() %>% 
   ggplot(aes(x = weight)) +
-  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35)  +
-  geom_point(data = data_adults, aes(y = height), color = clr0, size = .3) +
+  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr0d, alpha = .35)  +
+  geom_point(data = data_adults, aes(y = height), color = rgb(0,0,0,.5), size = .6) +
   geom_ribbon(data = model_hight_mu_interval,
               aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35) +
   geom_line(data = model_hight_mu_interval,
@@ -866,8 +866,8 @@ plot_model_intervals <- function(mod, data,
               PI_upper = PI(height)[2]) %>% 
     ungroup() %>% 
     ggplot(aes(x = weight_s)) +
-    geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35)  +
-    geom_point(data = data, aes(y = height), color = rgb(0,0,0,.3), size = .4) +
+    geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr0d, alpha = .35)  +
+    geom_point(data = data, aes(y = height), color = rgb(0,0,0,.25), size = .4) +
     geom_ribbon(data = model_hight_mu_interval,
                 aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35) +
     geom_line(data = model_hight_mu_interval,
@@ -1235,7 +1235,7 @@ quap_formula <- alist(
 $$
 \begin{array}{cccr} 
 y_i & \sim & Normal( \mu, \sigma) & \textrm{[likelihood]}\\
-\mu & = & \alpha + \beta x_i & \textrm{[linear model]}\\
+\mu_i & = & \alpha + \beta x_i & \textrm{[linear model]}\\
 \alpha & \sim & Normal(0, 10) & \textrm{[$\alpha$ prior]}\\
 \beta & \sim & Uniform(0, 1) & \textrm{[$\beta$ prior]}\\
 \sigma & \sim & Exponential(1) & \textrm{[$\sigma$ prior]}
@@ -1247,7 +1247,7 @@ $$
 $$
 \begin{array}{cccr} 
 h_i & \sim & Normal( \mu, \sigma) & \textrm{[likelihood]} \\
-\mu & = & \alpha + \beta h_i & \textrm{[linear model]} \\
+\mu_i & = & \alpha + \beta h_i & \textrm{[linear model]} \\
 \alpha & \sim & Normal(150, 5) & \textrm{[$\alpha$ prior, starting size]} \\
 \beta & \sim & Uniform(0, 10) & \textrm{[$\beta$ prior, yearly growth]} \\
 \sigma & \sim & Normal(0, 8) & \textrm{[$\sigma$ prior, size variation]}
@@ -1370,8 +1370,8 @@ p_1 <- model_uncentered_sd %>%
             PI_upper = PI(height)[2]) %>% 
   ungroup() %>% 
   ggplot(aes(x = weight)) +
-  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35)  +
-  geom_point(data = data_adults, aes(y = height), color = clr0, size = .3) +
+  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr0d, alpha = .35)  +
+  geom_point(data = data_adults, aes(y = height), color = rgb(0,0,0,.5), size = .6) +
   geom_ribbon(data = model_uncentered_mu_interval,
               aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35) +
   geom_line(data = model_uncentered_mu_interval,
@@ -1385,8 +1385,8 @@ p_2 <- model_hight_sd %>%
             PI_upper = PI(height)[2]) %>% 
   ungroup() %>% 
   ggplot(aes(x = weight)) +
-  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35)  +
-  geom_point(data = data_adults, aes(y = height), color = clr0, size = .3) +
+  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr0d, alpha = .35)  +
+  geom_point(data = data_adults, aes(y = height), color = rgb(0,0,0,.5), size = .6) +
   geom_ribbon(data = model_hight_mu_interval,
               aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35) +
   geom_line(data = model_hight_mu_interval,
@@ -1725,14 +1725,7 @@ The relationship does not appear to be linear in the first place, so a non-lnear
 ```r
 data_log <- data %>% 
   mutate(weight_log = log10(weight))
-data_log$weight_log %>%  dens()
-```
-
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-50-1.svg" width="672" style="display: block; margin: auto;" />
-
-```r
 xbar_log <- mean(data_log$weight_log)
-
 model_hight_log <- quap(
   flist = alist(
     height ~ dnorm( mu, sigma ),
@@ -1835,15 +1828,403 @@ model_hight_sd_log %>%
 
 **H4**
 
+
+```r
+N <- 25
+cubic_priors <- tibble(n = 1:N,
+                        alpha = rnorm( n = N, mean =  -128, sd = 20 ),
+                        beta_1 = rnorm( n = N, mean = 11, sd = .1),
+                        beta_2 = rnorm( n = N, mean = -.1, sd = .01)) %>% 
+  expand(nesting(n, alpha, beta_1, beta_2),
+         weight = range(data_adults$weight)) %>% 
+  mutate(height = alpha + 
+           beta_1 * (weight - mean(data_adults$weight)) +
+           beta_2 * (weight - mean(data_adults$weight))^2)
+
+ggplot(cubic_priors, aes(x = weight, y = height, group = n)) +
+    pmap(cubic_priors, function(alpha, beta_1, beta_2, ...){
+      stat_function(fun = function(x){alpha + beta_1 * x + beta_2 * x^2}, 
+                    color = fll1, alpha = .1,
+                    n = 100, lwd = .2, geom = "line")
+    }) +
+    geom_hline(data = tibble(height = c(0, 272), type = 1:2),
+               aes(yintercept = height, linetype = factor(type)), size = .4) +
+    scale_linetype_manual(values = c(`1` = 3, `2` = 1), guide = "none") +
+    coord_cartesian(xlim = range(data_adults$weight), ylim = c(-100, 400)) +
+    theme(plot.title = element_markdown())
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-53-1.svg" width="672" style="display: block; margin: auto;" />
+
 **H5**
+
+
+```r
+cherry_blossoms_tib <- cherry_blossoms %>%
+  as_tibble() %>% 
+  filter(!is.na(temp) & !is.na(doy)) %>% 
+  mutate(temp_s = (temp - mean(temp, na.rm = TRUE))/sd(temp, na.rm = TRUE))
+
+temp_bar <- mean(cherry_blossoms_tib$temp, na.rm = TRUE)
+temp_sd <- sd(cherry_blossoms_tib$temp, na.rm = TRUE)
+
+cherry_blossoms_tib %>% 
+  as_tibble() %>% 
+  ggplot(aes(x = temp, y = doy)) +
+  geom_point(size = 1.2, color = fll2)
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-54-1.svg" width="672" style="display: block; margin: auto;" />
+
+$$
+\begin{array}{cccr} 
+d_i & \sim & Normal( \mu, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & \alpha + \beta x_i & \textrm{[linear model]}\\
+\alpha & \sim & Normal(105, 10) & \textrm{[$\alpha$ prior]}\\
+\beta & \sim & Normal(0, 10) & \textrm{[$\beta$ prior]}\\
+\sigma & \sim & Exponential(1) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+
+```r
+model_temp <- quap(
+  flist = alist(
+    doy ~ dnorm( mu, sigma ),
+    mu <- alpha + beta * temp_s,
+    alpha ~ dnorm( 105, 10 ),
+    beta ~ dnorm( 0, 10 ),
+    sigma ~ dexp( 1 )
+  ),
+  data = cherry_blossoms_tib
+)
+
+temp_seq <- (seq(from = 4.5, to = 8.4, by = .1) - temp_bar) / temp_sd
+
+model_temp_mu <- link(model_temp, data = data.frame(temp_s = temp_seq)) %>% 
+  as_tibble() %>% 
+  set_names(nm = temp_seq) %>% 
+  pivot_longer(cols = everything(), names_to = "temp_s", values_to = "doy") %>% 
+  mutate(temp_s = as.numeric(temp_s),
+         temp = temp_s * temp_sd + temp_bar) 
+
+model_temp_mu_interval <- model_temp_mu %>% 
+  group_by(temp) %>% 
+  summarise(mean = mean(doy),
+            PI_lower = PI(doy)[1],
+            PI_upper = PI(doy)[2]) %>% 
+  ungroup()
+
+model_temp_sd <- sim(model_temp, data = data.frame(temp_s = temp_seq), n = 1e4) %>% 
+  as_tibble() %>% 
+  set_names(nm = temp_seq) %>% 
+  pivot_longer(cols = everything(), names_to = "temp_s", values_to = "doy") %>% 
+  mutate(temp_s = as.numeric(temp_s),
+         temp = temp_s * temp_sd + temp_bar) 
+
+model_temp_sd %>% 
+  group_by(temp) %>% 
+  summarise(mean = mean(doy),
+            PI_lower = PI(doy)[1],
+            PI_upper = PI(doy)[2]) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = temp)) +
+  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr0d, alpha = .35)  +
+  geom_point(data = cherry_blossoms_tib, aes(y = doy), color = rgb(0,0,0,.5), size = .6) +
+  geom_ribbon(data = model_temp_mu_interval,
+              aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35) +
+  geom_line(data = model_temp_mu_interval,
+              aes(y = mean))
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-55-1.svg" width="672" style="display: block; margin: auto;" />
 
 **H6**
 
+
+```r
+n_knots <- 15
+knot_list <- quantile(data_cherry$year, probs = seq(0, 1, length.out = n_knots))
+
+b_spline_cherry <- bs(data_cherry$year,
+                      knots = knot_list[-c(1, n_knots)],
+                      degree = 3,
+                      intercept = TRUE)
+
+prior_predictive <- function(n = 100, prior_w = function(knots){rnorm(n = knots + 2, 0, 10)}){
+  tibble(.draw = 1:n,
+         alpha = rnorm(n, 100, 10),
+         w = purrr::map(seq_len(n),  # random weighting of knots
+                        function(x, knots){
+                          w <- prior_w(knots)
+                          w
+                        },
+                        knots = n_knots)) %>% 
+    mutate(mu = purrr::map2(alpha, w, .f = function(alpha, w, b){
+      mu <- alpha + b %*% w
+      mu %>%
+        as_tibble(.name_repair = ~"mu") %>%
+        mutate(year = data_cherry$year, .before = 1)
+    }, b = b_spline_cherry))  %>%
+    unnest(cols = mu)
+}
+
+
+p1 <- prior_predictive(n = 50) %>% 
+  ggplot(aes(x = year, y = mu))  +
+  labs(title = "weight sd: 10")
+
+p2 <- prior_predictive(n = 50, prior_w = function(knots){rnorm(n = knots + 2, mean = 0, sd = .3)}) %>%
+  ggplot(aes(x = year, y = mu)) +
+  labs(title = "weight sd: 0.3")
+
+p1 + p2 &
+  geom_vline(data = tibble(year = knot_list),
+             aes(xintercept = year),
+             linetype = 3, color = "black") &
+  geom_line(aes(group = .draw, color = .draw), alpha = .2) &
+  scale_color_gradientn(colours = c("black", clr0d, clr2), guide = "none") &
+  theme(panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank())
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-56-1.svg" width="672" style="display: block; margin: auto;" />
+
+
 **H7**
+
+This one is missing...
 
 **H8**
 
+
+```r
+set.seed(42)
+model_cherry2 <- quap(
+  alist(
+    D ~ dnorm(mu, sigma),
+    mu <- B %*% w,
+    w ~ dnorm(0, 10),
+    sigma ~ dexp(1)
+  ),
+  data = list(D = data_cherry$doy, B = b_spline_cherry),
+  start = list(w = rep(0, ncol(b_spline_cherry))),
+               control = list(maxit = 5000)
+)
+
+precis(model_cherry2, depth = 2) %>% round(digits = 2) %>% as_tibble(rownames = NA) %>%  knitr::kable()
+```
+
+
+
+|      |   mean|   sd|   5.5%|  94.5%|
+|:-----|------:|----:|------:|------:|
+|w[1]  |  92.84| 3.22|  87.69|  97.98|
+|w[2]  | 102.76| 3.09|  97.83| 107.69|
+|w[3]  | 100.43| 2.75|  96.03| 104.83|
+|w[4]  | 108.34| 1.64| 105.71| 110.96|
+|w[5]  | 101.56| 1.68|  98.88| 104.24|
+|w[6]  | 106.97| 1.74| 104.19| 109.75|
+|w[7]  |  97.56| 1.53|  95.12|  99.99|
+|w[8]  | 110.64| 1.53| 108.19| 113.08|
+|w[9]  | 101.68| 1.68|  99.00| 104.36|
+|w[10] | 105.75| 1.73| 102.99| 108.52|
+|w[11] | 107.37| 1.70| 104.66| 110.08|
+|w[12] | 102.67| 1.65| 100.02| 105.31|
+|w[13] | 108.15| 1.69| 105.44| 110.86|
+|w[14] | 103.77| 1.87| 100.78| 106.75|
+|w[15] | 101.31| 2.34|  97.57| 105.05|
+|w[16] |  95.98| 2.44|  92.08|  99.87|
+|w[17] |  92.12| 2.30|  88.45|  95.80|
+|sigma |   5.95| 0.15|   5.71|   6.18|
+
+```r
+cherry_samples <- extract.samples(model_cherry2) %>% 
+  as.data.frame() %>% 
+  as_tibble() %>% 
+  set_names(nm = c("sigma", str_pad(1:17, 2,pad = 0)))
+
+cherry_samples_mu <- cherry_samples %>% 
+  summarise(across(everything(), mean)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "bias_function", values_to ="weight")
+
+model_cherry_samples <- link(model_cherry2) %>% 
+  as_tibble()%>% 
+  set_names(nm = data_cherry$year) %>% 
+  pivot_longer(cols = everything(), names_to = "year", values_to = "doy") %>% 
+  mutate(year = as.numeric(year))  %>% 
+  arrange(year)
+
+model_cherry_stats <- model_cherry_samples %>% 
+  group_by(year) %>% 
+  nest() %>% 
+  mutate(mean = map_dbl(data, function(data){mean(data$doy)}),
+         PI_lower = map_dbl(data, function(data){PI(data$doy)[1]}),
+         PI_upper = map_dbl(data, function(data){PI(data$doy)[2]}))
+
+model_cherry_stats %>% 
+  ggplot(aes(x = year)) +
+  geom_vline(data = tibble(year = knot_list),
+             aes(xintercept = year),
+             linetype = 3, color = "black") +
+    geom_point(data = cherry_blossoms, aes(y = doy), color = clr2, alpha = .3) +
+  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr2, alpha = .35) +
+  geom_line(aes(y = mean)) +
+  labs(y = "Day of first blossom") +
+  theme(panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank())
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-57-1.svg" width="672" style="display: block; margin: auto;" />
+
+
 ## {brms} section
+
+### linear model of adult height
+
+**finding the posterior with {brms}**
+
+
+```r
+brms_c4_adult_heights <- brm(data = data_adults, 
+                             family = gaussian,
+                             height ~ 1,
+                             prior = c(prior(normal(178, 20), class = Intercept),
+                                       prior(uniform(0, 50), class = sigma)),
+                             iter = 31000,
+                             warmup = 30000,
+                             chains = 12,
+                             cores = 12,
+                             seed = 4,
+                             file = "brms/brms_c4_adult_heights")
+
+posterior_summary(brms_c4_adult_heights,probs = c(.055, .945)) %>% 
+  round(digits = 3) %>% 
+  knitr::kable()
+```
+
+
+
+|            |  Estimate| Est.Error|      Q5.5|     Q94.5|
+|:-----------|---------:|---------:|---------:|---------:|
+|b_Intercept |   154.604|     0.418|   153.947|   155.275|
+|sigma       |     7.742|     0.304|     7.276|     8.250|
+|lp__        | -1226.924|     1.058| -1228.772| -1225.927|
+
+```r
+brms_summary_plot <- function(mod, n_chains = 4){
+  bayes_data <- bayesplot::mcmc_areas_data(mod, prob = .95) %>% 
+  filter(parameter != "lp__")
+bayes_chains_data <- bayesplot::mcmc_trace_data(mod) %>% 
+  filter(parameter != "lp__")
+
+p_dens <- bayes_data %>% 
+  filter(interval == "outer") %>% 
+  ggplot(aes(x = x, y = scaled_density)) +
+  geom_area(color = clr0d, fill = fll0) +
+  geom_area(data = bayes_data %>% 
+  filter(interval == "inner"), color = clr2, fill = fll2) +
+  facet_wrap(parameter ~ . , scales = "free", ncol = 1)
+
+p_chains <- bayes_chains_data %>% 
+  ggplot(aes(x = iteration, y = value, group = chain)) +
+  geom_line(aes(color = chain), alpha = .6) +
+  facet_wrap(parameter ~ . , scales = "free", ncol = 1) +
+  scale_color_manual(values = scales::colour_ramp(colors = c("black",clr0d,clr2))(seq(0,1,length.out = n_chains)))
+p_dens + p_chains
+}
+
+brms_summary_plot(brms_c4_adult_heights)
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-58-1.svg" width="672" style="display: block; margin: auto;" />
+
+**sampling from the posterior**
+
+
+```r
+# equivalent to `rethinking::extract.samples()`
+brms_post <- as_draws_df(brms_c4_adult_heights) %>% 
+  as_tibble()
+
+head(brms_post)
+```
+
+```
+#> # A tibble: 6 x 6
+#>   b_Intercept sigma   lp__ .chain .iteration .draw
+#>         <dbl> <dbl>  <dbl>  <int>      <int> <int>
+#> 1        154.  8.07 -1227.      1          1     1
+#> 2        154.  7.84 -1227.      1          2     2
+#> 3        155.  8.21 -1228.      1          3     3
+#> 4        154.  7.99 -1227.      1          4     4
+#> 5        155.  7.77 -1226.      1          5     5
+#> 6        154.  7.93 -1227.      1          6     6
+```
+
+```r
+select(brms_post, b_Intercept:sigma) %>% 
+  cov() %>% 
+  cov2cor()
+```
+
+$$\begin{bmatrix} 1 &-0.0192241582730429 \\-0.0192241582730429 &1 \\ \end{bmatrix}$$
+
+```r
+brms_post %>%
+  dplyr::select(-(lp__:.draw)) %>% 
+  pivot_longer(cols = everything()) %>% 
+  group_by(name) %>% 
+  summarise(quantiles = list(tibble(quant = quantile(value, probs = c(.5, .025, .75)), 
+                                                perc = str_c("q",names(quant)))) )%>% 
+  unnest(quantiles) %>% 
+  pivot_wider(names_from = perc, values_from = quant) %>% 
+  mutate(across(.cols = -name, ~ round(.x, digits = 2))) %>% 
+  knitr::kable()
+```
+
+
+
+|name        |   q50%|  q2.5%|   q75%|
+|:-----------|------:|------:|------:|
+|b_Intercept | 154.59| 153.80| 154.89|
+|sigma       |   7.73|   7.18|   7.94|
+
+```r
+posterior_summary(brms_post)
+```
+
+$$\begin{bmatrix} 154.603681717344 &0.417698657902289 &153.797143321477 &155.411872045528 &7.7417412324536 &0.304409842943225 \\7.17548730321122 &8.38470302045445 &-1226.92435306886 &1.05809371424477 &-1229.68670608237 &-1225.89312495532 \\2.5 &1.11817376920787 &1 &4 &500.5 &288.711081398222 \\25.975 &975.025 &2000.5 &1154.84486692658 &100.975 &3900.025 \\ \end{bmatrix}$$
+
+**the height model with a predictor**
+
+
+```r
+data_adults <- data_adults %>% 
+  mutate(weight_centered = weight - mean(weight))
+
+brms_c4_heights_x <- brm(data = data_adults, 
+                         family = gaussian,
+                         height ~ 1 + weight_centered,
+                         prior = c(prior(normal(178, 20), class = Intercept),
+                                   prior(lognormal(0, 1), class = b),
+                                   prior(uniform(0, 50), class = sigma)),
+                         iter = 28000, warmup = 27000,
+                         chains = 12, cores = 12,
+                         seed = 42,
+                         file = "brms/brms_c4_heights_x")
+
+brms_summary_plot(brms_c4_heights_x, n_chains = 12)
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-60-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+#4.4.2.1
+```
+
+
 
 ---
 

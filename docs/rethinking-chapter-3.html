@@ -24,7 +24,7 @@
 <meta name="author" content="Kosmas Hench" />
 
 
-<meta name="date" content="2021-11-15" />
+<meta name="date" content="2021-11-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -713,7 +713,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.5" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#curves-from-lines"><i class="fa fa-check"></i><b>5.5</b> Curves from lines</a></li>
 <li class="chapter" data-level="5.6" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#splines"><i class="fa fa-check"></i><b>5.6</b> Splines</a></li>
 <li class="chapter" data-level="5.7" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#homework-2"><i class="fa fa-check"></i><b>5.7</b> Homework</a></li>
-<li class="chapter" data-level="5.8" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#brms-section-2"><i class="fa fa-check"></i><b>5.8</b> {brms} section</a></li>
+<li class="chapter" data-level="5.8" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#brms-section-2"><i class="fa fa-check"></i><b>5.8</b> {brms} section</a>
+<ul>
+<li class="chapter" data-level="5.8.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#linear-model-of-adult-height"><i class="fa fa-check"></i><b>5.8.1</b> linear model of adult height</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html"><i class="fa fa-check"></i><b>6</b> Bayesian Statistics the Fun Way</a>
 <ul>
@@ -839,9 +842,9 @@ Pr(vampire|positive) = \frac{Pr(positive|vampire) \times Pr(vampire)}{Pr(positiv
 <div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="rethinking-chapter-3.html#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(grid_data<span class="sc">$</span>posterior[grid_data<span class="sc">$</span>p_grid <span class="sc">&lt;</span> <span class="fl">0.5</span>])</span></code></pre></div>
 <pre><code>#&gt; [1] 0.171875</code></pre>
 <div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="rethinking-chapter-3.html#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(samples<span class="sc">$</span>proportion_water <span class="sc">&lt;</span> .<span class="dv">5</span>) <span class="sc">/</span> <span class="fu">length</span>(samples<span class="sc">$</span>proportion_water)</span></code></pre></div>
-<pre><code>#&gt; [1] 0.1696</code></pre>
+<pre><code>#&gt; [1] 0.1684</code></pre>
 <div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="rethinking-chapter-3.html#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(samples<span class="sc">$</span>proportion_water <span class="sc">&gt;</span> .<span class="dv">5</span> <span class="sc">&amp;</span> samples<span class="sc">$</span>proportion_water <span class="sc">&lt;</span> .<span class="dv">75</span>) <span class="sc">/</span> <span class="fu">length</span>(samples<span class="sc">$</span>proportion_water)</span></code></pre></div>
-<pre><code>#&gt; [1] 0.6075</code></pre>
+<pre><code>#&gt; [1] 0.6077</code></pre>
 <div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="rethinking-chapter-3.html#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># f_post &lt;-  function(x){dbeta(x = x, shape1 = 9 +1 , shape2 = 6 +1)}</span></span>
 <span id="cb51-2"><a href="rethinking-chapter-3.html#cb51-2" aria-hidden="true" tabindex="-1"></a>f_post <span class="ot">&lt;-</span>  <span class="cf">function</span>(x){<span class="fu">dbinom</span>(<span class="at">x =</span> <span class="dv">6</span>, <span class="at">size =</span> <span class="dv">9</span>, <span class="at">prob =</span> x)}</span>
 <span id="cb51-3"><a href="rethinking-chapter-3.html#cb51-3" aria-hidden="true" tabindex="-1"></a>f_post_norm <span class="ot">&lt;-</span> <span class="cf">function</span>(x){ <span class="fu">f_post</span>(x) <span class="sc">/</span> <span class="fu">integrate</span>(<span class="at">f =</span> f_post,<span class="at">lower =</span> <span class="dv">0</span>, <span class="at">upper =</span> <span class="dv">1</span>)[[<span class="dv">1</span>]]}</span></code></pre></div>
@@ -965,7 +968,7 @@ Pr(W | N ,p) = \frac{N!}{W! (N -W)!} p^{W}(1 - p)^{N-W}
 <div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="rethinking-chapter-3.html#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbinom</span>( <span class="dv">0</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">prob =</span> .<span class="dv">7</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] 0.09 0.42 0.49</code></pre>
 <div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="rethinking-chapter-3.html#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rbinom</span>( <span class="dv">10</span>, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">prob =</span> .<span class="dv">7</span>)</span></code></pre></div>
-<pre><code>#&gt;  [1] 1 1 0 1 2 2 1 1 1 1</code></pre>
+<pre><code>#&gt;  [1] 2 2 2 1 2 2 0 2 2 2</code></pre>
 <div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="rethinking-chapter-3.html#cb61-1" aria-hidden="true" tabindex="-1"></a>create_dummy_w <span class="ot">&lt;-</span> <span class="cf">function</span>(size, prob){</span>
 <span id="cb61-2"><a href="rethinking-chapter-3.html#cb61-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">rbinom</span>(<span class="dv">10</span><span class="sc">^</span><span class="dv">5</span>, <span class="at">size =</span> size, <span class="at">prob =</span> prob),</span>
 <span id="cb61-3"><a href="rethinking-chapter-3.html#cb61-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">size =</span> size,</span>
@@ -1053,7 +1056,7 @@ Pr(W | N ,p) = \frac{N!}{W! (N -W)!} p^{W}(1 - p)^{N-W}
 <span id="cb65-3"><a href="rethinking-chapter-3.html#cb65-3" aria-hidden="true" tabindex="-1"></a>  p_posterior_predictive</span></code></pre></div>
 <p><img src="rethinking_c3_files/figure-html/unnamed-chunk-13-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="rethinking-chapter-3.html#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( samples<span class="sc">$</span>w <span class="sc">==</span> <span class="dv">6</span> ) <span class="sc">/</span> <span class="fu">length</span>( samples<span class="sc">$</span>w )</span></code></pre></div>
-<pre><code>#&gt; [1] 0.19921</code></pre>
+<pre><code>#&gt; [1] 0.19894</code></pre>
 <div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="rethinking-chapter-3.html#cb68-1" aria-hidden="true" tabindex="-1"></a>globe_data <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;w&quot;</span>, <span class="st">&quot;l&quot;</span>, <span class="st">&quot;w&quot;</span>, <span class="st">&quot;w&quot;</span>, <span class="st">&quot;w&quot;</span>, <span class="st">&quot;l&quot;</span>, <span class="st">&quot;w&quot;</span>, <span class="st">&quot;l&quot;</span>, <span class="st">&quot;w&quot;</span>)</span>
 <span id="cb68-2"><a href="rethinking-chapter-3.html#cb68-2" aria-hidden="true" tabindex="-1"></a>globe_run_length <span class="ot">&lt;-</span> <span class="fu">rle</span>(globe_data)<span class="sc">$</span>lengths <span class="sc">%&gt;%</span> <span class="fu">max</span>()</span>
 <span id="cb68-3"><a href="rethinking-chapter-3.html#cb68-3" aria-hidden="true" tabindex="-1"></a>globe_n_switches <span class="ot">&lt;-</span> (<span class="fu">rle</span>(globe_data)<span class="sc">$</span>lengths <span class="sc">%&gt;%</span> <span class="fu">length</span>()) <span class="sc">-</span><span class="dv">1</span> </span>

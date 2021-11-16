@@ -2,7 +2,7 @@
 title: "Statistical Exploration"
 subtitle: "a small notebook to keep track"
 author: "Kosmas Hench"
-date: "2021-11-15"
+date: "2021-11-16"
 documentclass: book
 bibliography: [book.bib]
 biblio-style: apalike
