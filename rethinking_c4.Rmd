@@ -2096,7 +2096,7 @@ fitted(brms_c4_cherry_smooth2,
 ```
 
 
-Add-on about matrix-columns ([https://bookdown.org/content/4857/geocentric-models.html#second-bonus-group-predictors-with-matrix-columns](4.7 Second bonus))
+Add-on about matrix-columns ([4.7 Second bonus](https://bookdown.org/content/4857/geocentric-models.html#second-bonus-group-predictors-with-matrix-columns))
 
 ```{r}
 n <- 100

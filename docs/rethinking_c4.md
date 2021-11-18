@@ -518,8 +518,8 @@ precis(posterior_sample) %>%
 
 |       mean|        sd|       5.5%|      94.5%|histogram     |
 |----------:|---------:|----------:|----------:|:-------------|
-| 154.603666| 0.4100026| 153.937405| 155.260759|▁▁▅▇▂▁▁       |
-|   7.730901| 0.2914216|   7.269394|   8.196852|▁▁▁▁▂▅▇▇▃▁▁▁▁ |
+| 154.609815| 0.4108506| 153.959835| 155.267483|▁▁▅▇▂▁▁       |
+|   7.730234| 0.2913663|   7.266867|   8.190544|▁▁▁▁▂▅▇▇▃▁▁▁▁ |
 
 ## Linear Prediction
 
@@ -2570,7 +2570,7 @@ fitted(brms_c4_cherry_smooth2,
 <img src="rethinking_c4_files/figure-html/unnamed-chunk-71-1.svg" width="672" style="display: block; margin: auto;" />
 
 
-Add-on about matrix-columns ([https://bookdown.org/content/4857/geocentric-models.html#second-bonus-group-predictors-with-matrix-columns](4.7 Second bonus))
+Add-on about matrix-columns ([4.7 Second bonus](https://bookdown.org/content/4857/geocentric-models.html#second-bonus-group-predictors-with-matrix-columns))
 
 
 ```r
