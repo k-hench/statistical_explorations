@@ -516,10 +516,10 @@ precis(posterior_sample) %>%
 
 
 
-|     mean|        sd|      5.5%|      94.5%|histogram   |
-|--------:|---------:|---------:|----------:|:-----------|
-| 154.6015| 0.4085892| 153.95098| 155.260642|▁▁▅▇▂▁▁     |
-|   7.7307| 0.2892113|   7.27144|   8.196509|▁▁▂▅▇▇▃▁▁▁▁ |
+|       mean|        sd|       5.5%|      94.5%|histogram     |
+|----------:|---------:|----------:|----------:|:-------------|
+| 154.603666| 0.4100026| 153.937405| 155.260759|▁▁▅▇▂▁▁       |
+|   7.730901| 0.2914216|   7.269394|   8.196852|▁▁▁▁▂▅▇▇▃▁▁▁▁ |
 
 ## Linear Prediction
 
@@ -2094,8 +2094,8 @@ brms_c4_adult_heights <- brm(data = data_adults,
                                        prior(uniform(0, 50), class = sigma)),
                              iter = 31000,
                              warmup = 30000,
-                             chains = 12,
-                             cores = 12,
+                             chains = 7,
+                             cores = 7,
                              seed = 4,
                              file = "brms/brms_c4_adult_heights")
 
@@ -2211,7 +2211,7 @@ brms_c4_heights_x <- brm(data = data_adults,
                                    prior(lognormal(0, 1), class = b),
                                    prior(uniform(0, 50), class = sigma)),
                          iter = 28000, warmup = 27000,
-                         chains = 12, cores = 12,
+                         chains = 7, cores = 7,
                          seed = 42,
                          file = "brms/brms_c4_heights_x")
 
@@ -2220,13 +2220,433 @@ brms_summary_plot(brms_c4_heights_x, n_chains = 12)
 
 <img src="rethinking_c4_files/figure-html/unnamed-chunk-60-1.svg" width="672" style="display: block; margin: auto;" />
 
+*Logs and exps* (`m4.3b`)
+
+
 ```r
-#4.4.2.1
+brms_c4_heights_x_log <- brm(data = data_adults, 
+                             family = gaussian,
+                             bf(height ~ alpha + exp(logbeta) * weight_centered,
+                                alpha ~ 1,
+                                logbeta ~ 1,
+                                nl = TRUE),
+                             prior = c(prior(normal(178, 20), class = b, nlpar = alpha),
+                                       prior(normal(0, 1), class = b, nlpar = logbeta),
+                                       prior(uniform(0, 50), class = sigma)),
+                             iter = 31000, warmup = 30000,
+                             chains = 7, cores = 7,
+                             seed = 42,
+                             file = "brms/brms_c4_heights_x_log")
+```
+
+
+```r
+posterior_summary(brms_c4_heights_x)[1:3, ] %>% 
+  round(digits = 2)%>% 
+  as.data.frame()
+```
+
+```
+#>                   Estimate Est.Error   Q2.5  Q97.5
+#> b_Intercept         154.60      0.27 154.08 155.12
+#> b_weight_centered     0.90      0.04   0.82   0.99
+#> sigma                 5.11      0.20   4.74   5.52
+```
+
+```r
+vcov(brms_c4_heights_x) %>% 
+  cov2cor() %>% 
+  round(3) %>% 
+  as.data.frame()
+```
+
+```
+#>                 Intercept weight_centered
+#> Intercept           1.000          -0.003
+#> weight_centered    -0.003           1.000
+```
+
+```r
+brms_posterior_samples <- as_draws_df(brms_c4_heights_x) %>% 
+  as_tibble() %>%
+  select(-(lp__:.draw))
+
+brms_posterior_samples %>%
+  cov() %>%
+  cov2cor() %>% 
+  round(digits = 3)%>% 
+  as.data.frame()
+```
+
+```
+#>                   b_Intercept b_weight_centered sigma
+#> b_Intercept             1.000            -0.003 0.006
+#> b_weight_centered      -0.003             1.000 0.000
+#> sigma                   0.006             0.000 1.000
+```
+
+```r
+ggpairs(brms_posterior_samples,
+        lower = list(continuous = wrap(ggally_points, colour = clr1, size = .3, alpha = .1)),
+        diag = list(continuous = wrap("densityDiag", fill = fll1, color = clr1, adjust = .5)),
+        upper = list(continuous = wrap(ggally_cor, size = 5, color = "black", family = "Josefin sans")))
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-62-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+weight_seq <- tibble(weight = 25:70) %>% 
+  mutate(weight_centered = weight - mean(data_adults$weight))
+
+brms_model_hight_mu <- fitted(brms_c4_heights_x,
+                              summary = FALSE,
+                              newdata = weight_seq) %>%
+  as_tibble() %>%
+  set_names(nm = weight_seq$weight_centered) %>% 
+  pivot_longer(cols = everything(), names_to = "weight_centered", values_to = "height") %>% 
+  mutate(weight_centered = as.numeric(weight_centered)) 
+  
+brms_model_hight_mu_interval <- brms_model_hight_mu %>% 
+  group_by(weight_centered) %>% 
+  summarise(mean = mean(height),
+            PI_lower = PI(height)[1],
+            PI_upper = PI(height)[2]) %>% 
+  ungroup()
+
+brms_model_hight_samples <- predict(brms_c4_heights_x,
+                              summary = FALSE,
+                              newdata = weight_seq) %>%
+  as_tibble() %>%
+  set_names(nm = weight_seq$weight_centered) %>% 
+  pivot_longer(cols = everything(), names_to = "weight_centered", values_to = "height") %>% 
+  mutate(weight_centered = as.numeric(weight_centered)) 
+  
+brms_model_hight_samples_interval <- brms_model_hight_samples %>% 
+  group_by(weight_centered) %>% 
+  summarise(mean = mean(height),
+            PI_lower = PI(height)[1],
+            PI_upper = PI(height)[2]) %>% 
+  ungroup()
+
+data_adults %>%
+  ggplot(aes(x = weight_centered, y = height)) +
+  geom_point(shape = 21, size = 2, color = clr1, fill = fll1) +
+  geom_abline(intercept = fixef(brms_c4_heights_x)[1], 
+              slope     = fixef(brms_c4_heights_x)[2])
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-63-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+brms_model_hight_mu_interval %>% 
+  ggplot(aes(x = weight_centered)) +
+  geom_ribbon(data = brms_model_hight_samples_interval,
+              aes(ymin = PI_lower, ymax = PI_upper), fill = clr0d, alpha = .35)  +
+  geom_point(data = data_adults, aes(y = height), color = rgb(0,0,0,.5), size = .6) +
+  geom_ribbon(aes(ymin = PI_lower, ymax = PI_upper), fill = clr1, alpha = .35)  +
+  geom_line(aes(y = mean))
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-63-2.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+brms_c4_curve_x <- brm(data = data_model, 
+      family = gaussian,
+      height ~ 1 + weight_s + weight_s2,
+      prior = c(prior(normal(178, 20), class = Intercept),
+                prior(lognormal(0, 1), class = b, coef = "weight_s"),
+                prior(normal(0, 1), class = b, coef = "weight_s2"),
+                prior(uniform(0, 50), class = sigma)),
+      iter = 30000, warmup = 29000,
+      chains = 4, cores = 4,
+      seed = 4,
+      file = "brms/brms_c4_curve_x")
+
+brms_summary_plot(brms_c4_curve_x, n_chains = 4)
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-64-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+weight_seq <- tibble(weight_s = seq(from = -2.5, to = 2.5, length.out = 30)) %>% 
+  mutate(weight_s2 = weight_s^2)
+
+fitd_quad <- fitted(brms_c4_curve_x, 
+                    newdata = weight_seq,
+                    probs = c(.055, .955)) %>%
+  data.frame() %>%
+  bind_cols(weight_seq) %>% 
+  as_tibble()
+
+pred_quad <- predict(brms_c4_curve_x, 
+                     newdata = weight_seq,
+                     probs = c(.055, .955)) %>%
+  data.frame() %>%
+  bind_cols(weight_seq) %>% 
+  as_tibble()
+
+ggplot(data = data_model, 
+       aes(x = weight_s)) +
+  geom_ribbon(data = pred_quad, 
+              aes(ymin = Q5.5, ymax = Q95.5), fill = clr0d, alpha = .35) +
+  geom_smooth(data = fitd_quad,
+              aes(y = Estimate, ymin = Q5.5, ymax = Q95.5),
+              stat = "identity", color = clr1, fill = fll1, alpha = .35, size = .2) +
+  geom_point(aes(y = height), color = rgb(0,0,0,.5), size = .6)
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-65-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+num_knots <- 15
+knot_list <- quantile(data_cherry$year, probs = seq(from = 0, to = 1, length.out = num_knots))
+B <- bs(data_cherry$year,
+        knots = knot_list[-c(1, num_knots)], 
+        degree = 3, 
+        intercept = TRUE)
+
+data_cherry_B <- data_cherry %>% mutate(B = B)
+data_cherry_B %>% glimpse()
+```
+
+```
+#> Rows: 827
+#> Columns: 6
+#> $ year       <int> 812, 815, 831, 851, 853, 864, 866, 869, 889, 891, 892, 894,…
+#> $ doy        <int> 92, 105, 96, 108, 104, 100, 106, 95, 104, 109, 108, 106, 10…
+#> $ temp       <dbl> NA, NA, NA, 7.38, NA, 6.42, 6.44, NA, 6.83, 6.98, 7.11, 6.9…
+#> $ temp_upper <dbl> NA, NA, NA, 12.10, NA, 8.69, 8.11, NA, 8.48, 8.96, 9.11, 8.…
+#> $ temp_lower <dbl> NA, NA, NA, 2.66, NA, 4.14, 4.77, NA, 5.19, 5.00, 5.11, 5.5…
+#> $ B          <bs[,17]> <bs[26 x 17]>
+```
+
+```r
+brms_c4_cherry_spline <- brm(data = data_cherry_B,
+      family = gaussian,
+      doy ~ 1 + B,
+      prior = c(prior(normal(100, 10), class = Intercept),
+                prior(normal(0, 10), class = b),
+                prior(exponential(1), class = sigma)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "brms/brms_c4_cherry_spline")
+```
+
+
+```r
+brms_posterior_samples <- as_draws_df(brms_c4_cherry_spline)
+years_seq <- tibble(year = seq(from = min(data_cherry$year), to = max(data_cherry$year), by = 10))
+
+fitd_quad <- fitted(brms_c4_cherry_spline, 
+                    probs = c(.055, .955)) %>%
+  data.frame() %>%
+  bind_cols(data_cherry_B) %>% 
+  as_tibble()
+
+pred_quad <- predict(brms_c4_cherry_spline, 
+                    probs = c(.055, .955)) %>%
+  data.frame() %>%
+  bind_cols(data_cherry_B) %>% 
+  as_tibble()
+
+ggplot(data = data_cherry, 
+       aes(x = year)) +
+  geom_vline(data = tibble(year = knot_list), aes(xintercept = year), 
+             linetype = 3, color = rgb(0,0,0,.4)) +
+  geom_point(aes(y = doy), color = rgb(0,0,0,.5), size = .6) +
+  geom_ribbon(data = pred_quad, 
+              aes(ymin = Q5.5, ymax = Q95.5), fill = clr0d, alpha = .35) +
+  geom_smooth(data = fitd_quad,
+              aes(y = Estimate, ymin = Q5.5, ymax = Q95.5),
+              stat = "identity", color = clr1, fill = fll1, alpha = .35, size = .2) +
+  geom_hline(yintercept = fixef(brms_c4_cherry_spline)[1, 1], color = clr1, linetype = 2) +
+  theme(panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank())
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-67-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+get_prior(data = data_cherry,
+          family = gaussian,
+          doy ~ 1 + s(year))
+```
+
+```
+#>                   prior     class    coef group resp dpar nlpar bound
+#>                  (flat)         b                                    
+#>                  (flat)         b syear_1                            
+#>  student_t(3, 105, 5.9) Intercept                                    
+#>    student_t(3, 0, 5.9)       sds                                    
+#>    student_t(3, 0, 5.9)       sds s(year)                            
+#>    student_t(3, 0, 5.9)     sigma                                    
+#>        source
+#>       default
+#>  (vectorized)
+#>       default
+#>       default
+#>  (vectorized)
+#>       default
+```
+
+Using a *thin plate* spline
+
+
+```r
+brms_c4_cherry_smooth <- brm(data = data_cherry,
+                             family = gaussian,
+                             doy ~ 1 + s(year),
+                             prior = c(prior(normal(100, 10), class = Intercept),
+                                       prior(normal(0, 10), class = b),
+                                       prior(student_t(3, 0, 5.9), class = sds),
+                                       prior(exponential(1), class = sigma)),
+                             iter = 2000, warmup = 1000,
+                             chains = 4, cores = 4,
+                             seed = 4,
+                             control = list(adapt_delta = .99),
+                             file = "brms/brms_c4_cherry_smooth")
+```
+
+
+```r
+fitted(brms_c4_cherry_smooth,
+       probs = c(.055, .945)) %>% 
+  data.frame() %>% 
+  bind_cols(select(data_cherry, year, doy)) %>% 
+  as_tibble() %>% 
+  ggplot(aes(x = year, y = doy, ymin = Q5.5, ymax = Q94.5)) +
+  geom_vline(data = tibble(year = knot_list), aes(xintercept = year), 
+             linetype = 3, color = rgb(0,0,0,.4)) +
+  geom_point(aes(y = doy), color = rgb(0,0,0,.5), size = .6) +
+  geom_smooth(aes(y = Estimate, ymin = Q5.5, ymax = Q94.5),
+              stat = "identity", color = clr1, fill = fll1, alpha = .35, size = .2) +
+  geom_hline(yintercept = fixef(brms_c4_cherry_smooth)[1, 1], color = clr1, linetype = 2) +
+  labs(subtitle = "brms smooth using s(year) (thin plate)",
+       y = "day in year") +
+  theme(panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank())
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-70-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+brms_c4_cherry_smooth2 <- brm(data = data_cherry,
+                              family = gaussian,
+                              doy ~ 1 + s(year, bs = "bs", k = 19),
+                              prior = c(prior(normal(100, 10), class = Intercept),
+                                        prior(normal(0, 10), class = b),
+                                        prior(student_t(3, 0, 5.9), class = sds),
+                                        prior(exponential(1), class = sigma)),
+                              iter = 2000, warmup = 1000, chains = 4, cores = 4,
+                              seed = 4,
+                              control = list(adapt_delta = .99),
+                              file = "brms/brms_c4_cherry_smooth2")
+
+fitted(brms_c4_cherry_smooth2,
+       probs = c(.055, .945)) %>% 
+  data.frame() %>% 
+  bind_cols(select(data_cherry, year, doy)) %>% 
+  as_tibble() %>% 
+  ggplot(aes(x = year, y = doy, ymin = Q5.5, ymax = Q94.5)) +
+  geom_vline(data = tibble(year = knot_list), aes(xintercept = year), 
+             linetype = 3, color = rgb(0,0,0,.4)) +
+  geom_point(aes(y = doy), color = rgb(0,0,0,.5), size = .6) +
+  geom_smooth(aes(y = Estimate, ymin = Q5.5, ymax = Q94.5),
+              stat = "identity", color = clr1, fill = fll1, alpha = .35, size = .2) +
+  geom_hline(yintercept = fixef(brms_c4_cherry_smooth2)[1, 1], color = clr1, linetype = 2) +
+  labs(subtitle = "brms smooth using s(year) (B-spline)",
+       y = "day in year") +
+  theme(panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank())
+```
+
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-71-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+Add-on about matrix-columns ([https://bookdown.org/content/4857/geocentric-models.html#second-bonus-group-predictors-with-matrix-columns](4.7 Second bonus))
+
+
+```r
+n <- 100
+
+# how many continuous x predictor variables would you like?
+k <- 10
+
+# simulate a dichotomous dummy variable for z
+# simulate an n by k array for X
+set.seed(4)
+
+data_matrix_columns <- tibble(z = sample(0:1, size = n, replace = T),
+                              X = array(runif(n * k, min = 0, max = 1), dim = c(n, k)))
+
+# set the data-generating parameter values
+a     <- 1
+theta <- 5
+b     <- 1:k
+sigma <- 2
+
+# simulate the criterion
+data_matrix_columns <- data_matrix_columns %>% 
+  mutate(y = as.vector(a + X %*% b + theta * z + rnorm(n, mean = 0, sd = sigma)))
+
+# data_matrix_columns %>% glimpse()
+# data_matrix_columns$X[1,]
+
+brms_c4_matrix_column <- brm(data = data_matrix_columns,
+                             family = gaussian,
+                             y ~ 1 + z + X,
+                             prior = c(prior(normal(0, 2), class = Intercept),
+                                       prior(normal(0, 10), class = b),
+                                       prior(exponential(1), class = sigma)),
+                             iter = 2000, warmup = 1000, chains = 4, cores = 4,
+                             seed = 4,
+                             file = "brms/brms_c4_matrix_column")
+
+summary(brms_c4_matrix_column)
+```
+
+```
+#>  Family: gaussian 
+#>   Links: mu = identity; sigma = identity 
+#> Formula: y ~ 1 + z + X 
+#>    Data: data_matrix_columns (Number of observations: 100) 
+#>   Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+#>          total post-warmup draws = 4000
+#> 
+#> Population-Level Effects: 
+#>           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+#> Intercept     0.95      1.19    -1.47     3.34 1.00     6928     3291
+#> z             4.74      0.42     3.91     5.56 1.00     7389     3032
+#> X1            0.57      0.75    -0.86     2.04 1.00     6798     3312
+#> X2            0.90      0.69    -0.47     2.26 1.00     6421     2949
+#> X3            3.41      0.75     1.96     4.90 1.00     7375     3214
+#> X4            2.81      0.73     1.36     4.25 1.00     6712     3469
+#> X5            5.74      0.72     4.32     7.12 1.00     6621     3588
+#> X6            6.40      0.73     4.97     7.82 1.00     6552     3228
+#> X7            8.49      0.73     7.06     9.90 1.00     7098     3335
+#> X8            8.40      0.69     7.04     9.76 1.00     8718     3363
+#> X9            8.82      0.81     7.27    10.39 1.00     8378     3273
+#> X10           9.32      0.73     7.88    10.78 1.00     8260     2894
+#> 
+#> Family Specific Parameters: 
+#>       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+#> sigma     1.99      0.16     1.71     2.32 1.00     5722     3433
+#> 
+#> Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+#> and Tail_ESS are effective sample size measures, and Rhat is the potential
+#> scale reduction factor on split chains (at convergence, Rhat = 1).
 ```
 
 
 
----
+  ---
 
 <div id="myModal" class="modal">
   <span class="close">&times;</span>
