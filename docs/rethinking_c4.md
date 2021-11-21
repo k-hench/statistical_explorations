@@ -13,7 +13,7 @@ editor_options:
 
 
 
-by [Richard McElreath](https://xcelab.net/rm/statistical-rethinking/), building on the Summary by [Solomon Kurz](https://bookdown.org/content/4857/)
+by [Richard McElreath](https://xcelab.net/rm/statistical-rethinking/), building on the Summaries by [Solomon Kurz](https://bookdown.org/content/4857/) and [Jake Thompson](https://sr2-solutions.wjakethompson.com/linear-models.html).
 
 ## Why normal distributions are normal
 
@@ -516,10 +516,10 @@ precis(posterior_sample) %>%
 
 
 
-|       mean|        sd|       5.5%|      94.5%|histogram     |
-|----------:|---------:|----------:|----------:|:-------------|
-| 154.609815| 0.4108506| 153.959835| 155.267483|▁▁▅▇▂▁▁       |
-|   7.730234| 0.2913663|   7.266867|   8.190544|▁▁▁▁▂▅▇▇▃▁▁▁▁ |
+|       mean|        sd|       5.5%|      94.5%|histogram      |
+|----------:|---------:|----------:|----------:|:--------------|
+| 154.608693| 0.4091753| 153.950385| 155.258785|▁▁▅▇▂▁▁        |
+|   7.735728| 0.2944356|   7.257201|   8.205518|▁▁▁▁▂▅▇▇▃▁▁▁▁▁ |
 
 ## Linear Prediction
 

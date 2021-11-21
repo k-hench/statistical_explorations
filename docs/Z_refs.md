@@ -35,13 +35,13 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#>  [1] GGally_1.5.0         ggtext_0.1.1         brms_2.16.1         
-#>  [4] Rcpp_1.0.6           EnvStats_2.4.0       ggraph_2.0.5.9000   
-#>  [7] tidygraph_1.2.0      glue_1.4.2           patchwork_1.1.0.9000
-#> [10] prismatic_1.0.0.9000 forcats_0.5.1        stringr_1.4.0       
-#> [13] dplyr_1.0.6          purrr_0.3.4          readr_1.4.0         
-#> [16] tidyr_1.1.3          tibble_3.1.2         ggplot2_3.3.5       
-#> [19] tidyverse_1.3.0.9000
+#>  [1] ggdag_0.2.3.9000     GGally_1.5.0         ggtext_0.1.1        
+#>  [4] brms_2.16.1          Rcpp_1.0.6           EnvStats_2.4.0      
+#>  [7] ggraph_2.0.5.9000    tidygraph_1.2.0      glue_1.4.2          
+#> [10] patchwork_1.1.0.9000 prismatic_1.0.0.9000 forcats_0.5.1       
+#> [13] stringr_1.4.0        dplyr_1.0.6          purrr_0.3.4         
+#> [16] readr_1.4.0          tidyr_1.1.3          tibble_3.1.2        
+#> [19] ggplot2_3.3.5        tidyverse_1.3.0.9000
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] readxl_1.3.1         backports_1.2.1      plyr_1.8.6          
