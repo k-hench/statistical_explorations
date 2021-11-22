@@ -56,7 +56,7 @@ p_waffle +
   theme(legend.position = "bottom")
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-2-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-2-1.svg" width="90%" style="display: block; margin: auto;" />
 
 Age Model: first model (divorce rate depends on age at marriage)
 
@@ -453,11 +453,11 @@ data_divorce_sim <- tibble(median_age_std = rnorm(n),
                            divorce_codep = rnorm(n, mean = median_age_std + marriage_std))
 
 p1 <- ggpairs(data_divorce_sim %>% dplyr::select(-divorce_codep),
-        lower = list(continuous = wrap(ggally_points, colour = clr1, size = .5, alpha = .7)),
+        lower = list(continuous = wrap(ggally_points, colour = clr1, size = .9, alpha = .7)),
         diag = list(continuous = wrap("densityDiag", fill = fll1, color = clr1, adjust = 1)),
         upper = list(continuous = wrap(ggally_cor, size = 5, color = "black", family = "Josefin sans")))
 p2 <- ggpairs(data_divorce_sim %>% dplyr::select(-divorce_std),
-        lower = list(continuous = wrap(ggally_points, colour = clr2, size = .5, alpha = .7)),
+        lower = list(continuous = wrap(ggally_points, colour = clr2, size = .9, alpha = .7)),
         diag = list(continuous = wrap("densityDiag", fill = fll2, color = clr2, adjust = 1)),
         upper = list(continuous = wrap(ggally_cor, size = 5, color = "black", family = "Josefin sans")))
 
@@ -642,7 +642,7 @@ p_12 <- ggplot(mapping = aes(x = residual_marriage)) +
   geom_point(data = residuals_marriage, aes(y = divorce_std),
              color = clr1, fill = clr_lighten(clr1,.35), shape = 21) +
   geom_text(data = residuals_marriage %>% filter(Loc %in% c("DC", "HI", "ND", "ME", "WY")),
-            aes(y = divorce_std - .2, label = Loc)) +
+            aes(y = divorce_std - .4, label = Loc)) +
   labs(y = "divorce_rate (std)")
 ```
 
@@ -717,7 +717,7 @@ p_22 <- ggplot(mapping = aes(x = residual_age)) +
   geom_point(data = residuals_age, aes(y = divorce_std),
              color = clr2, fill = clr_lighten(clr2,.35), shape = 21) +
   geom_text(data = residuals_age %>% filter(Loc %in% c("DC", "HI", "ID")),
-            aes(y = divorce_std - .2, label = Loc)) +
+            aes(y = divorce_std - .4, label = Loc)) +
   labs(y = "divorce_rate (std)")
 ```
 
@@ -772,6 +772,211 @@ ggplot(mapping = aes(x = divorce_std)) +
 
 <img src="rethinking_c5_files/figure-html/unnamed-chunk-22-1.svg" width="672" style="display: block; margin: auto;" />
 
+Regressions tend to under-estimate variable in the high end of the range and over-estimate in the low end of the range.
+This is normal, they *"pull towards the mean"*.
+
+The labeled States however (ID, ME, RI, UT), are not well predicted by the Model (eg. due to additional social factors).
+
+
+Simulating spurious association
+
+
+```r
+N <- 100
+data_spurious <- tibble(x_real = rnorm(N),
+                        x_spur = rnorm(N, x_real),
+                        y = rnorm(N, x_real))
+
+ggpairs(data_spurious,
+        lower = list(continuous = wrap(ggally_points, colour = clr3, size = .9, alpha = .7)),
+        diag = list(continuous = wrap("densityDiag", fill = fll3, color = clr3, adjust = 1)),
+        upper = list(continuous = wrap(ggally_cor, size = 5, color = "black", family = "Josefin sans")))
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-23-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+model_spurious <- quap(
+  flist = alist(
+    y ~ dnorm(mu, sigma),
+    mu <- alpha + beta_r * x_real + beta_s * x_spur,
+    alpha ~ dnorm(0, .2),
+    beta_r ~ dnorm(0, .5),
+    beta_s ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_spurious
+)
+
+precis(model_spurious) %>% 
+  as.matrix() %>% 
+  round(digits = 2) %>% 
+  knitr::kable()
+```
+
+
+
+|       | mean|   sd|  5.5%| 94.5%|
+|:------|----:|----:|-----:|-----:|
+|alpha  | 0.09| 0.09| -0.06|  0.24|
+|beta_r | 0.87| 0.14|  0.64|  1.10|
+|beta_s | 0.09| 0.11| -0.09|  0.27|
+|sigma  | 1.06| 0.07|  0.94|  1.17|
+
+Note, how the estimated mean for `beta_s` is close to 0 (0.09) -- despite the correlation shown above 🤔`.
+
+#### Counterfactual Plots
+
+
+```r
+model_counterfactual <- quap(
+  flist = alist(
+    # A -> D <- M
+    divorce_std ~ dnorm( mu, sigma ) ,
+    mu <- alpha + beta_M * marriage_std + beta_A * median_age_std,
+    alpha ~ dnorm( 0, 0.2 ),
+    beta_A ~ dnorm( 0, 0.5 ),
+    beta_M ~ dnorm( 0, 0.5 ),
+    sigma ~ dexp( 1 ),
+    # A -> M
+    marriage_std ~ dnorm( mu_M, sigma_M ),
+    mu_M <- alpha_M + beta_AM * median_age_std,
+    alpha_M ~ dnorm( 0, 0.2 ),
+    beta_AM ~ dnorm( 0, 0.5 ),
+    sigma_M ~ dexp(1)
+  ),
+  data = data_waffle
+)
+
+precis(model_counterfactual) %>% 
+  as.matrix() %>% 
+  round(digits = 2) %>% 
+  knitr::kable()
+```
+
+
+
+|        |  mean|   sd|  5.5%| 94.5%|
+|:-------|-----:|----:|-----:|-----:|
+|alpha   |  0.00| 0.10| -0.16|  0.16|
+|beta_A  | -0.61| 0.15| -0.85| -0.37|
+|beta_M  | -0.07| 0.15| -0.31|  0.18|
+|sigma   |  0.79| 0.08|  0.66|  0.91|
+|alpha_M |  0.00| 0.09| -0.14|  0.14|
+|beta_AM | -0.69| 0.10| -0.85| -0.54|
+|sigma_M |  0.68| 0.07|  0.57|  0.79|
+
+Note, that `marriage_std` and `median_age_std` are strongly negatively correlated (-0.69)
+
+
+```r
+A_seq <- seq(-2, 2, length.out = 30)
+
+unpack_sim <- function(x, seq = A_seq){
+  nms <- names(x)
+  purrr::map(.x = nms, .f = function(y, x, seq_in = seq){
+    x[[y]] %>% 
+          as_tibble() %>% 
+      set_names(nm = seq_along(seq_in)) %>% 
+      pivot_longer(cols = everything(),
+                   names_to = "row_idx", 
+                   values_to = "value") %>% 
+      mutate(parameter = y)
+    }, x = x) %>% 
+    purrr::reduce(bind_rows)
+}
+
+data_sim <- sim(fit = model_counterfactual,
+                data = tibble(median_age_std = A_seq),
+                vars = c("marriage_std", "divorce_std")) %>% 
+  unpack_sim()
+
+data_sim_pi <- data_sim %>% 
+  group_by(row_idx, parameter) %>% 
+  summarise(mean = mean(value),
+            PI_lower = PI(value)[1],
+            PI_upper = PI(value)[2]) %>% 
+  ungroup() %>% 
+  mutate(row_idx = as.numeric(row_idx),
+         median_age_std = A_seq[row_idx]) %>% 
+  arrange(parameter, median_age_std)
+
+data_sim_pi %>% 
+  ggplot() +
+  geom_smooth(aes(x = median_age_std, y = mean, ymin = PI_lower, ymax = PI_upper,
+                  color = parameter, fill = after_scale(clr_alpha(color))),
+              stat = "identity", size = .4) +
+  scale_color_manual(values = c(clr0d, clr3), guide = "none") +
+  labs(y = "counterfactual value", title = "Counterfactual effects of age at marriage on") +
+  facet_wrap(parameter ~ .)
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-25-1.svg" width="672" style="display: block; margin: auto;" />
+
+Numerical operations (eg. simulating the causal effect of raising the median age of marriage from 20 to 30):
+
+
+```r
+A_seq2 <-  (c(20, 30) - mean(data_waffle$MedianAgeMarriage)) / sd(data_waffle$MedianAgeMarriage)
+
+data_sim_num <- sim(fit = model_counterfactual,
+                data = tibble(median_age_std = A_seq2),
+                vars = c("marriage_std", "divorce_std")) %>% 
+  unpack_sim(seq = A_seq2)
+
+data_sim_num %>% 
+  filter(parameter == "divorce_std") %>%
+  dplyr::select(-parameter) %>% 
+  mutate(pair = (row_number() + 1) %/% 2) %>% 
+  pivot_wider(names_from = row_idx, values_from = value) %>% 
+  mutate(effect = `2` - `1`) %>% 
+  summarise(mean = mean(effect))
+```
+
+```
+#> # A tibble: 1 x 1
+#>    mean
+#>   <dbl>
+#> 1 -4.59
+```
+
+...A change of four and a half standard deviations is quite extreme!
+
+
+```r
+M_seq <- A_seq
+
+data_sim_M <- sim(fit = model_counterfactual,
+                data = tibble(marriage_std = M_seq,
+                              median_age_std  = 0),
+                vars = c("divorce_std")) %>% 
+  as_tibble() %>% 
+  set_names(nm = seq_along(M_seq)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "row_idx", 
+               values_to = "divorce_std") 
+
+data_sim_M_pi <- data_sim_M %>% 
+  group_by(row_idx) %>% 
+  summarise(mean = mean(divorce_std),
+            PI_lower = PI(divorce_std)[1],
+            PI_upper = PI(divorce_std)[2]) %>% 
+  ungroup() %>% 
+  mutate(row_idx = as.numeric(row_idx),
+         marriage_std = M_seq[row_idx])
+
+data_sim_M_pi %>% 
+  ggplot() +
+  geom_smooth(aes(x = marriage_std, y = mean, ymin = PI_lower, ymax = PI_upper),
+              color = clr1, fill = fll1,
+              stat = "identity", size = .4) +
+  scale_color_manual(values = c(clr0d, clr3), guide = "none") +
+  labs(y = "counterfactual value",
+       title = "Counterfactual effects of marriage rate on divorce rate") +
+  lims(y = c(-2, 2))
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-27-1.svg" width="672" style="display: block; margin: auto;" />
 
 ## Homework
 
