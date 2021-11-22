@@ -24,7 +24,7 @@
 <meta name="author" content="Kosmas Hench" />
 
 
-<meta name="date" content="2021-11-21" />
+<meta name="date" content="2021-11-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -721,8 +721,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html"><i class="fa fa-check"></i><b>6</b> Rethinking: Chapter 5</a>
 <ul>
 <li class="chapter" data-level="6.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#directed-acyclic-graphs"><i class="fa fa-check"></i><b>6.1</b> Directed Acyclic Graphs</a></li>
-<li class="chapter" data-level="6.2" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multiple-regression-notion"><i class="fa fa-check"></i><b>6.2</b> Multiple Regression notion</a></li>
-<li class="chapter" data-level="6.3" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#brms-section-3"><i class="fa fa-check"></i><b>6.3</b> {brms} section</a></li>
+<li class="chapter" data-level="6.2" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multiple-regression-notion"><i class="fa fa-check"></i><b>6.2</b> Multiple Regression notion</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#visualizations-for-multivariate-regressions"><i class="fa fa-check"></i><b>6.2.1</b> Visualizations for multivariate regressions</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#homework-3"><i class="fa fa-check"></i><b>6.3</b> Homework</a></li>
+<li class="chapter" data-level="6.4" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#brms-section-3"><i class="fa fa-check"></i><b>6.4</b> {brms} section</a></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html"><i class="fa fa-check"></i><b>7</b> Bayesian Statistics the Fun Way</a>
 <ul>
@@ -865,7 +869,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-2"><a href="rethinking-chapter-2.html#cb3-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">marbles =</span> <span class="dv">4</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb3-3"><a href="rethinking-chapter-2.html#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">possibilities =</span> marbles <span class="sc">^</span> draws) <span class="sc">%&gt;%</span> </span>
 <span id="cb3-4"><a href="rethinking-chapter-2.html#cb3-4" aria-hidden="true" tabindex="-1"></a>  flextable<span class="sc">::</span><span class="fu">flextable</span>()</span></code></pre></div>
-<template id="3365855b-3c33-488b-b78a-eb76ca9f3be5"><style>
+<template id="05e1c068-d7d5-4f75-87fe-7d15ad6840e1"><style>
 .tabwid table{
   border-spacing:0px !important;
   border-collapse:collapse;
@@ -899,12 +903,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 .tabwid table tr {
 background-color: transparent;
 }
-</style><div class="tabwid"><style>.cl-83233fce{}.cl-831e28ea{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-831e3c68{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-831e6832{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-831e6850{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-831e685a{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-83233fce'>
-<thead><tr style="overflow-wrap:break-word;"><td class="cl-831e685a"><p class="cl-831e3c68"><span class="cl-831e28ea">draws</span></p></td><td class="cl-831e685a"><p class="cl-831e3c68"><span class="cl-831e28ea">marbles</span></p></td><td class="cl-831e685a"><p class="cl-831e3c68"><span class="cl-831e28ea">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-831e6832"><p class="cl-831e3c68"><span class="cl-831e28ea">1</span></p></td><td class="cl-831e6832"><p class="cl-831e3c68"><span class="cl-831e28ea">4</span></p></td><td class="cl-831e6832"><p class="cl-831e3c68"><span class="cl-831e28ea">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-831e6832"><p class="cl-831e3c68"><span class="cl-831e28ea">2</span></p></td><td class="cl-831e6832"><p class="cl-831e3c68"><span class="cl-831e28ea">4</span></p></td><td class="cl-831e6832"><p class="cl-831e3c68"><span class="cl-831e28ea">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-831e6850"><p class="cl-831e3c68"><span class="cl-831e28ea">3</span></p></td><td class="cl-831e6850"><p class="cl-831e3c68"><span class="cl-831e28ea">4</span></p></td><td class="cl-831e6850"><p class="cl-831e3c68"><span class="cl-831e28ea">64</span></p></td></tr></tbody></table></div></template>
-<div class="flextable-shadow-host" id="5dc43f26-e6c9-40ca-82c9-55cde81a45eb"></div>
+</style><div class="tabwid"><style>.cl-7d7d74ba{}.cl-7d75788c{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-7d759c68{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-7d75eeac{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7d75eef2{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7d75ef10{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-7d7d74ba'>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-7d75ef10"><p class="cl-7d759c68"><span class="cl-7d75788c">draws</span></p></td><td class="cl-7d75ef10"><p class="cl-7d759c68"><span class="cl-7d75788c">marbles</span></p></td><td class="cl-7d75ef10"><p class="cl-7d759c68"><span class="cl-7d75788c">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-7d75eeac"><p class="cl-7d759c68"><span class="cl-7d75788c">1</span></p></td><td class="cl-7d75eeac"><p class="cl-7d759c68"><span class="cl-7d75788c">4</span></p></td><td class="cl-7d75eeac"><p class="cl-7d759c68"><span class="cl-7d75788c">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-7d75eeac"><p class="cl-7d759c68"><span class="cl-7d75788c">2</span></p></td><td class="cl-7d75eeac"><p class="cl-7d759c68"><span class="cl-7d75788c">4</span></p></td><td class="cl-7d75eeac"><p class="cl-7d759c68"><span class="cl-7d75788c">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-7d75eef2"><p class="cl-7d759c68"><span class="cl-7d75788c">3</span></p></td><td class="cl-7d75eef2"><p class="cl-7d759c68"><span class="cl-7d75788c">4</span></p></td><td class="cl-7d75eef2"><p class="cl-7d759c68"><span class="cl-7d75788c">64</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="c68861ce-4d5e-4209-91f3-d45be3822b94"></div>
 <script>
-var dest = document.getElementById("5dc43f26-e6c9-40ca-82c9-55cde81a45eb");
-var template = document.getElementById("3365855b-3c33-488b-b78a-eb76ca9f3be5");
+var dest = document.getElementById("c68861ce-4d5e-4209-91f3-d45be3822b94");
+var template = document.getElementById("05e1c068-d7d5-4f75-87fe-7d15ad6840e1");
 var caption = template.content.querySelector("caption");
 if(caption) {
   caption.style.cssText = "display:block;text-align:center;";
@@ -1287,12 +1291,12 @@ Posterior = \frac{Probability~of~the~Data \times Prior}{ Average~probability~of~
 #&gt; 
 #&gt; |      mean|        sd|      5.5%|     94.5%|qa         |
 #&gt; |---------:|---------:|---------:|---------:|:----------|
-#&gt; | 0.6666664| 0.1571338| 0.4155362| 0.9177966|W: 6, L: 3 |
+#&gt; | 0.6666671| 0.1571337| 0.4155371| 0.9177971|W: 6, L: 3 |
 #&gt; 
 #&gt; 
 #&gt; |      mean|        sd|      5.5%|     94.5%|qa          |
 #&gt; |---------:|---------:|---------:|---------:|:-----------|
-#&gt; | 0.6666665| 0.1111104| 0.4890907| 0.8442424|W: 12, L: 6 |
+#&gt; | 0.6666666| 0.1111104| 0.4890907| 0.8442424|W: 12, L: 6 |
 #&gt; 
 #&gt; 
 #&gt; |      mean|        sd|      5.5%|     94.5%|qa           |

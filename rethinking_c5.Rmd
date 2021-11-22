@@ -183,7 +183,7 @@ D_i & {\sim} & Normal(\mu, \sigma) & \textrm{[likelihood]}\\
 $$
 
 ```{r}
-model_mariage <- quap(
+model_marriage <- quap(
   flist = alist(
     divorce_std ~ dnorm( mu, sigma ) ,
     mu <- alpha + beta_M * marriage_std ,
@@ -199,7 +199,7 @@ model_mariage <- quap(
 marriage_seq <- seq(min(data_waffle$marriage_std),
                max(data_waffle$marriage_std),
                length.out = 101)
-model_marriage_posterior_prediction_samples <- link(model_mariage,
+model_marriage_posterior_prediction_samples <- link(model_marriage,
                                                data = data.frame(marriage_std = marriage_seq)) %>% 
   as_tibble() %>% 
   set_names(nm = marriage_seq) %>% 
@@ -217,7 +217,7 @@ model_marriage_posterior_prediction_pi <- model_marriage_posterior_prediction_sa
             PI_upper = PI(Divorce)[2]) %>% 
   ungroup()
 
-model_marriage_posterior_prediction_simulation <- sim(model_mariage,
+model_marriage_posterior_prediction_simulation <- sim(model_marriage,
                                                  data = data.frame(marriage_std = marriage_seq), 
                                                  n = 5e3) %>% 
   as_tibble() %>% 
@@ -373,6 +373,350 @@ or even *matrix* notion
 $$
 m = Xb
 $$
+
+```{r}
+model_multiple <- quap(
+  flist = alist(
+      divorce_std ~ dnorm( mu, sigma ) ,
+    mu <- alpha + beta_M * marriage_std + beta_A * median_age_std,
+    alpha ~ dnorm( 0, 0.2 ),
+    beta_A ~ dnorm( 0, 0.5 ),
+    beta_M ~ dnorm( 0, 0.5 ),
+    sigma ~ dexp( 1 )
+  ),
+  data = data_waffle
+)
+
+precis(model_multiple) %>% 
+  round(digits = 2) %>% 
+  as.matrix() %>% 
+  knitr::kable()
+```
+
+```{r, fig.asp = .3}
+ct <- coeftab(model_age, model_marriage, model_multiple,se = TRUE)
+plot_coeftab(ct)
+```
+
+`beta_A` doesn't really change, it only grows more uncertain, yet `beta_M` is only associated with divorce, when marriage rate is missing from the model.
+
+> "Once we know the median age at marriage for a State, there is little to no additional predictive power in also knowing the rate of marriage at that State."
+
+$\rightarrow$ $D \perp \!\!\! \perp M | A$
+
+simulating the divorcee example
+
+```{r}
+n <- 50
+data_divorce_sim <- tibble(median_age_std = rnorm(n),
+                           marriage_std = rnorm(n, mean = -median_age_std),
+                           divorce_std = rnorm(n, mean = median_age_std),
+                           divorce_codep = rnorm(n, mean = median_age_std + marriage_std))
+
+p1 <- ggpairs(data_divorce_sim %>% dplyr::select(-divorce_codep),
+        lower = list(continuous = wrap(ggally_points, colour = clr1, size = .5, alpha = .7)),
+        diag = list(continuous = wrap("densityDiag", fill = fll1, color = clr1, adjust = 1)),
+        upper = list(continuous = wrap(ggally_cor, size = 5, color = "black", family = "Josefin sans")))
+p2 <- ggpairs(data_divorce_sim %>% dplyr::select(-divorce_std),
+        lower = list(continuous = wrap(ggally_points, colour = clr2, size = .5, alpha = .7)),
+        diag = list(continuous = wrap("densityDiag", fill = fll2, color = clr2, adjust = 1)),
+        upper = list(continuous = wrap(ggally_cor, size = 5, color = "black", family = "Josefin sans")))
+
+cowplot::plot_grid(ggmatrix_gtable(p1), ggmatrix_gtable(p2))
+```
+
+simulating the right DAG ($D \perp \!\!\! \perp M | A$)
+
+```{r}
+model_multiple_sim <- quap(
+  flist = alist(
+      divorce_std ~ dnorm( mu, sigma ) ,
+    mu <- alpha + beta_M * marriage_std + beta_A * median_age_std,
+    alpha ~ dnorm( 0, 0.2 ),
+    beta_A ~ dnorm( 0, 0.5 ),
+    beta_M ~ dnorm( 0, 0.5 ),
+    sigma ~ dexp( 1 )
+  ),
+  data = data_divorce_sim
+)
+
+model_age_sim <- quap(
+  flist = alist(
+      divorce_std ~ dnorm( mu, sigma ) ,
+    mu <- alpha + beta_A * median_age_std,
+    alpha ~ dnorm( 0, 0.2 ),
+    beta_A ~ dnorm( 0, 0.5 ),
+    sigma ~ dexp( 1 )
+  ),
+  data = data_divorce_sim
+)
+
+model_marriage_sim <- quap(
+  flist = alist(
+      divorce_std ~ dnorm( mu, sigma ) ,
+    mu <- alpha + beta_M * marriage_std,
+    alpha ~ dnorm( 0, 0.2 ),
+    beta_M ~ dnorm( 0, 0.5 ),
+    sigma ~ dexp( 1 )
+  ),
+  data = data_divorce_sim
+)
+```
+
+```{r, fig.asp = .3}
+ct_sim <- coeftab(model_age_sim, model_marriage_sim, model_multiple_sim, se = TRUE)
+plot_coeftab(ct_sim)
+```
+
+simulating the left DAG ($D \not\!\perp\!\!\!\perp M | A$)
+
+```{r}
+model_multiple_sim_codep <- quap(
+  flist = alist(
+      divorce_codep ~ dnorm( mu, sigma ) ,
+    mu <- alpha + beta_M * marriage_std + beta_A * median_age_std,
+    alpha ~ dnorm( 0, 0.2 ),
+    beta_A ~ dnorm( 0, 0.5 ),
+    beta_M ~ dnorm( 0, 0.5 ),
+    sigma ~ dexp( 1 )
+  ),
+  data = data_divorce_sim
+)
+
+model_age_sim_codep <- quap(
+  flist = alist(
+      divorce_codep ~ dnorm( mu, sigma ) ,
+    mu <- alpha + beta_A * median_age_std,
+    alpha ~ dnorm( 0, 0.2 ),
+    beta_A ~ dnorm( 0, 0.5 ),
+    sigma ~ dexp( 1 )
+  ),
+  data = data_divorce_sim
+)
+
+model_marriage_sim_codep <- quap(
+  flist = alist(
+      divorce_codep ~ dnorm( mu, sigma ) ,
+    mu <- alpha + beta_M * marriage_std,
+    alpha ~ dnorm( 0, 0.2 ),
+    beta_M ~ dnorm( 0, 0.5 ),
+    sigma ~ dexp( 1 )
+  ),
+  data = data_divorce_sim
+)
+```
+
+
+```{r, fig.asp = .3}
+ct_sim_codep <- coeftab(model_age_sim_codep, model_marriage_sim_codep, model_multiple_sim_codep,
+                        se = TRUE)
+plot_coeftab(ct_sim_codep)
+```
+
+
+### Visualizations for multivariate regressions
+
+- *Predictor residual plots.* useful for understanding the model, but not much else
+- *Posterior prediction plots.* checking fit and assessing predictions
+- *Counterfactual plots.* implied predictions for imaginary experiments
+
+#### Predictor residual plots
+
+predictor residual plot for *marriage rate*
+
+```{r}
+pred_res_marriage <- quap(
+  flist = alist(
+    marriage_std ~ dnorm( mu, sigma ) ,
+    mu <- alpha + beta_AM * median_age_std,
+    alpha ~ dnorm( 0, 0.2 ),
+    beta_AM ~ dnorm( 0, 0.5 ),
+    sigma ~ dexp( 1 )
+  ),
+  data = data_waffle
+)
+
+residuals_marriage <- link(pred_res_marriage) %>% 
+  as_tibble() %>% 
+  set_names(nm = seq_along(data_waffle$median_age_std)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "row_idx", 
+               values_to = "fit_marriage") %>%
+  group_by(row_idx) %>% 
+  summarise(mean_marriage = mean(fit_marriage),
+            lower_pi = PI(fit_marriage)[1],
+            upper_pi = PI(fit_marriage)[2]) %>% 
+  ungroup() %>% 
+  mutate(row_idx = as.numeric(row_idx)) %>% 
+  left_join(data_waffle %>%  mutate(row_idx = row_number()),. ) %>% 
+  mutate(residual_marriage  = marriage_std - mean_marriage)
+
+p_11 <- residuals_marriage %>% 
+  ggplot(aes(x = median_age_std)) +
+  geom_segment(aes(xend = median_age_std, y = mean_marriage, yend = marriage_std),
+               color = rgb(0,0,0,.6), linetype = 3) +
+  geom_line(aes(y = mean_marriage), color = clr1) +
+  geom_point(aes(y = marriage_std),
+             color = clr1, fill = clr_lighten(clr1, .35), shape = 21) +
+  geom_text(data = residuals_marriage %>% filter(Loc %in% c("DC", "HI", "ND", "ME", "WY")),
+            aes(x = median_age_std - .1, y = marriage_std, label = Loc), hjust = 1) 
+
+pred_res_marriage_mu <- quap(
+  flist = alist(
+    divorce_std ~ dnorm( mu, sigma ) ,
+    mu <- alpha + beta * residual_marriage,
+    alpha ~ dnorm( 0, 0.2 ),
+    beta ~ dnorm( 0, 0.5 ),
+    sigma ~ dexp( 1 )
+  ),
+  data = residuals_marriage
+)
+
+seq_res <- seq(min(residuals_marriage$residual_marriage), max(residuals_marriage$residual_marriage), length.out = 101)
+
+residual_lm_posterior <- link(pred_res_marriage_mu, data = data.frame(residual_marriage = seq_res)) %>% 
+  as_tibble() %>% 
+  set_names(nm = seq_res) %>% 
+  pivot_longer(cols = everything(), names_to = "residual_marriage", values_to = "divorce_std") %>% 
+  mutate(residual_marriage = as.numeric(residual_marriage)) %>% 
+  group_by(residual_marriage) %>% 
+  summarise(mean = mean(divorce_std),
+            PI_lower = PI(divorce_std)[1],
+            PI_upper = PI(divorce_std)[2]) %>% 
+  ungroup()
+
+p_12 <- ggplot(mapping = aes(x = residual_marriage)) +
+  geom_vline(xintercept = 0, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_smooth(data = residual_lm_posterior, aes(y = mean, ymin = PI_lower, ymax = PI_upper),
+              stat = "identity", color = clr1, fill = fll1, size = .4) +
+  geom_point(data = residuals_marriage, aes(y = divorce_std),
+             color = clr1, fill = clr_lighten(clr1,.35), shape = 21) +
+  geom_text(data = residuals_marriage %>% filter(Loc %in% c("DC", "HI", "ND", "ME", "WY")),
+            aes(y = divorce_std - .2, label = Loc)) +
+  labs(y = "divorce_rate (std)")
+```
+
+predictor residual plot for *age at marriage*
+
+```{r}
+pred_res_age <- quap(
+  flist = alist(
+    median_age_std ~ dnorm( mu, sigma ) ,
+    mu <- alpha + beta_MA * marriage_std,
+    alpha ~ dnorm( 0, 0.2 ),
+    beta_MA ~ dnorm( 0, 0.5 ),
+    sigma ~ dexp( 1 )
+  ),
+  data = data_waffle
+)
+
+residuals_age <- link(pred_res_age) %>% 
+  as_tibble() %>% 
+  set_names(nm = seq_along(data_waffle$marriage_std)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "row_idx", 
+               values_to = "fit_age") %>%
+  group_by(row_idx) %>% 
+  summarise(mean_age = mean(fit_age),
+            lower_pi = PI(fit_age)[1],
+            upper_pi = PI(fit_age)[2]) %>% 
+  ungroup() %>% 
+  mutate(row_idx = as.numeric(row_idx)) %>% 
+  left_join(data_waffle %>%  mutate(row_idx = row_number()),. ) %>% 
+  mutate(residual_age  = median_age_std - mean_age)
+
+p_21 <- residuals_age %>% 
+  ggplot(aes(x = marriage_std)) +
+  geom_segment(aes(xend = marriage_std, y = mean_age, yend = median_age_std),
+               color = rgb(0,0,0,.6), linetype = 3) +
+  geom_line(aes(y = mean_age), color = clr2) +
+  geom_point(aes(y = median_age_std),
+             color = clr2, fill = clr_lighten(clr2, .35), shape = 21) +
+  geom_text(data = residuals_marriage %>% filter(Loc %in% c("DC", "HI", "ID")),
+            aes(x = marriage_std - .1, y = median_age_std, label = Loc), hjust = 1) 
+
+pred_res_age_mu <- quap(
+  flist = alist(
+    divorce_std ~ dnorm( mu, sigma ) ,
+    mu <- alpha + beta * residual_age,
+    alpha ~ dnorm( 0, 0.2 ),
+    beta ~ dnorm( 0, 0.5 ),
+    sigma ~ dexp( 1 )
+  ),
+  data = residuals_age
+)
+
+seq_res_age <- seq(min(residuals_age$residual_age), max(residuals_age$residual_age), length.out = 101)
+
+residual_lm_posterior_age <- link(pred_res_age_mu, data = data.frame(residual_age = seq_res_age)) %>% 
+  as_tibble() %>% 
+  set_names(nm = seq_res_age) %>% 
+  pivot_longer(cols = everything(), names_to = "residual_age", values_to = "divorce_std") %>% 
+  mutate(residual_age = as.numeric(residual_age)) %>% 
+  group_by(residual_age) %>% 
+  summarise(mean = mean(divorce_std),
+            PI_lower = PI(divorce_std)[1],
+            PI_upper = PI(divorce_std)[2]) %>% 
+  ungroup()
+
+p_22 <- ggplot(mapping = aes(x = residual_age)) +
+  geom_vline(xintercept = 0, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_smooth(data = residual_lm_posterior_age, aes(y = mean, ymin = PI_lower, ymax = PI_upper),
+              stat = "identity", color = clr2, fill = fll2, size = .4) +
+  geom_point(data = residuals_age, aes(y = divorce_std),
+             color = clr2, fill = clr_lighten(clr2,.35), shape = 21) +
+  geom_text(data = residuals_age %>% filter(Loc %in% c("DC", "HI", "ID")),
+            aes(y = divorce_std - .2, label = Loc)) +
+  labs(y = "divorce_rate (std)")
+```
+
+```{r, fig.asp = .7}
+p_11 + p_21 +
+  p_12 + p_22
+```
+
+#### Posterior Preediction Plots
+
+```{r}
+posterior_prediction <- link(model_multiple) %>% 
+  as_tibble() %>% 
+    set_names(nm = seq_along(data_waffle$divorce_std)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "row_idx", 
+               values_to = "divorce_predicted") %>%
+  group_by(row_idx) %>% 
+  summarise(divorce_predicted_mean = mean(divorce_predicted),
+            lower_pi = PI(divorce_predicted)[1],
+            upper_pi = PI(divorce_predicted)[2]) %>% 
+  ungroup() %>% 
+  mutate(row_idx = as.numeric(row_idx)) %>% 
+  left_join(data_waffle %>%  mutate(row_idx = row_number()), . ) 
+
+posterior_simmulation <- sim(model_multiple) %>% 
+  as_tibble() %>% 
+    set_names(nm = seq_along(data_waffle$divorce_std)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "row_idx", 
+               values_to = "divorce_predicted") %>%
+  group_by(row_idx) %>% 
+  summarise(lower_pi = PI(divorce_predicted)[1],
+            upper_pi = PI(divorce_predicted)[2]) %>% 
+  ungroup() %>% 
+  mutate(row_idx = as.numeric(row_idx)) %>% 
+  left_join(data_waffle %>%  mutate(row_idx = row_number()), . ) 
+
+ggplot(mapping = aes(x = divorce_std)) +
+  geom_abline(slope = 1, size = .7, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_linerange(data = posterior_prediction,
+                aes(ymin = lower_pi, ymax =  upper_pi), color = clr2)+
+  geom_point(data = posterior_prediction, aes(y = divorce_predicted_mean), 
+             color = clr2, fill = clr_lighten(clr2,.6), shape = 21, size = 1.5)+
+  geom_text(data = posterior_prediction %>% filter(Loc %in% c("ID", "ME", "RI", "UT")),
+            aes(x = divorce_std - .15, y = divorce_predicted_mean, label = Loc)) 
+  
+```
+
+
 ## Homework
 
 **E1**

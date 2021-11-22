@@ -19,6 +19,8 @@ clrd <- clr1l
 clr3 <- "#81ACA4"
 
 clr_dag <- rgb(.8,.8,.8,.7)
+clr_theme <- rgb(0,0,0,.1)
+fll_theme <- clr_alpha(clr_theme, .03)
 
 fll0 <- clr_alpha(clr0)
 fll1 <- clr_alpha(clr1)
@@ -61,3 +63,32 @@ plot_dag <- function(dag, clr_in = clr1){
                                        predictor = "black"), guide = "none") +
     theme_dag()
 }
+
+plot_coeftab <- function(ct, prob = .95){
+  ct@coefs %>%
+  as_tibble() %>%
+  mutate(param = row.names(ct@coefs)) %>% 
+  separate(param, into = c("parameter", "type"),
+           sep = "\\.") %>%
+  mutate(type = if_else(is.na(type), "est", "se")) %>% 
+  pivot_longer(cols = starts_with("model"), 
+               names_to = "model") %>% 
+  pivot_wider(values_from = value, names_from = type) %>% 
+  mutate(model = str_remove(model, "model_")) %>% 
+  filter(grepl("beta", parameter))  %>% 
+  ggplot(aes(y = model, color = model)) +
+  geom_vline(xintercept = 0, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_segment(aes(yend = model,
+                   x = est - qnorm(1 - (1 - prob)/2) * se,
+                   xend = est + qnorm(1 - (1 - prob)/2) * se)) +
+  geom_point(aes(x = est, fill = after_scale(clr_lighten(color))),
+             shape = 21, size = 3) +
+  facet_wrap(parameter ~ ., scales = "free_x") +
+  scale_color_manual(values = c(clr3, clr1, clr2),
+                     guide = "none") +
+  labs(y = NULL, x = "estimate") +
+  theme(panel.background = element_rect(color = clr_theme, size = .5,
+                                        fill = "transparent"),
+        strip.background = element_rect(color = clr_theme, size = 0,
+                                        fill = fll_theme))
+  }
