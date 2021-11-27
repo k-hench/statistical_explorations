@@ -553,7 +553,6 @@ model_marriage_sim_codep <- quap(
 ```
 
 
-
 ```r
 ct_sim_codep <- coeftab(model_age_sim_codep, model_marriage_sim_codep, model_multiple_sim_codep,
                         se = TRUE)
@@ -977,6 +976,546 @@ data_sim_M_pi %>%
 ```
 
 <img src="rethinking_c5_files/figure-html/unnamed-chunk-27-1.svg" width="672" style="display: block; margin: auto;" />
+
+## Masked relationship
+
+Loading the milk data
+
+
+```r
+data(milk)
+data_milk <- milk %>% 
+  filter(complete.cases(.)) %>% 
+  as_tibble() %>% 
+  mutate(`mass.log` = log(mass),
+         across(.cols = c(`kcal.per.g`, `neocortex.perc`, `mass.log`),
+                .fns = standardize,
+                .names = "{str_remove_all(.col, '\\\\..*')}_std"))
+
+data_milk %>%
+  precis() %>% 
+  as.matrix() %>%
+  as.data.frame() %>% 
+  filter(!is.na(mean)) %>% 
+  mutate(across(.cols = mean:`94.5%`,  function(x){round(as.numeric(x), digits = 2)})) %>% 
+  knitr::kable()
+```
+
+
+
+|               |  mean|    sd|  5.5%| 94.5%|histogram      |
+|:--------------|-----:|-----:|-----:|-----:|:--------------|
+|kcal.per.g     |  0.66|  0.17|  0.47|  0.93|▇▂▁▁▁▂▁▁▁▁▁    |
+|perc.fat       | 36.06| 14.71| 15.08| 54.45|▂▁▁▂▃▃▂▅▃▁▇▂   |
+|perc.protein   | 16.26|  5.60|  9.28| 23.79|▂▅▅▅▅▂▂▅▇▂     |
+|perc.lactose   | 47.68| 13.59| 30.35| 68.31|▂▇▅▅▂▇▅▁▅▂     |
+|mass           | 16.64| 23.58|  0.30| 57.89|▇▁▁▁▁▁▁▁       |
+|neocortex.perc | 67.58|  5.97| 58.41| 75.59|▂▁▂▅▁▅▅▅▇▅▂▂   |
+|mass.log       |  1.50|  1.93| -1.26|  4.05|▂▁▂▂▂▂▅▂▇▁▂▂▅▅ |
+|kcal_std       |  0.00|  1.00| -1.09|  1.55|▃▇▁▃▁▂▂        |
+|neocortex_std  |  0.00|  1.00| -1.54|  1.34|▁▁▂▃▁▇▃▂       |
+|mass_std       |  0.00|  1.00| -1.43|  1.32|▁▂▂▃▃▁▇        |
+
+### Bi-variate models
+
+:::columns
+:::column1st
+Neocortex effect on caloric content of milk
+$$
+\begin{array}{cccr} 
+K_i & {\sim} & Normal(\mu_i, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & \alpha + \beta_{N} N_{i} & \textrm{[linear model]}\\
+\alpha & \sim & Normal(0, 0.2) & \textrm{[$\alpha$ prior]}\\
+\beta_{N} & \sim & Normal(0, 0.5) & \textrm{[$\beta_N$ prior]}\\
+\sigma & \sim & Exponential(1) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+:::   
+:::column2nd
+Mothers weight effect on caloric content of milk
+$$
+\begin{array}{cccr} 
+K_i & {\sim} & Normal(\mu_i, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & \alpha + \beta_{M} M_{i} & \textrm{[linear model]}\\
+\alpha & \sim & Normal(0, 0.2) & \textrm{[$\alpha$ prior]}\\
+\beta_{M} & \sim & Normal(0, 0.5) & \textrm{[$\beta_M$ prior]}\\
+\sigma & \sim & Exponential(1) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+:::
+:::
+
+Model implementation (neocortex, draft)
+
+
+```r
+model_milk_draft <- quap(
+  flist = alist(
+    kcal_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_N * neocortex_std,
+    alpha ~ dnorm(0, 1),
+    beta_N ~ dnorm(0, 1),
+    sigma ~ dexp(1)
+  ),
+  data = data_milk
+)
+
+prior_milk_draft <- extract.prior(model_milk_draft) %>% 
+  as_tibble()
+
+seq_prior <- c(-2, 2)
+
+prior_prediction_milk_draft <- link(model_milk_draft,
+                             post = prior_milk_draft,
+                             data = tibble(neocortex_std = seq_prior)) %>% 
+  as_tibble() %>% 
+    set_names(nm = seq_prior)
+
+p_draft <- prior_prediction_milk_draft %>% 
+  filter(row_number() <= 50) %>% 
+  ggplot() +
+  geom_segment(aes(x = -2, xend = 2, y = `-2`, yend = `2`), alpha = .6, color = clr0d)
+```
+
+Model implementation (neocortex)
+
+
+```r
+model_milk_cortex <- quap(
+  flist = alist(
+    kcal_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_N * neocortex_std,
+    alpha ~ dnorm(0, .2),
+    beta_N ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_milk
+)
+
+precis(model_milk_cortex) %>% 
+  as.matrix() %>%
+  round(digits = 2) %>% 
+  knitr::kable()
+```
+
+
+
+|       | mean|   sd|  5.5%| 94.5%|
+|:------|----:|----:|-----:|-----:|
+|alpha  | 0.00| 0.15| -0.24|  0.24|
+|beta_N | 0.13| 0.21| -0.21|  0.47|
+|sigma  | 0.93| 0.15|  0.69|  1.18|
+
+
+
+```r
+prior_milk_cortex <- extract.prior(model_milk_cortex) %>% 
+  as_tibble()
+
+prior_prediction_milk_cortex <- link(model_milk_cortex,
+                             post = prior_milk_cortex,
+                             data = tibble(neocortex_std = seq_prior)) %>% 
+  as_tibble() %>% 
+    set_names(nm = seq_prior)
+
+p_cortex <- prior_prediction_milk_cortex %>% 
+  filter(row_number() <= 50) %>% 
+  ggplot() +
+  geom_segment(aes(x = -2, xend = 2, y = `-2`, yend = `2`),
+               alpha = .6, color = clr0d)
+```
+
+
+```r
+p_draft + p_cortex &
+  coord_cartesian(xlim = c(-2, 2),
+                  ylim = c(-2, 2)) &
+  labs(x = "neocortex_std", y = "kcal_std")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-32-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+seq_cortex <- seq(min(data_milk$neocortex_std) - .15, max(data_milk$neocortex_std) + .15, length.out = 51)
+
+model_milk_cortex_posterior_prediction_samples <- link(model_milk_cortex,
+                                               data = data.frame(neocortex_std = seq_cortex)) %>% 
+  as_tibble() %>% 
+  set_names(nm = seq_cortex) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "neocortex_std",
+               values_to = "kcal_std") %>% 
+  mutate(neocortex_std = as.numeric(neocortex_std)) 
+
+model_milk_cortex_posterior_prediction_pi <- model_milk_cortex_posterior_prediction_samples %>% 
+  group_by(neocortex_std) %>% 
+  summarise(mean = mean(kcal_std),
+            PI_lower = PI(kcal_std)[1],
+            PI_upper = PI(kcal_std)[2]) %>% 
+  ungroup()
+
+p_cortex <- ggplot(mapping = aes(x = neocortex_std)) +
+  geom_smooth(data = model_milk_cortex_posterior_prediction_pi, stat = "identity",
+              aes(y = mean, ymin = PI_lower, ymax = PI_upper),
+              color = clr2, fill = fll2, size = .2) +
+  geom_point(data = data_milk, aes(y = kcal_std), color = rgb(0,0,0,.5), size = 1.6) +
+  labs(x = "neocprtex_std", y = "kcal_std")
+```
+
+Model implementation (mothers weight)
+
+
+```r
+model_milk_weight <- quap(
+  flist = alist(
+    kcal_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_M * mass_std,
+    alpha ~ dnorm(0, .2),
+    beta_M ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_milk
+)
+
+precis(model_milk_weight) %>% 
+  as.matrix() %>%
+  round(digits = 2) %>% 
+  knitr::kable()
+```
+
+
+
+|       |  mean|   sd|  5.5%| 94.5%|
+|:------|-----:|----:|-----:|-----:|
+|alpha  |  0.00| 0.15| -0.23|  0.23|
+|beta_M | -0.30| 0.20| -0.62|  0.03|
+|sigma  |  0.89| 0.15|  0.65|  1.12|
+
+
+```r
+seq_weight <- seq(min(data_milk$mass_std) - .15, max(data_milk$mass_std) + .15, length.out = 51)
+
+model_milk_weight_posterior_prediction_samples <- link(model_milk_weight,
+                                               data = data.frame(mass_std = seq_weight)) %>% 
+  as_tibble() %>% 
+  set_names(nm = seq_weight) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "mass_std",
+               values_to = "kcal_std") %>% 
+  mutate(mass_std = as.numeric(mass_std)) 
+
+model_milk_weight_posterior_prediction_pi <- model_milk_weight_posterior_prediction_samples %>% 
+  group_by(mass_std) %>% 
+  summarise(mean = mean(kcal_std),
+            PI_lower = PI(kcal_std)[1],
+            PI_upper = PI(kcal_std)[2]) %>% 
+  ungroup()
+
+p_weight <- ggplot(mapping = aes(x = mass_std)) +
+  geom_smooth(data = model_milk_weight_posterior_prediction_pi, stat = "identity",
+              aes(y = mean, ymin = PI_lower, ymax = PI_upper),
+              color = clr2, fill = fll2, size = .2) +
+  geom_point(data = data_milk, aes(y = kcal_std), color = rgb(0,0,0,.5), size = 1.6) +
+  labs(x = "mass_std", y = "kcal_std")
+```
+
+
+```r
+p_cortex + p_weight
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-36-1.svg" width="672" style="display: block; margin: auto;" />
+
+Model implementation (necocortex and mothers weight)
+
+$$
+\begin{array}{cccr} 
+K_i & {\sim} & Normal(\mu_i, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & \alpha + \beta_{N} N_{i} + \beta_{M} M_{i} & \textrm{[linear model]}\\
+\alpha & \sim & Normal(0, 0.2) & \textrm{[$\alpha$ prior]}\\
+\beta_{N} & \sim & Normal(0, 0.5) & \textrm{[$\beta_N$ prior]}\\
+\beta_{M} & \sim & Normal(0, 0.5) & \textrm{[$\beta_M$ prior]}\\
+\sigma & \sim & Exponential(1) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+
+```r
+model_milk_multi <- quap(
+  flist = alist(
+    kcal_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_N * neocortex_std + beta_M * mass_std,
+    alpha ~ dnorm(0, .2),
+    beta_N ~ dnorm(0, .5),
+    beta_M ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_milk
+)
+
+precis(model_milk_multi) %>% 
+  as.matrix() %>%
+  round(digits = 2) %>% 
+  knitr::kable()
+```
+
+
+
+|       |  mean|   sd|  5.5%| 94.5%|
+|:------|-----:|----:|-----:|-----:|
+|alpha  |  0.00| 0.13| -0.20|  0.20|
+|beta_N |  0.64| 0.23|  0.27|  1.01|
+|beta_M | -0.75| 0.23| -1.12| -0.37|
+|sigma  |  0.69| 0.12|  0.49|  0.88|
+
+
+```r
+ct_milk <- coeftab(model_milk_cortex, model_milk_weight, model_milk_multi,
+                        se = TRUE)
+plot_coeftab(ct_milk)
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-38-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+data_milk %>% 
+  dplyr::select(kcal_std, neocortex_std, mass_std) %>% 
+  ggpairs(lower = list(continuous = wrap(ggally_points, colour = clr2, size = .9, alpha = .7)),
+          diag = list(continuous = wrap("densityDiag", fill = fll2, color = clr2, adjust = 1)),
+          upper = list(continuous = wrap(ggally_cor, size = 5, color = "black", family = "Josefin sans")))
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-39-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+dag1 <- dagify(
+  K ~ M + N,
+  N ~ M,
+  exposure = "M",
+  outcome = "K") %>% 
+  tidy_dagitty(.dagitty = .,layout = tibble(x = c(0,1,.5), y = c(1,1, .4))) %>%
+  mutate(stage = if_else(name == "K", "response",
+                         if_else(name %in% c("M", "N"),
+                                 "predictor", "confounds")))
+
+dag2 <- dagify(
+  K ~ M + N,
+  M ~ N,
+  exposure = "M",
+  outcome = "K") %>% 
+  tidy_dagitty(.dagitty = .,layout = tibble(x = c(0,1,.5), y = c(1,1, .4))) %>%
+  mutate(stage = if_else(name == "K", "response",
+                         if_else(name %in% c("M", "N"),
+                                 "predictor", "confounds")))
+
+dag3 <- dagify(
+  K ~ M + N,
+  M ~ U,
+  N ~ U,
+  exposure = "M",
+  outcome = "K") %>% 
+  tidy_dagitty(.dagitty = .,layout = tibble(x = c(0,1,.5, .5), y = c(1,1, 1,.4))) %>%
+  mutate(stage = if_else(name == "K", "response",
+                         if_else(name %in% c("M", "N"),
+                                 "predictor", "confounds")))
+
+plot_dag(dag1, clr_in = clr3) + 
+  plot_dag(dag2, clr_in = clr3) +
+  plot_dag(dag3, clr_in = clr3) +
+  plot_layout(nrow = 1) +
+  plot_annotation(tag_levels = "a") &
+  scale_y_continuous(limits = c(.35, 1.05)) &
+  coord_equal() & 
+  theme(plot.tag = element_text(family = fnt_sel))
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-40-1.svg" width="960" style="display: block; margin: auto;" />
+
+Counterfactual plots for DAG c)
+
+
+```r
+data_sim_mass <- link(fit = model_milk_multi,
+                       data = tibble(mass_std = 0,
+                                     neocortex_std  = seq_cortex),
+                       vars = c("kcal_std")) %>% 
+  as_tibble() %>% 
+  set_names(nm = seq_along(seq_cortex)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "row_idx", 
+               values_to = "kcal_std") 
+
+data_sim_mass_pi <- data_sim_mass %>% 
+  group_by(row_idx) %>% 
+  summarise(mean = mean(kcal_std),
+            PI_lower = PI(kcal_std)[1],
+            PI_upper = PI(kcal_std)[2]) %>% 
+  ungroup() %>% 
+  mutate(row_idx = as.numeric(row_idx),
+         neocortex_std = seq_cortex[row_idx])
+
+p_mass <- data_sim_mass_pi %>% 
+  ggplot() +
+  geom_smooth(aes(x = neocortex_std, y = mean, ymin = PI_lower, ymax = PI_upper),
+              color = clr2, fill = fll2,
+              stat = "identity", size = .4) +
+  scale_color_manual(values = c(clr0d, clr3), guide = "none") +
+  labs(y = "counterfactual kcal",
+       title = "kcal at mass_std = 0") 
+```
+
+
+```r
+data_sim_cortex <- link(fit = model_milk_multi,
+                       data = tibble(mass_std = seq_weight,
+                                     neocortex_std  = 0),
+                       vars = c("kcal_std")) %>% 
+  as_tibble() %>% 
+  set_names(nm = seq_along(seq_weight)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "row_idx", 
+               values_to = "kcal_std") 
+
+data_sim_cortex_pi <- data_sim_cortex %>% 
+  group_by(row_idx) %>% 
+  summarise(mean = mean(kcal_std),
+            PI_lower = PI(kcal_std)[1],
+            PI_upper = PI(kcal_std)[2]) %>% 
+  ungroup() %>% 
+  mutate(row_idx = as.numeric(row_idx),
+         mass_std = seq_weight[row_idx])
+
+p_cortex <- data_sim_cortex_pi %>% 
+  ggplot() +
+  geom_smooth(aes(x = mass_std, y = mean, ymin = PI_lower, ymax = PI_upper),
+              color = clr2, fill = fll2,
+              stat = "identity", size = .4) +
+  scale_color_manual(values = c(clr0d, clr3), guide = "none") +
+  labs(y = "counterfactual kcal",
+       title = "kcal at neocortex_std = 0") 
+```
+
+
+```r
+p_mass + p_cortex &
+  coord_cartesian(ylim = c(-1, 2))
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-43-1.svg" width="672" style="display: block; margin: auto;" />
+
+### Simulate a masking relationship
+
+DAG a) ($M \rightarrow K \leftarrow N \leftarrow M$)
+
+
+```r
+n <- 100
+data_milk_sim1 <- tibble(mass_std = rnorm(n = n),
+                         neocortex_std = rnorm(n = n, mean = mass_std),
+                         kcal_std = rnorm(n = n, mean = neocortex_std - mass_std))
+```
+
+
+```r
+data_milk_sim1 %>% 
+  dplyr::select(kcal_std, neocortex_std, mass_std) %>% 
+  ggpairs(lower = list(continuous = wrap(ggally_points, colour = clr0d, size = .9, alpha = .7)),
+          diag = list(continuous = wrap("densityDiag", fill = fll0, color = clr0d, adjust = 1)),
+          upper = list(continuous = wrap(ggally_cor, size = 5, color = "black", family = "Josefin sans")))
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-45-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+DAG b) ($N \rightarrow M \rightarrow K \leftarrow N$)
+
+
+```r
+data_milk_sim2 <- tibble(neocortex_std = rnorm(n = n),
+                         mass_std = rnorm(n = n, mean = neocortex_std),
+                         kcal_std = rnorm(n = n, mean = neocortex_std - mass_std))
+```
+
+DAG c) ($U \rightarrow N \rightarrow M \rightarrow K \leftarrow N \leftarrow U$)
+
+
+```r
+data_milk_sim3 <- tibble(unsampled = rnorm(n = n),
+                         neocortex_std = rnorm(n = n, mean = unsampled),
+                         mass_std = rnorm(n = n, mean = unsampled),
+                         kcal_std = rnorm(n = n, mean = neocortex_std - mass_std))
+```
+
+
+```r
+model_milk_cortex_sim <- quap(
+  flist = alist(
+    kcal_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_N * neocortex_std,
+    alpha ~ dnorm(0, .2),
+    beta_N ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_milk_sim1
+)
+
+model_milk_weight_sim <- quap(
+  flist = alist(
+    kcal_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_M * mass_std,
+    alpha ~ dnorm(0, .2),
+    beta_M ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_milk_sim1
+)
+
+model_milk_multi_sim <- quap(
+  flist = alist(
+    kcal_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_N * neocortex_std + beta_M * mass_std,
+    alpha ~ dnorm(0, .2),
+    beta_N ~ dnorm(0, .5),
+    beta_M ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_milk_sim1
+)
+```
+
+
+```r
+ct_milk_sim <- coeftab(model_milk_cortex_sim, model_milk_weight_sim, model_milk_multi_sim,
+                        se = TRUE)
+plot_coeftab(ct_milk_sim)
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-49-1.svg" width="672" style="display: block; margin: auto;" />
+
+Computing the *Marcov Equivalence Set*
+
+
+```r
+dag_milk <- dagitty("dag{
+        M -> K <- N
+        M -> N}")
+
+coordinates(dag_milk) <- list( x = c( M = 0, N = 1, K = .5),
+                               y = c( M = 1, N = 1, K = .3))
+
+dag_milk %>% 
+  node_equivalent_dags() %>% 
+  mutate(stage = "predictor") %>% 
+  plot_dag() +
+  coord_cartesian(xlim = c(-.1, 1.1),
+                  ylim = c(.2, 1.1))+
+  facet_wrap(~ dag)
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-50-1.svg" width="960" style="display: block; margin: auto;" />
 
 ## Homework
 

@@ -83,7 +83,8 @@ plot_coeftab <- function(ct, prob = .95){
                    xend = est + qnorm(1 - (1 - prob)/2) * se)) +
   geom_point(aes(x = est, fill = after_scale(clr_lighten(color))),
              shape = 21, size = 3) +
-  facet_wrap(parameter ~ ., scales = "free_x") +
+  facet_wrap(parameter ~ .#, scales = "free_x"
+             ) +
   scale_color_manual(values = c(clr3, clr1, clr2),
                      guide = "none") +
   labs(y = NULL, x = "estimate") +
