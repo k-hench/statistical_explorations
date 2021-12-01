@@ -93,7 +93,7 @@ sum(samples$proportion_water < .5) / length(samples$proportion_water)
 ```
 
 ```
-#> [1] 0.1708
+#> [1] 0.1736
 ```
 
 ```r
@@ -101,7 +101,7 @@ sum(samples$proportion_water > .5 & samples$proportion_water < .75) / length(sam
 ```
 
 ```
-#> [1] 0.6111
+#> [1] 0.6038
 ```
 
 ```r
@@ -265,7 +265,7 @@ rbinom( 10, size = 2, prob = .7)
 ```
 
 ```
-#>  [1] 1 2 1 2 2 1 1 2 1 2
+#>  [1] 1 2 2 2 1 2 1 1 2 2
 ```
 
 ```r
@@ -383,7 +383,7 @@ sum( samples$w == 6 ) / length( samples$w )
 ```
 
 ```
-#> [1] 0.20131
+#> [1] 0.20191
 ```
 
 
@@ -995,6 +995,323 @@ p_brms_posterior + p_brms_posterior_predictive
 ```
 
 <img src="rethinking_c3_files/figure-html/unnamed-chunk-39-1.svg" width="672" style="display: block; margin: auto;" />
+
+## pymc3 section
+
+Taken from [pymc-devs](https://github.com/pymc-devs/resources/tree/master/Rethinking_2)...
+
+
+```python
+import arviz as az
+import matplotlib.pyplot as plt
+import numpy as np
+import pymc3 as pm
+import scipy.stats as stats
+import seaborn as sns
+import matplotlib
+from matplotlib.colors import ListedColormap
+import matplotlib.font_manager
+matplotlib.font_manager._rebuild()
+```
+
+
+
+
+```python
+def posterior_grid_approx(grid_points = 5, success = 6, tosses = 9):
+    """"""
+    # define grid
+    p_grid = np.linspace(0, 1, grid_points)
+
+    # define prior
+    prior = np.repeat(5, grid_points)  # uniform
+    # prior = (p_grid >= 0.5).astype(int)  # truncated
+    # prior = np.exp(- 5 * abs(p_grid - 0.5))  # double exp
+
+    # compute likelihood at each point in the grid
+    likelihood = stats.binom.pmf(success, tosses, p_grid)
+
+    # compute product of likelihood and prior
+    unstd_posterior = likelihood * prior
+
+    # standardize the posterior, so it sums to 1
+    posterior = unstd_posterior / unstd_posterior.sum()
+    return p_grid, posterior
+```
+
+
+
+```python
+PrPV = 0.95
+PrPM = 0.01
+PrV = 0.001
+PrP = PrPV * PrV + PrPM * (1 - PrV)
+PrVP = PrPV * PrV / PrP
+PrVP
+```
+
+```
+#> 0.08683729433272395
+```
+
+
+```python
+p_grid, posterior = posterior_grid_approx(grid_points = 100, success = 6, tosses = 9)
+samples = np.random.choice(p_grid, p = posterior, size = int(1e4), replace = True)
+```
+
+
+```python
+fig, (ax0, ax1) = plt.subplots(1, 2, figsize = (12, 4))
+ax0.plot(samples, "o", alpha = 0.2, color = r.clr3)
+ax0.set_xlabel("sample number")
+ax0.set_ylabel("proportion water (p)")
+ax0.spines['left'].set_visible(False)
+ax0.spines['right'].set_visible(False)
+ax0.spines['top'].set_visible(False)
+ax0.spines['bottom'].set_visible(False)
+ax0.grid(linestyle = 'dotted')
+az.plot_kde(samples, ax = ax1, plot_kwargs = {"color": r.clr3})
+ax1.set_xlabel("proportion water (p)")
+ax1.set_ylabel("density")
+ax1.spines['left'].set_visible(False)
+ax1.spines['right'].set_visible(False)
+ax1.spines['top'].set_visible(False)
+ax1.spines['bottom'].set_visible(False)
+ax1.grid(linestyle = 'dotted')
+plt.show()
+```
+
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-45-1.svg" style="display: block; margin: auto;" />
+
+
+```python
+sum(posterior[p_grid < 0.5])
+```
+
+```
+#> 0.17183313110747475
+```
+
+
+```python
+sum(samples < 0.5) / 1e4
+```
+
+```
+#> 0.1767
+```
+
+
+```python
+sum((samples > 0.5) & (samples < 0.75)) / 1e4
+```
+
+```
+#> 0.6113
+```
+
+
+```python
+np.percentile(samples, 80)
+```
+
+```
+#> 0.7575757575757577
+```
+
+
+
+```python
+np.percentile(samples, [10, 90])
+```
+
+```
+#> array([0.44444444, 0.80808081])
+```
+
+
+```python
+p_grid, posterior = posterior_grid_approx(grid_points = 100, success = 3, tosses = 3)
+plt.plot(p_grid, posterior, color = r.clr3)
+plt.xlabel("proportion water (p)")
+plt.ylabel("Density")
+plt.gca().spines['left'].set_visible(False)
+plt.gca().spines['right'].set_visible(False)
+plt.gca().spines['top'].set_visible(False)
+plt.gca().spines['bottom'].set_visible(False)
+plt.grid(linestyle = 'dotted')
+plt.show()
+```
+
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-51-3.svg" style="display: block; margin: auto;" />
+
+
+```python
+samples = np.random.choice(p_grid, p = posterior, size = int(1e4), replace = True)
+np.percentile(samples, [25, 75])
+```
+
+```
+#> array([0.71717172, 0.93939394])
+```
+
+
+```python
+az.hdi(samples, hdi_prob = 0.5)
+```
+
+```
+#> array([0.84848485, 1.        ])
+```
+
+
+```python
+p_grid[posterior == max(posterior)]
+```
+
+```
+#> array([1.])
+```
+
+
+```python
+stats.mode(samples)[0]
+```
+
+```
+#> array([1.])
+```
+
+```python
+np.mean(samples), np.median(samples)
+```
+
+```
+#> (0.8061979797979799, 0.8484848484848485)
+```
+
+
+```python
+sum(posterior * abs(0.5 - p_grid))
+```
+
+```
+#> 0.31626874808692995
+```
+
+
+```python
+loss = [sum(posterior * abs(p - p_grid)) for p in p_grid]
+p_grid[loss == min(loss)]
+```
+
+```
+#> array([0.84848485])
+```
+
+
+```python
+stats.binom.pmf(range(3), n = 2, p = 0.7)
+```
+
+```
+#> array([0.09, 0.42, 0.49])
+```
+
+
+```python
+stats.binom.rvs(n = 2, p = 0.7, size = 1)
+```
+
+```
+#> array([1])
+```
+
+
+```python
+stats.binom.rvs(n = 2, p = 0.7, size = 10)
+```
+
+```
+#> array([2, 2, 1, 2, 1, 0, 2, 1, 2, 2])
+```
+
+
+```python
+dummy_w = stats.binom.rvs(n = 2, p = 0.7, size = int(1e5))
+[(dummy_w == i).mean() for i in range(3)]
+```
+
+```
+#> [0.08832, 0.42272, 0.48896]
+```
+
+
+```python
+dummy_w = stats.binom.rvs(n = 9, p = 0.7, size = int(1e5))
+# dummy_w = stats.binom.rvs(n=9, p=0.6, size=int(1e4))
+# dummy_w = stats.binom.rvs(n=9, p=samples)
+bar_width = 0.7
+plt.hist(dummy_w, bins = np.arange(0, 11) - bar_width / 2, width = bar_width, color = r.clr3)
+```
+
+```
+#> (array([2.0000e+00, 4.2000e+01, 3.9200e+02, 2.1170e+03, 7.4230e+03,
+#>        1.7153e+04, 2.6752e+04, 2.6557e+04, 1.5640e+04, 3.9220e+03]), array([-0.35,  0.65,  1.65,  2.65,  3.65,  4.65,  5.65,  6.65,  7.65,
+#>         8.65,  9.65]), <a list of 10 Patch objects>)
+```
+
+```python
+plt.xlim(0, 9.5)
+```
+
+```
+#> (0, 9.5)
+```
+
+```python
+plt.xlabel("dummy water count")
+plt.ylabel("Frequency")
+plt.gca().spines['left'].set_visible(False)
+plt.gca().spines['right'].set_visible(False)
+plt.gca().spines['top'].set_visible(False)
+plt.gca().spines['bottom'].set_visible(False)
+plt.grid(linestyle = 'dotted')
+plt.show()
+```
+
+<img src="rethinking_c3_files/figure-html/unnamed-chunk-62-5.svg" style="display: block; margin: auto;" />
+
+
+```python
+p_grid, posterior = posterior_grid_approx(grid_points = 100, success = 6, tosses = 9)
+np.random.seed(100)
+samples = np.random.choice(p_grid, p = posterior, size = int(1e4), replace = True)
+```
+
+
+```python
+birth1 = np.array([1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 
+                   0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 
+                   1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0,
+                   0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0,
+                   0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1])
+birth2 = np.array([0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0,
+                   0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0,
+                   0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+                   1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0,
+                   0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0])
+```
+
+
+```python
+sum(birth1) + sum(birth2)
+```
+
+```
+#> 111
+```
 
 ---
 

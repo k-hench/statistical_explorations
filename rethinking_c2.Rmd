@@ -686,13 +686,12 @@ import scipy.stats as stats
 import seaborn as sns
 import matplotlib
 from matplotlib.colors import ListedColormap
-# import matplotlib.font_manager
-# matplotlib.font_manager._rebuild()
+import matplotlib.font_manager
+matplotlib.font_manager._rebuild()
 ```
 
-
-```{python}
-RANDOM_SEED = 8927
+```{python, include = FALSE, echo = FALSE}
+RANDOM_SEED = 42
 np.random.seed(RANDOM_SEED)
 az.style.use("arviz-whitegrid")
 matplotlib.rcParams['font.family'] = 'sans-serif'
@@ -759,7 +758,7 @@ for idx, ps in enumerate(points):
 
 ```
 
-```{python,}
+```{python}
 np.repeat((0, 1), (3, 6))
 
 data = np.repeat((0, 1), (3, 6))
@@ -775,7 +774,7 @@ print("Mean\tStandard deviation\np {:.2}\t{:.2}".format(mean_q["p"], std_q[0]))
 ```
 
 
-```{python, }
+```{python }
 # Compute the 89% percentile interval
 norm = stats.norm(mean_q, std_q)
 prob = 0.89

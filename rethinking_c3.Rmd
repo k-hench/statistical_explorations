@@ -781,6 +781,209 @@ p_brms_posterior_predictive <- samples_brms %>%
 p_brms_posterior + p_brms_posterior_predictive
 ```
 
+## pymc3 section
+
+Taken from [pymc-devs](https://github.com/pymc-devs/resources/tree/master/Rethinking_2)...
+
+```{python}
+import arviz as az
+import matplotlib.pyplot as plt
+import numpy as np
+import pymc3 as pm
+import scipy.stats as stats
+import seaborn as sns
+import matplotlib
+from matplotlib.colors import ListedColormap
+import matplotlib.font_manager
+matplotlib.font_manager._rebuild()
+```
+
+```{python, include = FALSE, echo = FALSE}
+RANDOM_SEED = 42
+np.random.seed(RANDOM_SEED)
+az.style.use("arviz-whitegrid")
+matplotlib.rcParams['font.family'] = 'sans-serif'
+matplotlib.rcParams['font.sans-serif'] = 'Josefin Sans'
+matplotlib.rcParams['font.style'] = 'normal'
+print(matplotlib.font_manager.findfont("Josefin Sans"))
+```
+
+```{python}
+def posterior_grid_approx(grid_points = 5, success = 6, tosses = 9):
+    """"""
+    # define grid
+    p_grid = np.linspace(0, 1, grid_points)
+
+    # define prior
+    prior = np.repeat(5, grid_points)  # uniform
+    # prior = (p_grid >= 0.5).astype(int)  # truncated
+    # prior = np.exp(- 5 * abs(p_grid - 0.5))  # double exp
+
+    # compute likelihood at each point in the grid
+    likelihood = stats.binom.pmf(success, tosses, p_grid)
+
+    # compute product of likelihood and prior
+    unstd_posterior = likelihood * prior
+
+    # standardize the posterior, so it sums to 1
+    posterior = unstd_posterior / unstd_posterior.sum()
+    return p_grid, posterior
+```
+
+
+```{python}
+PrPV = 0.95
+PrPM = 0.01
+PrV = 0.001
+PrP = PrPV * PrV + PrPM * (1 - PrV)
+PrVP = PrPV * PrV / PrP
+PrVP
+```
+
+```{python}
+p_grid, posterior = posterior_grid_approx(grid_points = 100, success = 6, tosses = 9)
+samples = np.random.choice(p_grid, p = posterior, size = int(1e4), replace = True)
+```
+
+```{python}
+fig, (ax0, ax1) = plt.subplots(1, 2, figsize = (12, 4))
+ax0.plot(samples, "o", alpha = 0.2, color = r.clr3)
+ax0.set_xlabel("sample number")
+ax0.set_ylabel("proportion water (p)")
+ax0.spines['left'].set_visible(False)
+ax0.spines['right'].set_visible(False)
+ax0.spines['top'].set_visible(False)
+ax0.spines['bottom'].set_visible(False)
+ax0.grid(linestyle = 'dotted')
+az.plot_kde(samples, ax = ax1, plot_kwargs = {"color": r.clr3})
+ax1.set_xlabel("proportion water (p)")
+ax1.set_ylabel("density")
+ax1.spines['left'].set_visible(False)
+ax1.spines['right'].set_visible(False)
+ax1.spines['top'].set_visible(False)
+ax1.spines['bottom'].set_visible(False)
+ax1.grid(linestyle = 'dotted')
+plt.show()
+```
+
+```{python}
+sum(posterior[p_grid < 0.5])
+```
+
+```{python}
+sum(samples < 0.5) / 1e4
+```
+
+```{python}
+sum((samples > 0.5) & (samples < 0.75)) / 1e4
+```
+
+```{python}
+np.percentile(samples, 80)
+```
+
+
+```{python}
+np.percentile(samples, [10, 90])
+```
+
+```{python}
+p_grid, posterior = posterior_grid_approx(grid_points = 100, success = 3, tosses = 3)
+plt.plot(p_grid, posterior, color = r.clr3)
+plt.xlabel("proportion water (p)")
+plt.ylabel("Density")
+plt.gca().spines['left'].set_visible(False)
+plt.gca().spines['right'].set_visible(False)
+plt.gca().spines['top'].set_visible(False)
+plt.gca().spines['bottom'].set_visible(False)
+plt.grid(linestyle = 'dotted')
+plt.show()
+```
+
+```{python}
+samples = np.random.choice(p_grid, p = posterior, size = int(1e4), replace = True)
+np.percentile(samples, [25, 75])
+```
+
+```{python}
+az.hdi(samples, hdi_prob = 0.5)
+```
+
+```{python}
+p_grid[posterior == max(posterior)]
+```
+
+```{python}
+stats.mode(samples)[0]
+np.mean(samples), np.median(samples)
+```
+
+```{python}
+sum(posterior * abs(0.5 - p_grid))
+```
+
+```{python}
+loss = [sum(posterior * abs(p - p_grid)) for p in p_grid]
+p_grid[loss == min(loss)]
+```
+
+```{python}
+stats.binom.pmf(range(3), n = 2, p = 0.7)
+```
+
+```{python}
+stats.binom.rvs(n = 2, p = 0.7, size = 1)
+```
+
+```{python}
+stats.binom.rvs(n = 2, p = 0.7, size = 10)
+```
+
+```{python}
+dummy_w = stats.binom.rvs(n = 2, p = 0.7, size = int(1e5))
+[(dummy_w == i).mean() for i in range(3)]
+```
+
+```{python}
+dummy_w = stats.binom.rvs(n = 9, p = 0.7, size = int(1e5))
+# dummy_w = stats.binom.rvs(n=9, p=0.6, size=int(1e4))
+# dummy_w = stats.binom.rvs(n=9, p=samples)
+bar_width = 0.7
+plt.hist(dummy_w, bins = np.arange(0, 11) - bar_width / 2, width = bar_width, color = r.clr3)
+plt.xlim(0, 9.5)
+plt.xlabel("dummy water count")
+plt.ylabel("Frequency")
+plt.gca().spines['left'].set_visible(False)
+plt.gca().spines['right'].set_visible(False)
+plt.gca().spines['top'].set_visible(False)
+plt.gca().spines['bottom'].set_visible(False)
+plt.grid(linestyle = 'dotted')
+plt.show()
+```
+
+```{python}
+p_grid, posterior = posterior_grid_approx(grid_points = 100, success = 6, tosses = 9)
+np.random.seed(100)
+samples = np.random.choice(p_grid, p = posterior, size = int(1e4), replace = True)
+```
+
+```{python}
+birth1 = np.array([1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 
+                   0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 
+                   1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0,
+                   0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0,
+                   0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1])
+birth2 = np.array([0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0,
+                   0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0,
+                   0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
+                   1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0,
+                   0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0])
+```
+
+```{python}
+sum(birth1) + sum(birth2)
+```
+
 ---
 
 <div id="myModal" class="modal">
