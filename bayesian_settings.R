@@ -19,6 +19,7 @@ clrd <- clr1l
 clr3 <- "#81ACA4"
 
 clr_dag <- rgb(.8,.8,.8,.7)
+clr_dark <- rgb(.2,.2,.2,.5)
 clr_theme <- rgb(0,0,0,.1)
 fll_theme <- clr_alpha(clr_theme, .03)
 
@@ -93,3 +94,5 @@ plot_coeftab <- function(ct, prob = .95){
         strip.background = element_rect(color = clr_theme, size = 0,
                                         fill = fll_theme))
   }
+
+as_tibble_rn <- function(x, nm = "param"){ as_tibble(x) %>% mutate(nm = row.names(x)) %>% set_names(nm = c(names(x), nm))}

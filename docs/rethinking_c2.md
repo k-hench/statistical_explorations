@@ -67,7 +67,7 @@ tibble(draws = 1:3,
 ```
 
 ```{=html}
-<template id="a8cf3751-e7d3-4b94-98b4-2f187679a5f6"><style>
+<template id="064ba003-779e-4433-9a04-ba73383741e5"><style>
 .tabwid table{
   border-spacing:0px !important;
   border-collapse:collapse;
@@ -101,15 +101,15 @@ tibble(draws = 1:3,
 .tabwid table tr {
 background-color: transparent;
 }
-</style><div class="tabwid"><style>.cl-54db6d98{}.cl-54d65ae2{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-54d66f82{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-54d69c8c{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-54d69caa{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-54d69cbe{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-54db6d98'>
+</style><div class="tabwid"><style>.cl-67fca9b8{}.cl-67f7b282{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-67f7c5a6{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-67f7f152{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-67f7f170{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-67f7f17a{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-67fca9b8'>
 ```
 
 ```{=html}
-<thead><tr style="overflow-wrap:break-word;"><td class="cl-54d69cbe"><p class="cl-54d66f82"><span class="cl-54d65ae2">draws</span></p></td><td class="cl-54d69cbe"><p class="cl-54d66f82"><span class="cl-54d65ae2">marbles</span></p></td><td class="cl-54d69cbe"><p class="cl-54d66f82"><span class="cl-54d65ae2">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-54d69c8c"><p class="cl-54d66f82"><span class="cl-54d65ae2">1</span></p></td><td class="cl-54d69c8c"><p class="cl-54d66f82"><span class="cl-54d65ae2">4</span></p></td><td class="cl-54d69c8c"><p class="cl-54d66f82"><span class="cl-54d65ae2">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-54d69c8c"><p class="cl-54d66f82"><span class="cl-54d65ae2">2</span></p></td><td class="cl-54d69c8c"><p class="cl-54d66f82"><span class="cl-54d65ae2">4</span></p></td><td class="cl-54d69c8c"><p class="cl-54d66f82"><span class="cl-54d65ae2">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-54d69caa"><p class="cl-54d66f82"><span class="cl-54d65ae2">3</span></p></td><td class="cl-54d69caa"><p class="cl-54d66f82"><span class="cl-54d65ae2">4</span></p></td><td class="cl-54d69caa"><p class="cl-54d66f82"><span class="cl-54d65ae2">64</span></p></td></tr></tbody></table></div></template>
-<div class="flextable-shadow-host" id="8585f72f-5cd3-46d0-93c1-39e99c8ab02d"></div>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-67f7f17a"><p class="cl-67f7c5a6"><span class="cl-67f7b282">draws</span></p></td><td class="cl-67f7f17a"><p class="cl-67f7c5a6"><span class="cl-67f7b282">marbles</span></p></td><td class="cl-67f7f17a"><p class="cl-67f7c5a6"><span class="cl-67f7b282">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-67f7f152"><p class="cl-67f7c5a6"><span class="cl-67f7b282">1</span></p></td><td class="cl-67f7f152"><p class="cl-67f7c5a6"><span class="cl-67f7b282">4</span></p></td><td class="cl-67f7f152"><p class="cl-67f7c5a6"><span class="cl-67f7b282">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-67f7f152"><p class="cl-67f7c5a6"><span class="cl-67f7b282">2</span></p></td><td class="cl-67f7f152"><p class="cl-67f7c5a6"><span class="cl-67f7b282">4</span></p></td><td class="cl-67f7f152"><p class="cl-67f7c5a6"><span class="cl-67f7b282">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-67f7f170"><p class="cl-67f7c5a6"><span class="cl-67f7b282">3</span></p></td><td class="cl-67f7f170"><p class="cl-67f7c5a6"><span class="cl-67f7b282">4</span></p></td><td class="cl-67f7f170"><p class="cl-67f7c5a6"><span class="cl-67f7b282">64</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="f21c8a7e-54b6-4a7e-9ec0-73f769cb5424"></div>
 <script>
-var dest = document.getElementById("8585f72f-5cd3-46d0-93c1-39e99c8ab02d");
-var template = document.getElementById("a8cf3751-e7d3-4b94-98b4-2f187679a5f6");
+var dest = document.getElementById("f21c8a7e-54b6-4a7e-9ec0-73f769cb5424");
+var template = document.getElementById("064ba003-779e-4433-9a04-ba73383741e5");
 var caption = template.content.querySelector("caption");
 if(caption) {
   caption.style.cssText = "display:block;text-align:center;";
@@ -518,17 +518,17 @@ conpare_qa(w_in = 24, l_in = 12)
 #> 
 #> |      mean|        sd|      5.5%|     94.5%|qa         |
 #> |---------:|---------:|---------:|---------:|:----------|
-#> | 0.6666665| 0.1571338| 0.4155363| 0.9177967|W: 6, L: 3 |
+#> | 0.6666664| 0.1571338| 0.4155362| 0.9177967|W: 6, L: 3 |
 #> 
 #> 
 #> |      mean|        sd|      5.5%|     94.5%|qa          |
 #> |---------:|---------:|---------:|---------:|:-----------|
-#> | 0.6666648| 0.1111107| 0.4890884| 0.8442411|W: 12, L: 6 |
+#> | 0.6666667| 0.1111104| 0.4890909| 0.8442425|W: 12, L: 6 |
 #> 
 #> 
-#> |     mean|        sd|     5.5%|    94.5%|qa           |
-#> |--------:|---------:|--------:|--------:|:------------|
-#> | 0.666667| 0.0785669| 0.541102| 0.792232|W: 24, L: 12 |
+#> |      mean|        sd|      5.5%|     94.5%|qa           |
+#> |---------:|---------:|---------:|---------:|:------------|
+#> | 0.6666665| 0.0785669| 0.5411015| 0.7922316|W: 24, L: 12 |
 ```
 
 <img src="rethinking_c2_files/figure-html/unnamed-chunk-17-1.svg" width="672" style="display: block; margin: auto;" />
@@ -910,6 +910,249 @@ as_draws_df(brms_c2_36_tosses) %>%
 
 <img src="rethinking_c2_files/figure-html/unnamed-chunk-30-1.svg" width="672" style="display: block; margin: auto;" />
 
+
+## pymc3 section
+
+Taken from from [pymc-devs](https://github.com/pymc-devs/resources/tree/master/Rethinking_2)...
+
+
+```python
+import arviz as az
+import matplotlib.pyplot as plt
+import numpy as np
+import pymc3 as pm
+import scipy.stats as stats
+import seaborn as sns
+import matplotlib
+from matplotlib.colors import ListedColormap
+# import matplotlib.font_manager
+# matplotlib.font_manager._rebuild()
+```
+
+
+
+```python
+RANDOM_SEED = 8927
+np.random.seed(RANDOM_SEED)
+az.style.use("arviz-whitegrid")
+matplotlib.rcParams['font.family'] = 'sans-serif'
+matplotlib.rcParams['font.sans-serif'] = 'Josefin Sans'
+matplotlib.rcParams['font.style'] = 'normal'
+```
+
+
+```python
+ways = np.array([0, 3, 8, 9, 0])
+ways / ways.sum()
+```
+
+```
+#> array([0.  , 0.15, 0.4 , 0.45, 0.  ])
+```
+
+$$
+Pr(w | n, p) = \frac{n!}{w! (n - w)!}p^{w}(1 - p)^{n-w}
+$$
+
+
+```python
+stats.binom.pmf(6, n = 9, p = 0.5)
+```
+
+```
+#> 0.16406250000000003
+```
+
+Computing the posterior using a grid approximation inside a `python` function.
+
+
+```python
+def posterior_grid_approx(grid_points = 5, success = 6, tosses = 9):
+    """"""
+    # define grid
+    p_grid = np.linspace(0, 1, grid_points)
+
+    # define prior
+    prior = np.repeat(5, grid_points)  # uniform
+    # prior = (p_grid >= 0.5).astype(int)  # truncated
+    # prior = np.exp(- 5 * abs(p_grid - 0.5))  # double exp
+
+    # compute likelihood at each point in the grid
+    likelihood = stats.binom.pmf(success, tosses, p_grid)
+
+    # compute product of likelihood and prior
+    unstd_posterior = likelihood * prior
+
+    # standardize the posterior, so it sums to 1
+    posterior = unstd_posterior / unstd_posterior.sum()
+    return p_grid, posterior
+```
+
+
+```python
+w, n = 6, 9
+
+fig, ax = plt.subplots(1, 3, figsize = (12, 4))
+
+points = (5, 10, 20)
+for idx, ps in enumerate(points):
+    p_grid, posterior = posterior_grid_approx(ps, w, n)
+    ax[idx].plot(p_grid, posterior, "o-", color = r.clr3, label = f"successes = {w}\ntosses = {n}")
+    ax[idx].set_xlabel("probability of water")
+    ax[idx].set_ylabel("posterior probability")
+    ax[idx].set_title(f"{ps} points")
+    ax[idx].legend(loc = 0)
+    ax[idx].spines['left'].set_visible(False)
+    ax[idx].spines['right'].set_visible(False)
+    ax[idx].spines['top'].set_visible(False)
+    ax[idx].spines['bottom'].set_visible(False)
+    ax[idx].grid(linestyle = 'dotted')
+```
+
+<img src="rethinking_c2_files/figure-html/unnamed-chunk-36-1.svg" style="display: block; margin: auto;" />
+
+
+```python
+np.repeat((0, 1), (3, 6))
+```
+
+```
+#> array([0, 0, 0, 1, 1, 1, 1, 1, 1])
+```
+
+```python
+data = np.repeat((0, 1), (3, 6))
+
+with pm.Model() as normal_approximation:
+    p = pm.Uniform("p", 0, 1)  # uniform priors
+    w = pm.Binomial("w", n=len(data), p=p, observed=data.sum())  # binomial likelihood
+    mean_q = pm.find_MAP()
+    std_q = ((1 / pm.find_hessian(mean_q, vars=[p])) ** 0.5)[0]
+
+# display summary of quadratic approximation
+```
+
+```
+#> █
+```
+
+```python
+print("Mean\tStandard deviation\np {:.2}\t{:.2}".format(mean_q["p"], std_q[0]))
+```
+
+```
+#> Mean	Standard deviation
+#> p 0.67	0.16
+```
+
+
+
+```python
+# Compute the 89% percentile interval
+norm = stats.norm(mean_q, std_q)
+prob = 0.89
+z = stats.norm.ppf([(1 - prob) / 2, (1 + prob) / 2])
+pi = mean_q["p"] + std_q * z
+print("5.5%, 94.5% \n{:.2}, {:.2}".format(pi[0], pi[1]))
+```
+
+```
+#> 5.5%, 94.5% 
+#> 0.42, 0.92
+```
+
+
+```python
+# analytical calculation
+w, n = 6, 9
+x = np.linspace(0, 1, 100)
+plt.plot(x, stats.beta.pdf(x, w + 1, n - w + 1), label="True posterior", color = r.clr0d)
+
+# quadratic approximation
+plt.plot(x, stats.norm.pdf(x, mean_q["p"], std_q), label="Quadratic approximation", color = r.clr3)
+plt.legend(loc = 0)
+
+plt.title(f"n = {n}")
+plt.xlabel("Proportion water");
+plt.gca().spines['left'].set_visible(False)
+plt.gca().spines['right'].set_visible(False)
+plt.gca().spines['top'].set_visible(False)
+plt.gca().spines['bottom'].set_visible(False)
+plt.grid(linestyle = 'dotted')
+plt.show()
+```
+
+<img src="rethinking_c2_files/figure-html/unnamed-chunk-39-3.svg" style="display: block; margin: auto;" />
+
+
+
+```python
+x = np.linspace(0, 1, 100)
+w, n = [6, 12, 24], [9, 18, 36]
+
+fig, ax = plt.subplots(1, 3, figsize=(12, 4))
+
+for idx, ps in enumerate(zip(w, n)):
+    data = np.repeat((0, 1), (ps[1] - ps[0], ps[0]))
+    with pm.Model() as normal_approximation:
+        p = pm.Uniform("p", 0, 1)  # uniform priors
+        w = pm.Binomial("w", n=len(data), p=p, observed=data.sum())  # binomial likelihood
+        mean_q = pm.find_MAP()
+        std_q = ((1 / pm.find_hessian(mean_q, vars=[p])) ** 0.5)[0]
+
+    ax[idx].plot(x, stats.beta.pdf(x, ps[0] + 1, ps[1] - ps[0] + 1), label = "True posterior", color = r.clr0d)
+    ax[idx].plot(x, stats.norm.pdf(x, mean_q["p"], std_q), label = "Quadratic approximation", color = r.clr3)
+    ax[idx].set_xlabel("probability of water")
+    ax[idx].set_ylabel("density")
+    ax[idx].set_title(r"$n={}$".format(ps[1]))
+    ax[idx].legend(loc="upper left")
+    ax[idx].spines['left'].set_visible(False)
+    ax[idx].spines['right'].set_visible(False)
+    ax[idx].spines['top'].set_visible(False)
+    ax[idx].spines['bottom'].set_visible(False)
+    ax[idx].grid(linestyle = 'dotted')
+```
+
+<img src="rethinking_c2_files/figure-html/unnamed-chunk-40-5.svg" style="display: block; margin: auto;" />
+
+
+
+```python
+n_samples = 1000
+p = np.zeros(n_samples)
+p[0] = 0.5
+W = 6
+L = 3
+
+for i in range(1, n_samples):
+    p_new = stats.norm(p[i - 1], 0.1).rvs(1)
+    if p_new < 0:
+        p_new = -p_new
+    if p_new > 1:
+        p_new = 2 - p_new
+    q0 = stats.binom.pmf(W, n = W + L, p = p[i - 1])
+    q1 = stats.binom.pmf(W, n = W + L, p = p_new)
+    if stats.uniform.rvs(0, 1) < q1 / q0:
+        p[i] = p_new
+    else:
+        p[i] = p[i - 1]
+```
+
+
+```python
+az.plot_kde(p, label = "Metropolis approximation", plot_kwargs = {"color": r.clr3})
+x = np.linspace(0, 1, 100)
+plt.plot(x, stats.beta.pdf(x, W + 1, L + 1), "C1", label = "True posterior", color = r.clr0d)
+plt.legend()
+plt.gca().spines['left'].set_visible(False)
+plt.gca().spines['right'].set_visible(False)
+plt.gca().spines['top'].set_visible(False)
+plt.gca().spines['bottom'].set_visible(False)
+plt.grid(linestyle = 'dotted')
+plt.show()
+```
+
+<img src="rethinking_c2_files/figure-html/unnamed-chunk-42-7.svg" style="display: block; margin: auto;" />
 
 ---
 

@@ -1517,33 +1517,457 @@ dag_milk %>%
 
 <img src="rethinking_c5_files/figure-html/unnamed-chunk-50-1.svg" width="960" style="display: block; margin: auto;" />
 
+## Categorical Variables
+
+### Indicator vs. Index variable (binary categories)
+
+Taking gender into account for the height model (but not caring about weight).
+
+
+```r
+data(Howell1)
+data_height <- as_tibble(Howell1) %>% 
+  mutate(sex = if_else(male == 1, 2, 1))
+```
+
+:::columns
+:::column1st
+Modeling as *dummy/indicator variable*
+$$
+\begin{array}{cccr} 
+h_i & {\sim} & Normal(\mu_i, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & \alpha + \beta_{m} m_{i} & \textrm{[linear model]}\\
+\alpha & \sim & Normal(178, 20) & \textrm{[$\alpha$ prior]}\\
+\beta_{m} & \sim & Normal(0, 10) & \textrm{[$\beta_N$ prior]}\\
+\sigma & \sim & Uniform(0,50) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+:::   
+:::column2nd
+Modeling as *index variable*
+$$
+\begin{array}{ccccr} 
+h_i & {\sim} & Normal(\mu_i, \sigma) & &\textrm{[likelihood]}\\
+\mu_i & = & \alpha_{\textrm{sex}[i]} & &\textrm{[linear model]}\\
+\alpha_j & \sim & Normal(178, 20) & \textrm{for}~j = 1..2 & \textrm{[$\alpha$ prior]}\\
+\sigma & \sim & Uniform(0,50) & &\textrm{[$\sigma$ prior]}
+\end{array}
+$$
+:::
+:::
+
+Demonstrating that in the *indicator variable* approach, the uncertainty of estimates is higher for the *male* type (coded as `1`), since this one is influenced by the uncertainty of two priors:
+
+
+```r
+indicator_prior <- tibble(mu_female = rnorm(1e4, 178, 20),
+       mu_male = rnorm(1e4, 178, 20) + rnorm(1e4, 0, 10))
+
+indicator_prior %>% 
+  precis() %>% 
+  as.matrix() %>% 
+  knitr::kable()
+```
+
+
+
+|          |mean     |sd       |5.5%     |94.5%    |histogram       |
+|:---------|:--------|:--------|:--------|:--------|:---------------|
+|mu_female |177.7964 |19.99779 |145.6110 |209.8597 |▁▁▁▁▂▃▇▇▇▅▃▁▁▁▁ |
+|mu_male   |177.5124 |22.49842 |141.7337 |213.0894 |▁▁▁▃▇▇▂▁▁▁      |
+
+
+```r
+indicator_long <- indicator_prior %>% 
+  pivot_longer(cols = everything(),
+               names_to = "sex",
+               values_to = "height",
+               names_transform = list(sex = function(str){str_remove(string = str, "mu_")}))
+
+ggplot(indicator_long) +
+  geom_density(data = indicator_long %>%  dplyr::select(-sex),
+               aes(x = height, y = ..count..), color = clr0d, fill = fll0) +
+  geom_density(aes(x = height, y = ..count..,
+                   color = sex, fill = after_scale(clr_alpha(color)))) +
+  facet_wrap(sex ~ . ) +
+  scale_color_manual(values = c(clr1, clr2), guide = "none")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-53-1.svg" width="672" style="display: block; margin: auto;" />
+
+Implementing the *index variable* approach:
+
+
+```r
+model_hight <- quap(
+  flist = alist(
+    height ~ dnorm(mu, sigma),
+    mu <- alpha[sex],
+    alpha[sex] ~ dnorm(178, 20),
+    sigma ~ dunif(0,50)
+  ),
+  data = data_height
+)
+
+precis(model_hight, depth = 2) %>%
+  as.matrix() %>% 
+  round(digits = 2) %>% 
+  knitr::kable()
+```
+
+
+
+|         |   mean|   sd|   5.5%|  94.5%|
+|:--------|------:|----:|------:|------:|
+|alpha[1] | 134.91| 1.61| 132.34| 137.48|
+|alpha[2] | 142.58| 1.70| 139.86| 145.29|
+|sigma    |  27.31| 0.83|  25.99|  28.63|
+
+
+```r
+hight_posterior_samples <- extract.samples(model_hight) %>% 
+  as_tibble() %>% 
+  mutate(diff_sex = alpha[ ,1] - alpha[ ,2] )
+```
+
+The expected difference between the considered types is called a *contrast*:
+
+
+```r
+hight_posterior_samples %>% 
+  precis() %>% 
+  as.matrix() %>%
+  knitr::kable()
+```
+
+
+
+|         |mean       |sd       |5.5%      |94.5%      |histogram       |
+|:--------|:----------|:--------|:---------|:----------|:---------------|
+|sigma    |27.307086  |0.822027 |25.99673  |28.620850  |▁▁▁▁▁▁▃▅▇▇▃▂▁▁▁ |
+|alpha.1  |134.933243 |1.599303 |132.39721 |137.457066 |▁▁▁▂▅▇▇▅▂▁▁▁▁   |
+|alpha.2  |142.592035 |1.708900 |139.84870 |145.308164 |▁▁▁▁▁▂▃▇▇▇▃▂▁▁▁ |
+|diff_sex |-7.658793  |2.341238 |-11.38310 |-3.867645  |▁▁▁▂▇▇▃▁▁▁      |
+
+
+```r
+p_contrast1 <- hight_posterior_samples %>% 
+  ggplot() +
+  geom_density(aes(x = alpha[,1], color = "female", fill = after_scale(clr_alpha(color))))+
+  geom_density(aes(x = alpha[,2], color = "male", fill = after_scale(clr_alpha(color)))) +
+  geom_errorbarh(data = tibble(start = median(hight_posterior_samples$alpha[,1]),
+                             end = median(hight_posterior_samples$alpha[,2])),
+                 aes(y = 0, xmin = start, xmax = end), height = .01) +
+  scale_color_manual(values = c(clr1, clr2), guide = "none") +
+  lims(y = c(-.01,.25))+
+  labs(x = "height") +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank())
+
+p_contrast2 <- hight_posterior_samples %>% 
+  ggplot() +
+  geom_density(aes(x = alpha[,2] - alpha[,1]), color = clr0d, fill = fll0) +
+  labs(x = "contrast height(male-female)") +
+    lims(y = c(-.01,.25))+
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank())
+
+p_contrast1 + p_contrast2 + plot_layout(widths = c(1,.66))
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-57-1.svg" width="672" style="display: block; margin: auto;" />
+
+### Multiple categories
+
+Taking the broad taxonomic unit into account for the milk model (but not caring about neocortex od weight).
+
+
+```r
+houses <- c("Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin")
+set.seed(63)
+data_milk_clade <- milk %>% 
+  as_tibble() %>% 
+  mutate(kcal_std = standardize(`kcal.per.g`),
+         clade_id = as.integer(clade),
+         house_id = sample(rep(1:4, each = 8), size = length(clade)),
+         house = houses[house_id])
+```
+
+$$
+\begin{array}{ccccr} 
+K_i & {\sim} & Normal(\mu_i, \sigma) & &\textrm{[likelihood]}\\
+\mu_i & = & \alpha_{\textrm{CLADE}[i]} & &\textrm{[linear model]}\\
+\alpha_j & \sim & Normal(0, 0.5) & \textrm{for}~j = 1..4 & \textrm{[$\alpha$ prior]}\\
+\sigma & \sim & Exponential(1) & &\textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+
+```r
+model_milk_clade <- quap(
+  flist = alist(
+    kcal_std ~ dnorm(mu, sigma),
+    mu <- alpha[clade_id],
+    alpha[clade_id] ~ dnorm(0, 0.5),
+    sigma ~ dexp(1)
+  ),
+  data = data_milk_clade
+)
+```
+
+
+```r
+precis(model_milk_clade, depth = 2, pars = "alpha") %>% 
+  as_tibble_rn() %>%
+  mutate(clade_id = str_remove_all(param, pattern =  "[a-z\\[\\]]*") %>% as.integer(),
+         clade = fct_reorder(levels(data_milk$clade)[clade_id], clade_id)) %>% 
+  ggplot(aes(y = clade)) +
+  geom_vline(xintercept = 0, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_linerange(aes(xmin = `5.5%`,
+                     xmax =`94.5%`), color = clr0d, fill = clr0) +
+  geom_point(aes(x = mean),
+             shape = 21, size = 3, color = clr0d, fill = clr0) +
+  scale_y_discrete("", limits = rev(levels(data_milk$clade))) +
+  labs(x = "expected kcal_std")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-60-1.svg" width="672" style="display: block; margin: auto;" />
+
+adding another categorical variable:
+
+$$
+\begin{array}{ccccr} 
+K_i & {\sim} & Normal(\mu_i, \sigma) & &\textrm{[likelihood]}\\
+\mu_i & = & \alpha_{\textrm{CLADE}[i]} + \alpha_{\textrm{HOUSE}[i]} & &\textrm{[linear model]}\\
+\alpha_{\textrm{CLADE},j} & \sim & Normal(0, 0.5) & \textrm{for}~j = 1..4 & \textrm{[$\alpha_{\textrm{CLADE}}$ prior]}\\
+\alpha_{\textrm{HOUSE},j} & \sim & Normal(0, 0.5) & \textrm{for}~j = 1..4 & \textrm{[$\alpha_{\textrm{CLADE}}$ prior]}\\
+\sigma & \sim & Exponential(1) & &\textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+
+
+```r
+model_milk_house <- quap(
+  flist = alist(
+    kcal_std ~ dnorm(mu, sigma),
+    mu <- alpha_clade[clade_id] + alpha_house[house_id],
+    alpha_clade[clade_id] ~ dnorm(0, 0.5),
+    alpha_house[house_id] ~ dnorm(0, 0.5),
+    sigma ~ dexp(1)
+  ),
+  data = data_milk_clade
+)
+```
+
+
+```r
+precis(model_milk_house, depth = 2, pars = "alpha") %>% 
+  as_tibble_rn() %>%
+  mutate(type = str_remove(param, pattern =  "alpha_") %>% str_remove("\\[[0-9]\\]"),
+         idx = str_extract(param, "[0-9]") %>% as.integer(),
+         name = if_else(type == "clade",
+                        levels(data_milk$clade)[idx],
+                        houses[idx])) %>% 
+  ggplot(aes(y = name, color = type)) +
+  geom_vline(xintercept = 0, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_linerange(aes(xmin = `5.5%`,
+                     xmax =`94.5%`)) +
+  geom_point(aes(x = mean, fill = after_scale(clr_lighten(color))),
+             shape = 21, size = 3 ) +
+  scale_color_manual(values = c(clade = clr0d, house = clr3), guide = "none") +
+  facet_grid(type ~ . , scales = "free_y", switch = "y") +
+  labs(x = "expected kcal_std") +
+  theme(axis.title.y = element_blank(),
+        strip.placement = "outside")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-62-1.svg" width="672" style="display: block; margin: auto;" />
+
 ## Homework
 
 **E1**
 
+$$
+\begin{array}{ccclr} 
+1) & \mu_i & = & \alpha + \beta x_{i} &\textrm{[simple linear regression]}\\
+2) & \mu_i & = & \beta_{x} x_{i} + \beta_{z} z_{i} &\textrm{[multiple linear regression]}\\
+3) & \mu_i & = & \alpha + \beta (x_{i} - z_{i}) &\textrm{[simple linear regression]}\\
+4) & \mu_i & = & \alpha + \beta_{x} x_{i} + \beta_{z} z_{i} &\textrm{[multiple linear regression]}\\
+\end{array}
+$$
+
 **E2**
+
+$$
+\begin{array}{cclr} 
+d_i & = & \alpha + \beta_{y} y_i + \beta_{p} p_{i}& \textrm{[linear model]}\\
+\end{array}
+$$
 
 **E3**
 
+$$
+\begin{array}{ccclr} 
+1) & t_i & = & \alpha_{f} + \beta_{ff} f_i & \textrm{[linear model]}\\
+2) & t_i & = & \alpha_{s} + \beta_{ss} s_{i} & \textrm{[linear model]}\\
+3) & t_i & = & \alpha + \beta_{f} f_i + \beta_{s} s_{i} & \textrm{[linear model]}\\
+\end{array}
+$$
+
+- $\beta_{f} \ge 0$
+- $\beta_{ss} \ge 0$
+- $t \sim f$ ($\beta_{f} \gt \beta_{ff}$)
+- $t \sim s$ ($\beta_{s} \gt \beta_{ss}$)
+- $f \sim -s$
+
 **E4**
 
-**E5**
+- 1), 3), 4) and 5)
 
-**E6**
-
-**E7**
+(models should contain $k - 1$ indicator variables)
 
 **M1**
 
+
+```r
+n <- 100
+data_spurious2 <- tibble(u = rnorm(n),
+                         x = rnorm(n, mean = u),
+                         y = rnorm(n, mean = -u),
+                         z = rnorm(n, mean = u) )
+
+data_spurious2 %>%  
+  ggpairs()
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-63-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+model_spurious2a <- quap(
+  flist = alist(
+    z ~ dnorm(mu, sigma),
+    mu <- alpha + beta_x * x,
+    alpha ~ dnorm(0, .2),
+    beta_x ~ dnorm(0, .75),
+    sigma ~ dexp(1)),
+  data = data_spurious2
+  )
+
+model_spurious2b <- quap(
+  flist = alist(
+    z ~ dnorm(mu, sigma),
+    mu <- alpha + beta_y * y,
+    alpha ~ dnorm(0, .2),
+    beta_y ~ dnorm(0, .75),
+    sigma ~ dexp(1)),
+  data = data_spurious2
+  ) 
+
+model_spurious2c <- quap(
+  flist = alist(
+    z ~ dnorm(mu, sigma),
+    mu <- alpha + beta_x * x + beta_y * y,
+    alpha ~ dnorm(0, .2),
+    beta_x ~ dnorm(0, .75),
+    beta_y ~ dnorm(0, .75),
+    sigma ~ dexp(1)),
+  data = data_spurious2
+  )
+```
+
+
+```r
+ct_spur <- coeftab(model_spurious2a, model_spurious2b, model_spurious2c,
+                        se = TRUE)
+plot_coeftab(ct_spur)
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-64-1.svg" width="672" style="display: block; margin: auto;" />
+
+
 **M2**
 
+
+```r
+data_masked <- tibble(u = rnorm(n),
+                      x = rnorm(n, mean = u),
+                      y = rnorm(n, mean = u),
+                      z = rnorm(n, mean = x-y) )
+
+data_masked %>%  
+  ggpairs()
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-65-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+model_masked_a <- quap(
+  flist = alist(
+    z ~ dnorm(mu, sigma),
+    mu <- alpha + beta_x * x,
+    alpha ~ dnorm(0, .2),
+    beta_x ~ dnorm(0, .75),
+    sigma ~ dexp(1)),
+  data = data_masked
+  )
+
+model_masked_b <- quap(
+  flist = alist(
+    z ~ dnorm(mu, sigma),
+    mu <- alpha + beta_y * y,
+    alpha ~ dnorm(0, .2),
+    beta_y ~ dnorm(0, .75),
+    sigma ~ dexp(1)),
+  data = data_masked
+  ) 
+
+model_masked_c <- quap(
+  flist = alist(
+    z ~ dnorm(mu, sigma),
+    mu <- alpha + beta_x * x + beta_y * y,
+    alpha ~ dnorm(0, .2),
+    beta_x ~ dnorm(0, .75),
+    beta_y ~ dnorm(0, .75),
+    sigma ~ dexp(1)),
+  data = data_masked
+  )
+```
+
+
+```r
+ct_masked <- coeftab(model_masked_a, model_masked_b, model_masked_c,
+                        se = TRUE)
+plot_coeftab(ct_masked)
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-66-1.svg" width="672" style="display: block; margin: auto;" />
+
 **M3**
+
+
+```r
+dag <- dagify(
+  D ~ A,
+  M ~ A,
+  exposure = "A",
+  outcome = "M") %>% 
+  tidy_dagitty(.dagitty = .,layout = tibble(x = c(0,.5,1), y = c(1, .4, 1))) %>%
+  mutate(stage = if_else(name == "D", "response",
+                         if_else(name %in% c("A", "M"),
+                                 "predictor", "confounds")))
+
+plot_dag(dag, clr_in = clr3) + 
+  scale_y_continuous(limits = c(.35, 1.05)) +
+  coord_equal()
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-67-1.svg" width="672" style="display: block; margin: auto;" />
+
 
 **M4**
 
 **M5**
-
-**M6**
 
 **H1**
 
@@ -1553,10 +1977,1136 @@ dag_milk %>%
 
 **H4**
 
-**H5**
-
-
 ## {brms} section
+
+### Age at marriage Model
+
+Note the `sample_prior = TRUE` to also sample from the prior (as well as from the posterior).
+Prior samples are extracted with `prior_draws()`.
+
+
+```r
+brms_c5_model_age <- brm(
+  data = data_waffle, 
+  family = gaussian,
+  divorce_std ~ 1 + median_age_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  sample_prior = TRUE,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c5_model_age")
+
+brms_age_prior <- prior_draws(brms_c5_model_age) %>% as_tibble()
+
+brms_age_prior %>% 
+  slice_sample(n = 50)  %>% 
+  rownames_to_column("draw") %>% 
+  expand(nesting(draw, Intercept, b),
+         a = c(-2, 2)) %>% 
+  mutate(d = Intercept + b * a) %>% 
+  ggplot(aes(a,d, group = draw)) +
+  geom_line(color = clr0d %>% clr_alpha()) +
+  labs(x = "median_age_std",
+       y = "divorce_rate_std")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-68-1.svg" width="672" style="display: block; margin: auto;" />
+
+Getting to the posterior predictions with `fitted()`:
+
+
+```r
+nd <- tibble(median_age_std = seq(from = -3, to = 3.2, length.out = 30))
+
+# now use `fitted()` to get the model-implied trajectories
+fitted(object = brms_c5_model_age,
+       newdata = nd) %>% 
+  as_tibble() %>% 
+  bind_cols(nd) %>% 
+  ggplot(aes(x = median_age_std)) +
+  geom_smooth(aes(y = Estimate, ymin = Q2.5, ymax = Q97.5),
+              stat = "identity",
+              color = clr0d, fill = fll0) + 
+  geom_point(data = data_waffle, aes(y = divorce_std), color = clr_dark )+
+  labs(x = "median_age_std",
+       y = "divorce_rate_std")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-69-1.svg" width="672" style="display: block; margin: auto;" />
+
+$\rightarrow$ The posterior for `median_age_std` ($\beta_{age}$) is reliably negative (look at `Estimate` and `95%` quantiles  )...
+
+
+```r
+print(brms_c5_model_age)
+```
+
+```
+#>  Family: gaussian 
+#>   Links: mu = identity; sigma = identity 
+#> Formula: divorce_std ~ 1 + median_age_std 
+#>    Data: data_waffle (Number of observations: 50) 
+#>   Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+#>          total post-warmup draws = 4000
+#> 
+#> Population-Level Effects: 
+#>                Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+#> Intercept          0.00      0.10    -0.20     0.20 1.00     3936     2758
+#> median_age_std    -0.57      0.11    -0.79    -0.34 1.00     3906     3129
+#> 
+#> Family Specific Parameters: 
+#>       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+#> sigma     0.82      0.08     0.68     1.00 1.00     4302     3021
+#> 
+#> Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+#> and Tail_ESS are effective sample size measures, and Rhat is the potential
+#> scale reduction factor on split chains (at convergence, Rhat = 1).
+```
+
+### Marriage rate Model
+
+
+```r
+brms_c5_model_marriage <- brm(
+  data = data_waffle,
+  family = gaussian,
+  divorce_std ~ 1 + marriage_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 5,
+  file = "brms/brms_c5_model_marriage")
+```
+
+... smaller magnitude for the *marriage rate model*:
+
+
+```r
+print(brms_c5_model_marriage)
+```
+
+```
+#>  Family: gaussian 
+#>   Links: mu = identity; sigma = identity 
+#> Formula: divorce_std ~ 1 + marriage_std 
+#>    Data: data_waffle (Number of observations: 50) 
+#>   Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+#>          total post-warmup draws = 4000
+#> 
+#> Population-Level Effects: 
+#>              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+#> Intercept        0.00      0.11    -0.22     0.22 1.00     4602     2813
+#> marriage_std     0.35      0.13     0.09     0.61 1.00     4325     3000
+#> 
+#> Family Specific Parameters: 
+#>       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+#> sigma     0.95      0.10     0.78     1.16 1.00     4404     3059
+#> 
+#> Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+#> and Tail_ESS are effective sample size measures, and Rhat is the potential
+#> scale reduction factor on split chains (at convergence, Rhat = 1).
+```
+
+
+
+```r
+nd <- tibble(marriage_std = seq(from = -2.5, to = 3.5, length.out = 30))
+
+# now use `fitted()` to get the model-implied trajectories
+fitted(object = brms_c5_model_marriage,
+       newdata = nd) %>% 
+  as_tibble() %>% 
+  bind_cols(nd) %>% 
+  ggplot(aes(x = marriage_std)) +
+  geom_smooth(aes(y = Estimate, ymin = Q2.5, ymax = Q97.5),
+              stat = "identity",
+              color = clr0d, fill = fll0) + 
+  geom_point(data = data_waffle, aes(y = divorce_std), color = clr_dark )+
+  labs(x = "marriage_rate_std",
+       y = "divorce_rate_std")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-73-1.svg" width="672" style="display: block; margin: auto;" />
+
+### Multiple regression
+
+
+```r
+brms_c5_model_multiple <- brm(
+  data = data_waffle, 
+  family = gaussian,
+  divorce_std ~ 1 + marriage_std + median_age_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c5_model_multiple")
+```
+
+
+
+```r
+print(brms_c5_model_multiple)
+```
+
+```
+#>  Family: gaussian 
+#>   Links: mu = identity; sigma = identity 
+#> Formula: divorce_std ~ 1 + marriage_std + median_age_std 
+#>    Data: data_waffle (Number of observations: 50) 
+#>   Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+#>          total post-warmup draws = 4000
+#> 
+#> Population-Level Effects: 
+#>                Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+#> Intercept          0.00      0.10    -0.19     0.19 1.00     3829     2943
+#> marriage_std      -0.06      0.16    -0.37     0.25 1.00     3291     2718
+#> median_age_std    -0.60      0.16    -0.92    -0.29 1.00     2859     2440
+#> 
+#> Family Specific Parameters: 
+#>       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+#> sigma     0.83      0.09     0.68     1.02 1.00     3553     2380
+#> 
+#> Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+#> and Tail_ESS are effective sample size measures, and Rhat is the potential
+#> scale reduction factor on split chains (at convergence, Rhat = 1).
+```
+
+```r
+mixedup::summarise_model(brms_c5_model_multiple)
+```
+
+```
+#>     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#>  Residual            0.68 0.83   0.68    1.02     1.00
+#>            Term Value   SE Lower_2.5 Upper_97.5
+#>       Intercept  0.00 0.10     -0.19       0.19
+#>    marriage_std -0.06 0.16     -0.37       0.25
+#>  median_age_std -0.60 0.16     -0.92      -0.29
+```
+
+
+
+```r
+bind_cols(
+  as_draws_df(brms_c5_model_age) %>% 
+    transmute(`brms_age-beta_age` = b_median_age_std),
+  as_draws_df(brms_c5_model_marriage) %>% 
+    transmute(`brms_marriage-beta_marriage` = b_marriage_std),
+  as_draws_df(brms_c5_model_multiple) %>% 
+    transmute(`brms_multi-beta_marriage` = b_marriage_std,
+              `brms_multi-beta_age` = b_median_age_std)
+  ) %>% 
+  pivot_longer(everything()) %>% 
+    group_by(name) %>% 
+  summarise(mean = mean(value),
+            ll   = quantile(value, prob = .025),
+            ul   = quantile(value, prob = .975)) %>% 
+  separate(col = name, into = c("fit", "parameter"), sep = "-")  %>% 
+  ggplot(aes(x = mean, xmin = ll, xmax = ul, y = fit)) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  geom_pointrange(color = clr0d, fill = clr0, shape = 21) +
+  facet_wrap(~ parameter, ncol = 1, labeller = label_parsed) +
+  theme(axis.title = element_blank()) 
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-76-1.svg" width="672" style="display: block; margin: auto;" />
+
+Simulating divorce data
+
+
+```r
+n <- 50 
+
+sim_d <- tibble(age = rnorm(n, mean = 0, sd = 1),
+                mar = rnorm(n, mean = -age, sd = 1), 
+                div = rnorm(n, mean =  age, sd = 1))
+
+brms_c5_model_age_sim <- update(brms_c5_model_age, 
+                                newdata = sim_d, 
+                                formula = div ~ 1 + age,
+                                seed = 42,
+                                file = "brms/brms_c5_model_age_sim")
+
+brms_c5_model_marriage_sim <- update(brms_c5_model_marriage, 
+                                newdata = sim_d, 
+                                formula = div ~ 1 + mar,
+                                seed = 42,
+                                file = "brms/brms_c5_model_marriage_sim")
+
+brms_c5_model_multiple_sim <- update(brms_c5_model_multiple, 
+                                newdata = sim_d, 
+                                formula = div ~ 1 + mar + age,
+                                seed = 42,
+                                file = "brms/brms_c5_model_multiple_sim")
+
+bind_cols(
+  as_draws_df(brms_c5_model_age_sim) %>% 
+    transmute(`brms_age-beta_age` = b_age),
+  as_draws_df(brms_c5_model_marriage_sim) %>% 
+    transmute(`brms_marriage-beta_marriage` = b_mar),
+  as_draws_df(brms_c5_model_multiple_sim) %>% 
+    transmute(`brms_multi-beta_marriage` = b_mar,
+              `brms_multi-beta_age` = b_age)
+  ) %>% 
+  pivot_longer(everything()) %>% 
+    group_by(name) %>% 
+  summarise(mean = mean(value),
+            ll   = quantile(value, prob = .025),
+            ul   = quantile(value, prob = .975)) %>% 
+  separate(col = name, into = c("fit", "parameter"), sep = "-")  %>% 
+  ggplot(aes(x = mean, xmin = ll, xmax = ul, y = fit)) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  geom_pointrange(color = clr0d, fill = clr0, shape = 21) +
+  facet_wrap(~ parameter, ncol = 1, labeller = label_parsed) +
+  theme(axis.title = element_blank())
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-77-1.svg" width="672" style="display: block; margin: auto;" />
+
+### Multivariate Posteriors
+
+
+```r
+brms_c5_model_residuals_marriage <- brm(
+  data = data_waffle, 
+  family = gaussian,
+  marriage_std ~ 1 + median_age_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c5_model_residuals_marriage")
+```
+
+
+```r
+fitted(brms_c5_model_residuals_marriage) %>%
+  data.frame() %>%
+  bind_cols(data_waffle) %>% 
+  as_tibble() %>% 
+  ggplot(aes(x = median_age_std, y = marriage_std)) +
+  geom_point(color = clr_dark) +
+  geom_segment(aes(xend = median_age_std, yend = Estimate), 
+               size = .5, linetype = 3) +
+  geom_line(aes(y = Estimate), 
+            color = clr0d) +
+  ggrepel::geom_text_repel(data = . %>%
+                             filter(Loc %in% c("WY", "ND", "ME", "HI", "DC")),  
+                  aes(label = Loc), 
+                  size = 3, seed = 14, family = fnt_sel) +
+  labs(x = "median_age_std",
+       y = "marriage_std")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-79-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+residual_data <- residuals(brms_c5_model_residuals_marriage) %>%
+  as_tibble() %>% 
+  bind_cols(data_waffle)
+
+brms_c5_model_residuals_data <- brm(
+  data = residual_data, 
+  family = gaussian,
+  divorce_std ~ 1 + Estimate,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c5_model_residuals_data")
+
+nd <- tibble(Estimate = seq(from = -2, to = 2, length.out = 30))
+
+residuals_intervals <- fitted(object = brms_c5_model_residuals_data,
+       newdata = nd) %>% 
+  as_tibble() %>%
+  rename(mean = "Estimate") %>% 
+  bind_cols(nd) 
+
+residual_data %>% 
+  ggplot(aes(x = Estimate, y = divorce_std)) +
+    geom_smooth(data = residuals_intervals,
+              aes(y = mean, ymin = Q2.5, ymax = Q97.5),
+              stat = "identity",
+              color = clr0d, fill = fll0) + 
+  geom_vline(xintercept = 0, linetype = 3, color = clr_dark) +
+    geom_point(color = clr_dark) +
+  ggrepel::geom_text_repel(data = . %>% filter(Loc %in% c("WY", "ND", "ME", "HI", "DC")),  
+                  aes(label = Loc), 
+                  size = 3, seed = 5, family = fnt_sel) 
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-80-1.svg" width="672" style="display: block; margin: auto;" />
+
+Don't use residuals as input data for another model - this ignores a ton of uncertainty:
+
+
+```r
+residual_data %>% 
+  ggplot(aes(x = Estimate, y = divorce_std)) +
+  geom_vline(xintercept = 0, linetype = 3, color = clr_dark) +
+  geom_pointrange(aes(xmin = `Q2.5`, xmax = `Q97.5`),
+                  color = clr0d, fill = clr0, shape = 21) +
+    ggrepel::geom_text_repel(data = . %>% filter(Loc %in% c("RI", "ME", "UT", "ID")),  
+                  aes(label = Loc), 
+                  size = 3, seed = 5, family = fnt_sel) 
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-81-1.svg" width="672" style="display: block; margin: auto;" />
+
+Posterior prediction plot:
+
+
+```r
+fitted(brms_c5_model_multiple) %>% 
+  as_tibble() %>% 
+  bind_cols(data_waffle) %>% 
+  ggplot(aes(x = divorce_std, y = Estimate)) +
+  geom_abline(slope = 1, linetype = 3, color = clr_dark) +
+  geom_pointrange(aes(ymin = `Q2.5`, ymax = `Q97.5`),
+                  color = clr0d, fill = clr0, shape = 21) +
+    ggrepel::geom_text_repel(data = . %>% filter(Loc %in% c("RI", "ME", "UT", "ID")),  
+                  aes(label = Loc), 
+                  size = 3, seed = 5, family = fnt_sel) 
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-82-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+brms_c5_model_spurious <- brm(
+  data = data_spurious, 
+  family = gaussian,
+  y ~ 1 + x_real + x_spur,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c5_model_spurious")
+
+mixedup::extract_fixef(brms_c5_model_spurious)
+```
+
+```
+#> # A tibble: 3 x 5
+#>   term      value    se lower_2.5 upper_97.5
+#>   <chr>     <dbl> <dbl>     <dbl>      <dbl>
+#> 1 Intercept 0.05  0.096    -0.135      0.242
+#> 2 x_real    0.902 0.146     0.619      1.18 
+#> 3 x_spur    0.094 0.108    -0.113      0.309
+```
+
+
+### Counterfactual plots
+
+> At this point, it’s important to recognize we have two regression models. As a first step, we might specify each model separately in a `bf()` function and save them as objects ([Estimating multivariate models with brms](https://cran.r-project.org/web/packages/brms/vignettes/brms_multivariate.html)). 
+
+
+```r
+divorce_model <- bf(divorce.std ~ 1 + median.age.std + marriage.std)
+marriage_model <- bf(marriage.std ~ 1 + median.age.std)
+divorce_model <- bf(divorcestd ~ 1 + medianagestd + marriagestd)
+marriage_model <- bf(marriagestd ~ 1 + medianagestd)
+```
+
+> Next we will combine our `bf()` objects with the `+` operator within the `brm()` function. For a model like this, we also specify `set_rescor(FALSE)` to prevent brms from adding a residual correlation between d and m. Also, notice how each prior statement includes a resp argument. This clarifies which sub-model the prior refers to.
+
+
+```r
+# can't use _ or . in column names in this context
+data_waffle_short <- data_waffle %>% set_names(nm = names(data_waffle) %>% str_remove_all("_"))
+
+brms_c5_model_counterfactual <- brm(
+  data = data_waffle_short, 
+  family = gaussian,
+  divorce_model + marriage_model + set_rescor(FALSE),
+  prior = c(prior(normal(0, 0.2), class = Intercept, resp = divorcestd),
+            prior(normal(0, 0.5), class = b, resp = divorcestd),
+            prior(exponential(1), class = sigma, resp = divorcestd),
+            prior(normal(0, 0.2), class = Intercept, resp = marriagestd),
+            prior(normal(0, 0.5), class = b, resp = marriagestd),
+            prior(exponential(1), class = sigma, resp = marriagestd)),
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c5_model_counterfactual")
+
+print(brms_c5_model_counterfactual)
+```
+
+```
+#>  Family: MV(gaussian, gaussian) 
+#>   Links: mu = identity; sigma = identity
+#>          mu = identity; sigma = identity 
+#> Formula: divorcestd ~ 1 + medianagestd + marriagestd 
+#>          marriagestd ~ 1 + medianagestd 
+#>    Data: data_waffle_short (Number of observations: 50) 
+#>   Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+#>          total post-warmup draws = 4000
+#> 
+#> Population-Level Effects: 
+#>                          Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+#> divorcestd_Intercept        -0.00      0.10    -0.20     0.19 1.00     5659
+#> marriagestd_Intercept       -0.00      0.09    -0.18     0.17 1.00     5705
+#> divorcestd_medianagestd     -0.61      0.16    -0.90    -0.29 1.00     3490
+#> divorcestd_marriagestd      -0.06      0.15    -0.36     0.25 1.00     3354
+#> marriagestd_medianagestd    -0.69      0.10    -0.89    -0.49 1.00     4910
+#>                          Tail_ESS
+#> divorcestd_Intercept         2695
+#> marriagestd_Intercept        3063
+#> divorcestd_medianagestd      2968
+#> divorcestd_marriagestd       2948
+#> marriagestd_medianagestd     3278
+#> 
+#> Family Specific Parameters: 
+#>                   Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+#> sigma_divorcestd      0.83      0.09     0.68     1.02 1.00     5112     3245
+#> sigma_marriagestd     0.71      0.08     0.58     0.89 1.00     4852     2896
+#> 
+#> Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+#> and Tail_ESS are effective sample size measures, and Rhat is the potential
+#> scale reduction factor on split chains (at convergence, Rhat = 1).
+```
+
+
+```r
+nd <- tibble(medianagestd = seq(from = -2, to = 2, length.out = 30),
+             marriagestd = 0)
+
+predict(brms_c5_model_counterfactual,
+          resp = "divorcestd",
+          newdata = nd) %>% 
+  data.frame() %>% 
+  bind_cols(nd) %>% 
+  ggplot(aes(x = medianagestd, y = Estimate, ymin = Q2.5, ymax = Q97.5)) +
+  geom_smooth(stat = "identity",
+              fill = fll0, color = clr0d, size = .2) +
+  labs(subtitle = "Total counterfactual effect of A on D",
+       x = "manipulated median_age_std",
+       y = "counterfactual divorce_std")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-86-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+nd <- tibble(marriagestd = seq(from = -2, to = 2, length.out = 30),
+             medianagestd = 0)
+
+predict(brms_c5_model_counterfactual,
+          resp = "divorcestd",
+          newdata = nd) %>% 
+  data.frame() %>% 
+  bind_cols(nd) %>% 
+  ggplot(aes(x = marriagestd, y = Estimate, ymin = Q2.5, ymax = Q97.5)) +
+  geom_smooth(stat = "identity",
+              fill = fll0, color = clr0d, size = .2) +
+  labs(subtitle = "Total counterfactual effect of M on D",
+       x = "manipulated marriage_std",
+       y = "counterfactual divorce_std")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-86-2.svg" width="672" style="display: block; margin: auto;" />
+
+### Masked Relationships
+
+
+```r
+brms_c5_model_milk_draft <- brm(
+  data = data_milk, 
+  family = gaussian,
+  kcal_std ~ 1 + neocortex_std,
+  prior = c(prior(normal(0, 1), class = Intercept),
+            prior(normal(0, 1), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, chains = 4, cores = 4,
+  seed = 42,
+  sample_prior = TRUE,
+  file = "brms/brms_c5_model_milk_draft")
+
+set.seed(42)
+prior_draws(brms_c5_model_milk_draft) %>% 
+  slice_sample(n = 50) %>% 
+  rownames_to_column() %>% 
+  expand(nesting(rowname, Intercept, b),
+         neocortex_std = c(-2, 2)) %>% 
+  mutate(kcal_std = Intercept + b * neocortex_std) %>% 
+  ggplot(aes(x = neocortex_std, y = kcal_std)) +
+  geom_line(aes(group = rowname),
+            color = clr0d %>% clr_alpha()) +
+  coord_cartesian(ylim = c(-2, 2)) +
+  labs(x = "neocortex_std",
+       y = "kcal_std",
+       subtitle = "Intercept ~ dnorm(0, 1); b ~ dnorm(0, 1)")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-87-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+brms_c5_model_milk_cortex <- brm(
+  data = data_milk, 
+  family = gaussian,
+  kcal_std ~ 1 + neocortex_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, chains = 4, cores = 4,
+  seed = 42,
+  sample_prior = TRUE,
+  file = "brms/brms_c5_model_milk_cortex")
+
+set.seed(42)
+prior_draws(brms_c5_model_milk_cortex) %>% 
+  slice_sample(n = 50) %>% 
+  rownames_to_column() %>% 
+  expand(nesting(rowname, Intercept, b),
+         neocortex_std = c(-2, 2)) %>% 
+  mutate(kcal_std = Intercept + b * neocortex_std) %>% 
+  ggplot(aes(x = neocortex_std, y = kcal_std)) +
+  geom_line(aes(group = rowname),
+            color = clr0d %>% clr_alpha()) +
+  coord_cartesian(ylim = c(-2, 2)) +
+  labs(x = "neocortex_std",
+       y = "kcal_std",
+       subtitle = "Intercept ~ dnorm(0, 0.2); b ~ dnorm(0, 0.5)")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-88-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+bind_rows(
+  as_draws_df(brms_c5_model_milk_draft)  %>% select(b_Intercept:sigma),
+  as_draws_df(brms_c5_model_milk_cortex) %>% select(b_Intercept:sigma)
+  )  %>% 
+  mutate(fit = rep(c("milk_draft", "milk_cortex"), each = n() / 2)) %>% 
+  pivot_longer(-fit, names_to = "parameter") %>% 
+  group_by(parameter, fit) %>% 
+  summarise(mean = mean(value),
+            ll = quantile(value, prob = .025),
+            ul = quantile(value, prob = .975)) %>% 
+  mutate(fit = factor(fit, levels = c("milk_draft", "milk_cortex"))) %>% 
+  ggplot(aes(x = mean, xmin = ll, xmax = ul, y = fit)) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  geom_pointrange(color = clr0d, fill = clr0, shape = 21) +
+  facet_wrap(~ parameter, ncol = 1) +
+  theme(axis.title = element_blank())
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-89-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+nd <- tibble(neocortex_std = seq(from = -2.5, to = 2, length.out = 30))
+
+fitted(brms_c5_model_milk_cortex, 
+       newdata = nd,
+       probs = c(.025, .975, .25, .75)) %>%
+  as_tibble() %>%
+  bind_cols(nd) %>% 
+  ggplot(aes(x = neocortex_std, y = Estimate, ymin = Q25, ymax = Q75)) +
+  geom_ribbon(aes(ymin = Q2.5, ymax = Q97.5),
+              fill = fll0) +
+  geom_smooth(stat = "identity",
+              fill = fll0, color = clr0d, size = .2) +
+  geom_point(data = data_milk, aes(x = neocortex_std, y = kcal_std),
+             inherit.aes = FALSE, color = clr_dark) +
+  labs(y = 'kcal_std')
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-90-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+brms_c5_model_milk_weight <- brm(
+  data = data_milk, 
+  family = gaussian,
+  kcal_std ~ 1 + mass_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  sample_prior = TRUE,
+  file = "brms/brms_c5_model_milk_weight")
+
+nd <- tibble(mass_std = seq(from = -2.5, to = 2.5, length.out = 30))
+
+fitted(brms_c5_model_milk_weight, 
+       newdata = nd,
+       probs = c(.025, .975, .25, .75)) %>%
+  as_tibble() %>%
+  bind_cols(nd) %>% 
+  ggplot(aes(x = mass_std, y = Estimate, ymin = Q25, ymax = Q75)) +
+  geom_ribbon(aes(ymin = Q2.5, ymax = Q97.5),
+              fill = fll0) +
+  geom_smooth(stat = "identity",
+              fill = fll0, color = clr0d, size = .2) +
+  geom_point(data = data_milk, aes(x = mass_std, y = kcal_std),
+             inherit.aes = FALSE, color = clr_dark) +
+  labs(y = 'kcal_std')
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-91-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+brms_c5_model_milk_multi <- brm(
+  data = data_milk, 
+  family = gaussian,
+  kcal_std ~ 1 + neocortex_std + mass_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c5_model_milk_multi")
+
+bind_cols(
+  as_draws_df(brms_c5_model_milk_cortex) %>% 
+    transmute(`cortex-beta_N` = b_neocortex_std),
+  as_draws_df(brms_c5_model_milk_weight) %>% 
+    transmute(`weight-beta_M` = b_mass_std),
+  as_draws_df(brms_c5_model_milk_multi) %>% 
+    transmute(`multi-beta_N` = b_neocortex_std,
+              `multi-beta_M` = b_mass_std)
+  ) %>% 
+  pivot_longer(everything()) %>% 
+  group_by(name) %>% 
+  summarise(mean = mean(value),
+            ll   = quantile(value, prob = .025),
+            ul   = quantile(value, prob = .975)) %>% 
+  separate(name, into = c("fit", "parameter"), sep = "-") %>% 
+  ggplot(aes(x = mean, y = fit, xmin = ll, xmax = ul)) +
+  geom_pointrange(color = clr0d, fill = clr0, shape = 21) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  ylab(NULL) +
+  facet_wrap(~ parameter, ncol = 1)
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-92-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+nd <- tibble(neocortex_std = seq(from = -2.5, to = 2, length.out = 30),
+             mass_std = 0)
+
+fitted(brms_c5_model_milk_multi, 
+         newdata = nd,
+         probs = c(.025, .975, .25, .75)) %>%
+  as_tibble() %>%
+  bind_cols(nd) %>% 
+  ggplot(aes(x = neocortex_std, y = Estimate)) +
+  geom_ribbon(aes(ymin = Q2.5, ymax = Q97.5),
+              fill = fll0) +
+  geom_smooth(aes(ymin = Q25, ymax = Q75),
+              stat = "identity",
+              fill = fll0, color = clr0d, size = .2) +
+  labs(subtitle = "Counterfactual holding M = 0", 
+       x = "neocortex_std",
+       y = "kcal_std")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-93-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+nd <- tibble(mass_std = seq(from = -2.5, to = 2.5, length.out = 30),
+             neocortex_std = 0)
+
+fitted(brms_c5_model_milk_multi, 
+         newdata = nd,
+         probs = c(.025, .975, .25, .75)) %>%
+  as_tibble() %>%
+  bind_cols(nd) %>% 
+  ggplot(aes(x = mass_std, y = Estimate)) +
+  geom_ribbon(aes(ymin = Q2.5, ymax = Q97.5),
+              fill = fll0) +
+  geom_smooth(aes(ymin = Q25, ymax = Q75),
+              stat = "identity",
+              fill = fll0, color = clr0d, size = .2) +
+  labs(subtitle = "Counterfactual holding M = 0", 
+       x = "mass_std",
+       y = "kcal_std")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-93-2.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+brms_c5_model_milk_multi_sim <- update(
+  brms_c5_model_milk_multi,
+  newdata = data_milk_sim1,
+  formula = kcal_std ~ 1 + neocortex_std + mass_std,
+  seed = 42,
+  file = "brms/brms_c5_model_milk_multi_sim")
+
+brms_c5_model_milk_cortex_sim <- update(
+  brms_c5_model_milk_cortex,
+  formula = kcal_std ~ 1 + neocortex_std,
+  seed = 42,
+  file = "brms/brms_c5_model_milk_cortex_sim")
+
+brms_c5_model_milk_weight_sim <- update(
+  brms_c5_model_milk_weight,
+  formula = kcal_std ~ 1 + mass_std,
+  seed = 42,
+  file = "brms/brms_c5_model_milk_weight_sim")
+
+mixedup::extract_fixef(brms_c5_model_milk_cortex_sim)
+```
+
+```
+#> # A tibble: 2 x 5
+#>   term          value    se lower_2.5 upper_97.5
+#>   <chr>         <dbl> <dbl>     <dbl>      <dbl>
+#> 1 Intercept     0.003 0.162    -0.324      0.321
+#> 2 neocortex_std 0.123 0.231    -0.325      0.584
+```
+
+```r
+mixedup::extract_fixef(brms_c5_model_milk_weight_sim)
+```
+
+```
+#> # A tibble: 2 x 5
+#>   term       value    se lower_2.5 upper_97.5
+#>   <chr>      <dbl> <dbl>     <dbl>      <dbl>
+#> 1 Intercept  0.005 0.152    -0.293      0.307
+#> 2 mass_std  -0.283 0.221    -0.708      0.158
+```
+
+```r
+mixedup::extract_fixef(brms_c5_model_milk_multi_sim)
+```
+
+```
+#> # A tibble: 3 x 5
+#>   term           value    se lower_2.5 upper_97.5
+#>   <chr>          <dbl> <dbl>     <dbl>      <dbl>
+#> 1 Intercept     -0.047 0.081    -0.208      0.112
+#> 2 neocortex_std  0.982 0.096     0.794      1.17 
+#> 3 mass_std      -1.04  0.118    -1.26      -0.808
+```
+
+### Categorical Variables
+
+#### Binary Categories
+
+For an indicator variable, we need this to be a `factor()`:
+
+
+```r
+data_height <- data_height %>% mutate(sex = factor(sex))
+
+brms_c5_model_height <- brm(
+  data = data_height, 
+  family = gaussian,
+  height ~ 0 + sex,
+  prior = c(prior(normal(178, 20), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c5_model_height")
+```
+
+contrasts with {brms}
+
+
+```r
+library(tidybayes)
+
+as_draws_df(brms_c5_model_height) %>% 
+  mutate(diff_fm = b_sex1 - b_sex2) %>% 
+  gather(key, value, -`lp__`) %>% 
+  group_by(key) %>% 
+  mean_qi(value, .width = .89) %>% 
+  filter(!grepl(key, pattern = "^\\.")) %>% 
+  knitr::kable()
+```
+
+
+
+|key     |      value|    .lower|     .upper| .width|.point |.interval |
+|:-------|----------:|---------:|----------:|------:|:------|:---------|
+|b_sex1  | 134.901752| 132.38783| 137.448902|   0.89|mean   |qi        |
+|b_sex2  | 142.593033| 139.91077| 145.293809|   0.89|mean   |qi        |
+|diff_fm |  -7.691281| -11.49839|  -3.924036|   0.89|mean   |qi        |
+|sigma   |  26.767597|  25.51963|  28.079138|   0.89|mean   |qi        |
+
+#### Many Categories
+
+
+```r
+brms_c5_model_milk_clade <- brm(
+  data = data_milk, 
+  family = gaussian,
+  kcal_std ~ 0 + clade,
+  prior = c(prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c5_model_milk_clade")
+```
+
+
+```r
+library(bayesplot)
+(mcmc_intervals_data(brms_c5_model_milk_clade, prob = .5) %>% 
+  filter(grepl(parameter, pattern = "^b")) %>% 
+  ggplot(aes(y = parameter)) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  geom_linerange(aes(xmin = ll, xmax = hh), lwd = .2, color = clr2) +
+  geom_pointrange(aes(xmin = l, x = m, xmax = h),
+                  lwd = .7, shape = 21, color = clr2, fill = clr_lighten(clr2,.2))) +
+  theme(axis.title = element_blank())
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-98-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+as_draws_df(brms_c5_model_milk_clade) %>% 
+  select(starts_with("b")) %>% 
+  as_tibble() %>% 
+  set_names(x = . , nm = names(.) %>% str_remove("b_clade")) %>% 
+  pivot_longer(everything()) %>% 
+  ggplot(aes(x = value, y = reorder(name, value))) +  # note how we used `reorder()` to arrange the coefficients
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  stat_pointinterval(point_interval = mode_hdi, .width = .89, 
+                     size = 2, shape = 21, color = clr2, fill = clr_lighten(clr2,.2)) +
+  labs(title = "My tidybayes-based coefficient plot",
+       x = "expected kcal (std)", 
+       y = NULL)
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-99-1.svg" width="672" style="display: block; margin: auto;" />
+
+naïve {brms}  model fit:
+
+
+```r
+brms_c5_model_milk_house <- brm(
+  data = data_milk_clade, 
+      family = gaussian,
+      kcal_std ~ 0 + clade + house,
+      prior = c(prior(normal(0, 0.5), class = b),
+                prior(exponential(1), class = sigma)),
+      iter = 2000, warmup = 1000,
+      chains = 4, cores = 4,
+      seed = 42,
+      file = "brms/brms_c5_model_milk_house")
+```
+
+$\rightarrow$ there are only three *house* levels 🤨.
+
+
+```r
+mixedup::extract_fixef(brms_c5_model_milk_house)
+```
+
+```
+#> # A tibble: 7 x 5
+#>   term                 value    se lower_2.5 upper_97.5
+#>   <chr>                <dbl> <dbl>     <dbl>      <dbl>
+#> 1 cladeApe            -0.431 0.261    -0.932      0.082
+#> 2 cladeNewWorldMonkey  0.326 0.253    -0.173      0.824
+#> 3 cladeOldWorldMonkey  0.497 0.286    -0.075      1.04 
+#> 4 cladeStrepsirrhine  -0.504 0.294    -1.04       0.088
+#> 5 houseHufflepuff     -0.175 0.285    -0.742      0.378
+#> 6 houseRavenclaw      -0.129 0.278    -0.667      0.413
+#> 7 houseSlytherin       0.489 0.293    -0.109      1.04
+```
+
+```r
+precis(model_milk_house, depth = 2) %>% 
+  as.matrix() %>% knitr::kable()
+```
+
+
+
+|               |       mean|        sd|       5.5%|      94.5%|
+|:--------------|----------:|---------:|----------:|----------:|
+|alpha_clade[1] | -0.4205362| 0.2603510| -0.8366273| -0.0044451|
+|alpha_clade[2] |  0.3836736| 0.2596808| -0.0313464|  0.7986937|
+|alpha_clade[3] |  0.5664463| 0.2890333|  0.1045153|  1.0283773|
+|alpha_clade[4] | -0.5055652| 0.2966455| -0.9796621| -0.0314684|
+|alpha_house[1] | -0.1025635| 0.2617090| -0.5208251|  0.3156981|
+|alpha_house[2] | -0.1996998| 0.2754408| -0.6399074|  0.2405079|
+|alpha_house[3] | -0.1603306| 0.2690551| -0.5903326|  0.2696713|
+|alpha_house[4] |  0.4866255| 0.2875133|  0.0271236|  0.9461274|
+|sigma          |  0.6631322| 0.0881257|  0.5222904|  0.8039741|
+
+>  But there is no overall intercept, α, that stands for the expected value when all the predictors are set to 0.
+> When we use the typical formula syntax with brms, we can suppress the overall intercept when for a single index variable with the `<criterion> ~ 0 + <index variable>` syntax. That’s exactly what we did with our b5.9 model. The catch is this approach only works with one index variable within brms. Even though we suppressed the default intercept with our formula, `kcal_std ~ 0 + clade + house`, we ended up loosing the first category of the second variable, house.
+> [...] The solution is the use the [non-linear syntax](https://cran.r-project.org/web/packages/brms/vignettes/brms_nonlinear.html).
+
+
+```r
+brms_c5_model_milk_house_correct_index <- 
+  brm(data = data_milk_clade, 
+      family = gaussian,
+      bf(kcal_std ~ 0 + a + h, 
+         a ~ 0 + clade, 
+         h ~ 0 + house,
+         nl = TRUE),
+      prior = c(prior(normal(0, 0.5), nlpar = a),
+                prior(normal(0, 0.5), nlpar = h),
+                prior(exponential(1), class = sigma)),
+      iter = 2000, warmup = 1000,
+      chains = 4, cores = 4,
+      seed = 42,
+      file = "brms/brms_c5_model_milk_house_correct_index")
+
+mixedup::extract_fixef(brms_c5_model_milk_house_correct_index)
+```
+
+```
+#> # A tibble: 8 x 5
+#>   term                   value    se lower_2.5 upper_97.5
+#>   <chr>                  <dbl> <dbl>     <dbl>      <dbl>
+#> 1 a_cladeApe            -0.395 0.28     -0.936      0.146
+#> 2 a_cladeNewWorldMonkey  0.363 0.28     -0.183      0.902
+#> 3 a_cladeOldWorldMonkey  0.527 0.307    -0.112      1.11 
+#> 4 a_cladeStrepsirrhine  -0.455 0.321    -1.10       0.167
+#> 5 h_houseGryffindor     -0.097 0.284    -0.658      0.445
+#> 6 h_houseHufflepuff     -0.196 0.298    -0.771      0.396
+#> 7 h_houseRavenclaw      -0.159 0.285    -0.715      0.39 
+#> 8 h_houseSlytherin       0.468 0.31     -0.138      1.07
+```
+
+
+```r
+as_draws_df(brms_c5_model_milk_house_correct_index) %>% 
+  pivot_longer(starts_with("b_")) %>% 
+  mutate(name = str_remove(name, "b_") %>% 
+           str_remove(., "clade") %>% 
+           str_remove(., "house") %>% 
+           str_replace(., "World", " World ")) %>% 
+  separate(name, into = c("predictor", "level"), sep = "_") %>% 
+  mutate(predictor = if_else(predictor == "a", "clade", "house")) %>% 
+  ggplot(aes(x = value, y = reorder(level, value))) +  # note how we used `reorder()` to arrange the coefficients
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  stat_pointinterval(point_interval = mode_hdi, .width = .89, 
+                     size = 2, color = clr0d, fill = clr0, shape = 21 ) +
+  labs(x = "expected_kcal_std", 
+       y = NULL)  +
+  facet_wrap(~ predictor, scales = "free_y")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-103-1.svg" width="672" style="display: block; margin: auto;" />
+
+### Alternative ways to model multiple categories
+
+#### Contrast Coding
+
+
+```r
+data_contrast <- data_height %>%
+  mutate(sex_c = if_else(sex == "1", -0.5, 0.5))
+
+brms_c5_model_height_contrast <- brm(
+  data = data_contrast, 
+  family = gaussian,
+  height ~ 1 + sex_c,
+  prior = c(prior(normal(178, 20), class = Intercept),
+            prior(normal(0, 10), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c5_model_height_contrast")
+```
+
+> Our posterior for $\alpha$, above, is designed to capture the `average_of_the_group_means_in_height`, not `mean_height`. In cases where the sample sizes in the two groups were equal, these two would be same. Since we have different numbers of males and females in our data, the two values differ a bit
+
+
+```r
+as_draws_df(brms_c5_model_height_contrast) %>% 
+  mutate(male = b_Intercept - b_sex_c * 0.5,
+         female = b_Intercept + b_sex_c * 0.5,
+         `female - male` = b_sex_c) %>% 
+  pivot_longer(male:`female - male`) %>% 
+  ggplot(aes(x = value, y = 0)) +
+  stat_halfeye(.width = .95, shape = 21,
+               fill = fll0, color = clr0d,
+               normalize = "panels") +
+  scale_y_continuous(NULL, breaks = NULL) +
+  xlab("height") +
+  facet_wrap(~ name, scales = "free")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-105-1.svg" width="672" style="display: block; margin: auto;" />
+
+### Multilevel ANOVA
+
+(This might make sense after reading Chapter 13...)
+
+$$
+\begin{array}{ccccr} 
+K_i & {\sim} & Normal(\mu_i, \sigma) & &\textrm{[likelihood]}\\
+\mu_i & = & \alpha + u_{j[i]} & &\textrm{[linear model]}\\
+\alpha & \sim & Normal(0, 0.5) & &\textrm{[$\alpha$ prior]}\\
+\sigma & \sim & Exponential(1) & &\textrm{[$\sigma$ prior]} \\
+u_{j[i]} & \sim & Normal(0, \sigma_{CLADE}) & \textrm{for}~j = 1..4 &\textrm{[u prior]}\\
+\sigma_{CLADE} & \sim & Exponential(1) & &\textrm{[$\sigma_{CLADE}$ prior]} \\
+\end{array}
+$$
+
+> the four clade-specific deviations from that mean are captured by the four levels of $u_j$, which are themselves modeled as normally distributed with a mean of zero (because they are deviations, after all) and a standard deviation $\sigma_{CLADE}$ 
+
+
+```r
+brms_c5_model_milk_anova <- brm(
+  data = data_milk, 
+  family = gaussian,
+  kcal_std ~ 1 + (1 | clade),
+  prior = c(prior(normal(0, 0.5), class = Intercept),
+            prior(exponential(1), class = sigma),
+            prior(exponential(1), class = sd)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 5,
+  file = "brms/brms_c5_model_milk_anova")
+
+as_draws_df(brms_c5_model_milk_anova) %>% 
+  mutate(Ape = b_Intercept + `r_clade[Ape,Intercept]`,
+         `New World Monkey` = b_Intercept + `r_clade[New.World.Monkey,Intercept]`,
+         `Old World Monkey` = b_Intercept + `r_clade[Old.World.Monkey,Intercept]`,
+         Strepsirrhine = b_Intercept + `r_clade[Strepsirrhine,Intercept]`) %>% 
+  pivot_longer(Ape:Strepsirrhine) %>% 
+  ggplot(aes(x = value, y = reorder(name, value))) +
+   geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+ stat_pointinterval(point_interval = mode_hdi, .width = .89, 
+                     size = 2, color = clr0d, fill = clr0, shape = 21 ) +
+  labs(x = "expected_kcal_std", 
+       y = NULL)
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-106-1.svg" width="672" style="display: block; margin: auto;" />
 
 ---
 
