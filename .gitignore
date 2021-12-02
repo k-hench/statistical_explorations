@@ -1,4 +1,5 @@
 *.rds
 data
+!data/lds_by_state_2019.tsv
 _bookdown_files
 .Rproj.user

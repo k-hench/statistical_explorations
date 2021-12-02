@@ -762,11 +762,16 @@ posterior_simmulation <- sim(model_multiple) %>%
 ggplot(mapping = aes(x = divorce_std)) +
   geom_abline(slope = 1, size = .7, lty = 3, color = rgb(0,0,0,.6)) +
   geom_linerange(data = posterior_prediction,
-                aes(ymin = lower_pi, ymax =  upper_pi), color = clr2)+
-  geom_point(data = posterior_prediction, aes(y = divorce_predicted_mean), 
-             color = clr2, fill = clr_lighten(clr2,.6), shape = 21, size = 1.5)+
+                aes(ymin = lower_pi, ymax =  upper_pi,
+                     color = Loc %in% c("ID", "UT")))+
+  geom_point(data = posterior_prediction,
+             aes(y = divorce_predicted_mean,
+                     color = Loc %in% c("ID", "UT"),
+                 fill = after_scale(clr_lighten(color ,.5))), 
+             shape = 21, size = 1.5)+
   geom_text(data = posterior_prediction %>% filter(Loc %in% c("ID", "ME", "RI", "UT")),
-            aes(x = divorce_std - .15, y = divorce_predicted_mean, label = Loc)) 
+            aes(x = divorce_std - .15, y = divorce_predicted_mean, label = Loc)) +
+  scale_color_manual(values = c(`TRUE` = clr2, `FALSE` = clr0d), guide = "none")
 ```
 
 <img src="rethinking_c5_files/figure-html/unnamed-chunk-22-1.svg" width="672" style="display: block; margin: auto;" />
@@ -1964,18 +1969,645 @@ plot_dag(dag, clr_in = clr3) +
 
 <img src="rethinking_c5_files/figure-html/unnamed-chunk-67-1.svg" width="672" style="display: block; margin: auto;" />
 
-
 **M4**
+
+
+```r
+data_waffle_lds <- data_waffle %>% 
+  left_join(read_tsv("data/lds_by_state_2019.tsv")) %>% 
+  mutate(lds_std = standardize(lds_perc),
+         lds_perc_log10 = log10(lds_perc),
+         lds_log10_std = standardize(lds_perc_log10))
+
+data_waffle_lds %>% 
+  dplyr::select(lds_perc, lds_perc_log10) %>% 
+  pivot_longer(everything()) %>% 
+  ggplot(aes(x = value)) +
+  geom_histogram(bins = 10, color = clr0d, fill = fll0) +
+  facet_wrap(name ~ ., scales = "free")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-68-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+model_lds <- quap(
+  flist = alist(
+    divorce_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_age * median_age_std + beta_marriage * marriage_std + beta_lds * lds_log10_std,
+    alpha ~ dnorm(0, .2),
+    beta_age ~ dnorm(0, .5),
+    beta_marriage ~ dnorm(0, .5),
+    beta_lds ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_waffle_lds
+)
+
+precis(model_lds)
+```
+
+```
+#>                        mean         sd       5.5%       94.5%
+#> alpha         -1.107414e-06 0.09381855 -0.1499413  0.14993905
+#> beta_age      -6.980063e-01 0.15085492 -0.9391016 -0.45691097
+#> beta_marriage  7.808701e-02 0.16279768 -0.1820951  0.33826916
+#> beta_lds      -2.954843e-01 0.14942569 -0.5342954 -0.05667314
+#> sigma          7.511727e-01 0.07463009  0.6318994  0.87044597
+```
+
+
+```r
+precis(model_lds, depth = 2, pars = "beta") %>% 
+  as_tibble_rn() %>%
+  mutate(type = str_remove(param, pattern =  "beta_")) %>% 
+  ggplot(aes(y = type)) +
+  geom_vline(xintercept = 0, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_linerange(aes(xmin = `5.5%`,
+                     xmax =`94.5%`), color = clr0d) +
+  geom_point(aes(x = mean), color = clr0d, fill = clr0,
+             shape = 21, size = 3 ) +
+  theme(axis.title.y = element_blank())
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-70-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+posterior_prediction <- link(model_lds) %>% 
+  as_tibble() %>% 
+    set_names(nm = seq_along(data_waffle$divorce_std)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "row_idx", 
+               values_to = "divorce_predicted") %>%
+  group_by(row_idx) %>% 
+  summarise(divorce_predicted_mean = mean(divorce_predicted),
+            lower_pi = PI(divorce_predicted)[1],
+            upper_pi = PI(divorce_predicted)[2]) %>% 
+  ungroup() %>% 
+  mutate(row_idx = as.numeric(row_idx)) %>% 
+  left_join(data_waffle %>%  mutate(row_idx = row_number()), . ) 
+
+posterior_simmulation <- sim(model_lds) %>% 
+  as_tibble() %>% 
+    set_names(nm = seq_along(data_waffle$divorce_std)) %>% 
+  pivot_longer(cols = everything(),
+               names_to = "row_idx", 
+               values_to = "divorce_predicted") %>%
+  group_by(row_idx) %>% 
+  summarise(lower_pi = PI(divorce_predicted)[1],
+            upper_pi = PI(divorce_predicted)[2]) %>% 
+  ungroup() %>% 
+  mutate(row_idx = as.numeric(row_idx)) %>% 
+  left_join(data_waffle %>%  mutate(row_idx = row_number()), . ) 
+
+ggplot(mapping = aes(x = divorce_std)) +
+  geom_abline(slope = 1, size = .7, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_linerange(data = posterior_prediction,
+                aes(ymin = lower_pi, ymax =  upper_pi,
+                     color = Loc %in% c("ID", "UT")))+
+  geom_point(data = posterior_prediction,
+             aes(y = divorce_predicted_mean,
+                     color = Loc %in% c("ID", "UT"),
+                 fill = after_scale(clr_lighten(color ,.5))), 
+             shape = 21, size = 1.5)+
+  geom_text(data = posterior_prediction %>% filter(Loc %in% c("ID", "ME", "RI", "UT")),
+            aes(x = divorce_std - .15, y = divorce_predicted_mean, label = Loc)) +
+  scale_color_manual(values = c(`TRUE` = clr2, `FALSE` = clr0d), guide = "none")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-71-1.svg" width="672" style="display: block; margin: auto;" />
 
 **M5**
 
+
+```r
+dag1 <- dagify(
+  O ~ W + E + P,
+  W ~ P,
+  E ~ P,
+  exposure = "P",
+  outcome = "O") %>% 
+  tidy_dagitty(.dagitty = .,layout = tibble(x = c(0,.5,1, .5), y = c(1,1, 1,.4))) %>%
+  mutate(stage = if_else(name == "O", "response",
+                         if_else(name %in% c("W", "E", "P"),
+                                 "predictor", "confounds")))
+plot_dag(dag1, clr_in = clr3) + 
+  # plot_dag(dag2, clr_in = clr3) &
+  # scale_y_continuous(limits = c(.35, 1.05)) &
+  coord_equal()
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-72-1.svg" width="672" style="display: block; margin: auto;" />
+
+with 
+
+- $o$ as obesity rate
+- $p$ as gasoline price
+- $e$ as money spend on eating out
+- $w$ as average distance walked
+
+$$
+\begin{array}{cclr}
+o_i & \sim & Normal(\mu_i, \sigma) & \textrm{[likelyhood]}\\
+\mu_i & = & \alpha_{p} + \beta_{p} p_i & \textrm{[linear model (price only)]}\\
+\mu_i & = & \alpha_{w} + \beta_{w} w_i & \textrm{[linear model (walking)]}\\
+\mu_i & = & \alpha_{e} + \beta_{e} e_i & \textrm{[linear model (eating out)]}\\
+\mu_i & = & \alpha_{m} + \beta_{pp} + \beta_{ww} w_i + p_i + \beta_{ee} e_i & \textrm{[linear model]}\\
+\end{array}
+$$
+
 **H1**
+
+
+```r
+dagitty('dag{ M -> A -> D }') %>% 
+  impliedConditionalIndependencies()
+```
+
+```
+#> D _||_ M | A
+```
+
+This reads as *conditional on $A$, $D$ is independent from $M$*.
+
+given the results from `model_multiple`, this seems plausible as the multiple model greatly reduces the effect of `beat_M`:
+
+
+```r
+precis(model_multiple) %>% 
+  round(digits = 2) %>% 
+  as.matrix() %>% 
+  knitr::kable()
+```
+
+
+
+|       |  mean|   sd|  5.5%| 94.5%|
+|:------|-----:|----:|-----:|-----:|
+|alpha  |  0.00| 0.10| -0.16|  0.16|
+|beta_A | -0.61| 0.15| -0.85| -0.37|
+|beta_M | -0.07| 0.15| -0.31|  0.18|
+|sigma  |  0.79| 0.08|  0.66|  0.91|
+
+```r
+plot_coeftab(ct) +
+  scale_color_manual(values = rep(clr0d, 3), guide = "none")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-74-1.svg" width="672" style="display: block; margin: auto;" />
+
+Actually this one is a *markov equivalent* of the dag investigated in the main text (and all members of that set are consistent with the model):
+
+
+```r
+dag_h1 <- dagitty('dag{ M -> A -> D }') 
+
+coordinates(dag_h1) <- list( x = c( M = 0, A = 1, D = .5),
+                               y = c( M = 1, A = 1, D = .3))
+
+dag_h1 %>% 
+  node_equivalent_dags() %>% 
+  mutate(stage = "predictor") %>% 
+  plot_dag() +
+  coord_equal(xlim = c(-.1, 1.1),
+                  ylim = c(.2, 1.1))+
+  facet_wrap(~ dag)
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-75-1.svg" width="672" style="display: block; margin: auto;" />
 
 **H2**
 
+
+```r
+model_counterfactual_marriage <- quap(
+  flist = alist(
+    # A -> D
+    divorce_std ~ dnorm( mu, sigma ) ,
+    mu <- alpha + beta_A * median_age_std,
+    alpha ~ dnorm( 0, 0.2 ),
+    beta_A ~ dnorm( 0, 0.5 ),
+    sigma ~ dexp( 1 ),
+    # M -> A
+    median_age_std ~ dnorm( mu_A, sigma_A ),
+    mu_A <- alpha_A + beta_MA * marriage_std,
+    alpha_A ~ dnorm( 0, 0.2 ),
+    beta_MA ~ dnorm( 0, 0.5 ),
+    sigma_A ~ dexp(1)
+  ),
+  data = data_waffle
+)
+
+precis(model_counterfactual_marriage) %>% 
+  as.matrix() %>% 
+  round(digits = 2) %>% 
+  knitr::kable()
+```
+
+
+
+|        |  mean|   sd|  5.5%| 94.5%|
+|:-------|-----:|----:|-----:|-----:|
+|alpha   |  0.00| 0.10| -0.16|  0.16|
+|beta_A  | -0.57| 0.11| -0.74| -0.39|
+|sigma   |  0.79| 0.08|  0.66|  0.91|
+|alpha_A |  0.00| 0.09| -0.14|  0.14|
+|beta_MA | -0.69| 0.10| -0.85| -0.54|
+|sigma_A |  0.68| 0.07|  0.57|  0.79|
+
+```r
+M_seq <- seq(-2, 2, length.out = 30)
+
+data_sim <- sim(fit = model_counterfactual_marriage,
+                data = tibble(marriage_std = M_seq),
+                vars = c("median_age_std", "divorce_std")) %>% 
+  unpack_sim()
+
+data_sim_pi <- data_sim %>% 
+  group_by(row_idx, parameter) %>% 
+  summarise(mean = mean(value),
+            PI_lower = PI(value)[1],
+            PI_upper = PI(value)[2]) %>% 
+  ungroup() %>% 
+  mutate(row_idx = as.numeric(row_idx),
+         marriage_std = M_seq[row_idx]) %>% 
+  arrange(parameter, marriage_std)
+
+data_sim_pi %>% 
+  ggplot() +
+  geom_smooth(aes(x = marriage_std, y = mean, ymin = PI_lower, ymax = PI_upper,
+                  color = parameter, fill = after_scale(clr_alpha(color))),
+              stat = "identity", size = .4) +
+  scale_color_manual(values = c(clr0d, clr3), guide = "none") +
+  # labs(y = "counterfactual value", title = "Counterfactual effects of age at marriage on") +
+  facet_wrap(parameter ~ .)
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-76-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+M_seq2 <- c(data_waffle$median_age_std, data_waffle$median_age_std/2)
+
+m_rate_california <- which(data_waffle$Location == "Idaho")
+M_seq2 <- c(data_waffle$median_age_std[m_rate_california], data_waffle$median_age_std[m_rate_california]/2)
+
+data_sim2 <- sim(fit = model_counterfactual_marriage,
+                data = tibble(marriage_std = M_seq2),
+                vars = c("median_age_std", "divorce_std")) %>% 
+  data.frame() %>% 
+  pivot_longer(cols = everything()) %>% 
+  separate(name, into = c("param", "rn"), sep = '\\.', convert = TRUE) %>% 
+  mutate(group = c("org", "half")[1 + (rn > (length(M_seq2)/2))]) %>% 
+  filter(param == "divorce_std") %>% 
+  dplyr::select(-rn) %>% 
+  # mutate(value = value * sd(data_waffle$Divorce) + mean(data_waffle$Divorce)) %>% 
+  pivot_wider(names_from = group, values_from = value) %>% 
+  unnest() %>% 
+  mutate(diff = half - org)
+
+data_sim2 %>% 
+  ggplot(aes(x = diff)) +
+  geom_density(fill = fll0, color = clr0d)
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-76-2.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+data_sim2 %>% 
+  ggplot() +
+  geom_density(aes(x = org, color = "orgiginal", fill = after_scale(clr_alpha(color)))) +
+  geom_density(aes(x = half, color = "half", fill = after_scale(clr_alpha(color)))) +
+  scale_color_manual(values = c(original = clr0d, half = clr3)) +
+  labs(x = "divorce_std") +
+  theme(legend.position = "bottom")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-76-3.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+mean(data_sim2$diff)
+```
+
+```
+#> [1] 0.4763069
+```
+
+Halfing a states marriage rate would on average increase the divorce rate by ~ 0 standard deviations.
+
 **H3**
 
+
+```r
+dag1 <- dagify(
+  K ~ M + N,
+  N ~ M,
+  exposure = "M",
+  outcome = "K") %>% 
+  tidy_dagitty(.dagitty = .,layout = tibble(x = c(0,1,.5), y = c(1,1,.4))) %>%
+  mutate(stage = if_else(name == "K", "response",
+                         if_else(name %in% c("M", "N"),
+                                 "predictor", "confounds")))
+plot_dag(dag1, clr_in = clr3) + 
+  coord_equal()
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-77-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+model_counterfactual_milk <- quap(
+  flist = alist(
+    # M -> K <- N
+    kcal_std ~ dnorm( mu, sigma ) ,
+    mu <- alpha + beta_MK * mass_std + beta_NK * neocortex_std,
+    alpha ~ dnorm( 0, 0.2 ),
+    beta_MK ~ dnorm( 0, 0.5 ),
+    beta_NK ~ dnorm( 0, 0.5 ),
+    sigma ~ dexp( 1 ),
+    # M -> N
+    neocortex_std ~ dnorm( mu_N, sigma_N ),
+    mu_N <- alpha_N + beta_MN * mass_std,
+    alpha_N ~ dnorm( 0, 0.2 ),
+    beta_MN ~ dnorm( 0, 0.5 ),
+    sigma_N ~ dexp(1)
+  ),
+  data = data_milk
+)
+
+precis(model_counterfactual_milk) %>% 
+  as.matrix() %>% 
+  round(digits = 2) %>% 
+  knitr::kable()
+```
+
+
+
+|        |  mean|   sd|  5.5%| 94.5%|
+|:-------|-----:|----:|-----:|-----:|
+|alpha   |  0.00| 0.13| -0.20|  0.20|
+|beta_MK | -0.75| 0.23| -1.12| -0.37|
+|beta_NK |  0.64| 0.23|  0.27|  1.01|
+|sigma   |  0.69| 0.12|  0.49|  0.88|
+|alpha_N |  0.00| 0.12| -0.19|  0.19|
+|beta_MN |  0.68| 0.15|  0.44|  0.93|
+|sigma_N |  0.63| 0.11|  0.46|  0.80|
+
+```r
+W_seq <- seq(-2, 2, length.out = 30)
+
+data_sim <- sim(fit = model_counterfactual_milk,
+                data = tibble(mass_std = W_seq),
+                vars = c("neocortex_std", "kcal_std")) %>% 
+  unpack_sim()
+
+data_sim_pi <- data_sim %>% 
+  group_by(row_idx, parameter) %>% 
+  summarise(mean = mean(value),
+            PI_lower = PI(value)[1],
+            PI_upper = PI(value)[2]) %>% 
+  ungroup() %>% 
+  mutate(row_idx = as.numeric(row_idx),
+         mass_std = M_seq[row_idx]) %>% 
+  arrange(parameter, mass_std)
+
+data_sim_pi %>% 
+  ggplot() +
+  geom_smooth(aes(x = mass_std, y = mean, ymin = PI_lower, ymax = PI_upper,
+                  color = parameter, fill = after_scale(clr_alpha(color))),
+              stat = "identity", size = .4) +
+  scale_color_manual(values = c(clr0d, clr3), guide = "none") +
+  # labs(y = "counterfactual value", title = "Counterfactual effects of age at marriage on") +
+  facet_wrap(parameter ~ .)
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-78-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+M_seq2 <- (log(c(15, 30)) - mean(log(milk$mass))) / sd(log(milk$mass))
+
+data_sim2 <- sim(fit = model_counterfactual_milk,
+                data = tibble(mass_std = M_seq2),
+                vars = c("neocortex_std", "kcal_std")) %>% 
+  data.frame() %>% 
+  pivot_longer(cols = everything()) %>% 
+  separate(name, into = c("param", "rn"), sep = '\\.', convert = TRUE) %>% 
+  mutate(group = c("org", "double")[1 + (rn > (length(M_seq2)/2))]) %>% 
+  filter(param == "kcal_std") %>% 
+  dplyr::select(-rn) %>% 
+  # mutate(value = value * sd(data_waffle$Divorce) + mean(data_waffle$Divorce)) %>% 
+  pivot_wider(names_from = group, values_from = value) %>% 
+  unnest() %>% 
+  mutate(diff = double - org)
+
+data_sim2 %>% 
+  ggplot(aes(x = diff)) +
+  geom_density(fill = fll0, color = clr0d)
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-78-2.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+data_sim2 %>% 
+  ggplot() +
+  geom_density(aes(x = org, color = "orgiginal", fill = after_scale(clr_alpha(color)))) +
+  geom_density(aes(x = double, color = "double", fill = after_scale(clr_alpha(color)))) +
+  scale_color_manual(values = c(original = clr0d, double = clr3)) +
+  labs(x = "kcal_std") +
+  theme(legend.position = "bottom")
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-78-3.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+quantile(data_sim2$diff, probs = c(.05, .5, .95))
+```
+
+```
+#>         5%        50%        95% 
+#> -2.0362310 -0.0628029  1.7214482
+```
+
+```r
+mean(data_sim2$diff)
+```
+
+```
+#> [1] -0.09856929
+```
+
+Following the paths of the dag to get the causal effect.
+To then get to the magnitude of the contrast, scale by `max - min`.
+
+
+```r
+prec_out <- precis(model_counterfactual_milk)
+# ((M -> N) * (M -> K) ) + (M -> K) * delta_input
+(prec_out["beta_MN", "mean"] * prec_out["beta_NK", "mean"] + prec_out["beta_MK", "mean"] ) * diff(M_seq2)
+```
+
+```
+#> [1] -0.1264984
+```
+
 **H4**
+
+
+```r
+data_south <- data_waffle %>% 
+  dplyr::select(Location, South, ends_with("_std"))
+```
+
+
+```r
+dag <- dagify(
+  D ~ M + A + S,
+  M ~ A,
+  A ~ S,
+  exposure = "A",
+  outcome = "M") %>% 
+  tidy_dagitty(.dagitty = .,
+               layout = tibble(x = c(0,.5, .5, 1),
+                               y = c(1, .6, 1.4, 1))) %>%
+  mutate(stage = if_else(name == "D", "response",
+                         if_else(name %in% c("A", "M", "S"),
+                                 "predictor", "confounds")))
+
+plot_dag(dag, clr_in = clr3) + 
+  scale_y_continuous(limits = c(.5, 1.5)) +
+  coord_equal()
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-81-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+dagitty('dag{ D <- A -> M;  D <- S -> A; M -> D  }') %>% 
+  impliedConditionalIndependencies()
+```
+
+```
+#> M _||_ S | A
+```
+
+
+```r
+model_south_multi <- quap(
+  flist = alist(
+    marriage_std ~ dnorm(mu, sigma),
+    mu <- alpha  + beta_SD * South + beta_AD * median_age_std,
+    alpha ~ dnorm(0, .2),
+    beta_SD ~ dnorm(0,.5),
+    beta_AD ~ dnorm(0,.5),
+    sigma ~ dexp(1)
+  ),
+  data = data_south
+)
+
+precis(model_south_multi) %>% 
+  as.matrix() %>% 
+  round(digits = 2) %>% 
+  knitr::kable()
+```
+
+
+
+|        |  mean|   sd|  5.5%| 94.5%|
+|:-------|-----:|----:|-----:|-----:|
+|alpha   |  0.04| 0.10| -0.12|  0.19|
+|beta_SD | -0.17| 0.19| -0.48|  0.14|
+|beta_AD | -0.71| 0.10| -0.87| -0.56|
+|sigma   |  0.68| 0.07|  0.57|  0.78|
+
+`M` *could be* independent of `S` (large spread around zero)
+
+
+```r
+precis(model_south_multi)["beta_SD", ] %>% round(digits = 2)
+```
+
+```
+#>          mean   sd  5.5% 94.5%
+#> beta_SD -0.17 0.19 -0.48  0.14
+```
+
+Additional scenario (from [Jake Thompson](https://sr2-solutions.wjakethompson.com/more-linear-models.html))
+
+
+```r
+dag_coords <- tibble(name = c("S", "A", "M", "D"),
+                     x = c(1, 1, 2, 3),
+                     y = c(3, 1, 2, 1)/2)
+
+dagify(D ~ A + M,
+       M ~ A + S,
+       A ~ S,
+       coords = dag_coords) %>%
+  fortify() %>% 
+  mutate(stage = if_else(name == "D", "response",
+                         if_else(name %in% c("A", "M", "S"),
+                                 "predictor", "confounds"))) %>% 
+  plot_dag(clr_in = clr3) + 
+  scale_y_continuous(limits = c(.3, 1.7)) +
+  coord_equal()
+```
+
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-84-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+div_dag <- dagitty("dag{S -> M -> D; S -> A -> D; A -> M}")
+impliedConditionalIndependencies(div_dag)
+```
+
+```
+#> D _||_ S | A, M
+```
+
+
+
+```r
+model_south_multi2 <- quap(
+  flist = alist(
+    divorce_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_S * South + beta_A * median_age_std + beta_M * marriage_std,
+    alpha ~ dnorm(0, .2),
+    beta_S ~ dnorm(0,.5),
+    beta_A ~ dnorm(0,.5),
+    beta_M ~ dnorm(0,.5),
+    sigma ~ dexp(1)
+  ),
+  data = data_south
+)
+
+precis(model_south_multi2) %>% 
+  as.matrix() %>% 
+  round(digits = 2) %>% 
+  knitr::kable()
+```
+
+
+
+|       |  mean|   sd|  5.5%| 94.5%|
+|:------|-----:|----:|-----:|-----:|
+|alpha  | -0.08| 0.11| -0.25|  0.09|
+|beta_S |  0.35| 0.22|  0.01|  0.69|
+|beta_A | -0.56| 0.15| -0.80| -0.32|
+|beta_M | -0.04| 0.15| -0.28|  0.19|
+|sigma  |  0.76| 0.08|  0.64|  0.88|
+
+```r
+precis(model_south_multi2)["beta_S", ] %>% round(digits = 2)
+```
+
+```
+#>        mean   sd 5.5% 94.5%
+#> beta_S 0.35 0.22 0.01  0.69
+```
+
+
 
 ## {brms} section
 
@@ -2013,7 +2645,7 @@ brms_age_prior %>%
        y = "divorce_rate_std")
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-68-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-87-1.svg" width="672" style="display: block; margin: auto;" />
 
 Getting to the posterior predictions with `fitted()`:
 
@@ -2035,7 +2667,7 @@ fitted(object = brms_c5_model_age,
        y = "divorce_rate_std")
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-69-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-88-1.svg" width="672" style="display: block; margin: auto;" />
 
 $\rightarrow$ The posterior for `median_age_std` ($\beta_{age}$) is reliably negative (look at `Estimate` and `95%` quantiles  )...
 
@@ -2131,7 +2763,7 @@ fitted(object = brms_c5_model_marriage,
        y = "divorce_rate_std")
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-73-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-92-1.svg" width="672" style="display: block; margin: auto;" />
 
 ### Multiple regression
 
@@ -2217,7 +2849,7 @@ bind_cols(
   theme(axis.title = element_blank()) 
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-76-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-95-1.svg" width="672" style="display: block; margin: auto;" />
 
 Simulating divorce data
 
@@ -2269,7 +2901,7 @@ bind_cols(
   theme(axis.title = element_blank())
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-77-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-96-1.svg" width="672" style="display: block; margin: auto;" />
 
 ### Multivariate Posteriors
 
@@ -2308,7 +2940,7 @@ fitted(brms_c5_model_residuals_marriage) %>%
        y = "marriage_std")
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-79-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-98-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -2350,7 +2982,7 @@ residual_data %>%
                   size = 3, seed = 5, family = fnt_sel) 
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-80-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-99-1.svg" width="672" style="display: block; margin: auto;" />
 
 Don't use residuals as input data for another model - this ignores a ton of uncertainty:
 
@@ -2366,7 +2998,7 @@ residual_data %>%
                   size = 3, seed = 5, family = fnt_sel) 
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-81-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-100-1.svg" width="672" style="display: block; margin: auto;" />
 
 Posterior prediction plot:
 
@@ -2384,7 +3016,7 @@ fitted(brms_c5_model_multiple) %>%
                   size = 3, seed = 5, family = fnt_sel) 
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-82-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-101-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2501,7 +3133,7 @@ predict(brms_c5_model_counterfactual,
        y = "counterfactual divorce_std")
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-86-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-105-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
 nd <- tibble(marriagestd = seq(from = -2, to = 2, length.out = 30),
@@ -2520,7 +3152,7 @@ predict(brms_c5_model_counterfactual,
        y = "counterfactual divorce_std")
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-86-2.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-105-2.svg" width="672" style="display: block; margin: auto;" />
 
 ### Masked Relationships
 
@@ -2554,7 +3186,7 @@ prior_draws(brms_c5_model_milk_draft) %>%
        subtitle = "Intercept ~ dnorm(0, 1); b ~ dnorm(0, 1)")
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-87-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-106-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2586,7 +3218,7 @@ prior_draws(brms_c5_model_milk_cortex) %>%
        subtitle = "Intercept ~ dnorm(0, 0.2); b ~ dnorm(0, 0.5)")
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-88-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-107-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2608,7 +3240,7 @@ bind_rows(
   theme(axis.title = element_blank())
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-89-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-108-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -2630,7 +3262,7 @@ fitted(brms_c5_model_milk_cortex,
   labs(y = 'kcal_std')
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-90-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-109-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -2665,7 +3297,7 @@ fitted(brms_c5_model_milk_weight,
   labs(y = 'kcal_std')
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-91-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-110-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -2704,7 +3336,7 @@ bind_cols(
   facet_wrap(~ parameter, ncol = 1)
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-92-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-111-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -2728,7 +3360,7 @@ fitted(brms_c5_model_milk_multi,
        y = "kcal_std")
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-93-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-112-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
 nd <- tibble(mass_std = seq(from = -2.5, to = 2.5, length.out = 30),
@@ -2750,7 +3382,7 @@ fitted(brms_c5_model_milk_multi,
        y = "kcal_std")
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-93-2.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-112-2.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -2885,7 +3517,7 @@ library(bayesplot)
   theme(axis.title = element_blank())
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-98-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-117-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2903,7 +3535,7 @@ as_draws_df(brms_c5_model_milk_clade) %>%
        y = NULL)
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-99-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-118-1.svg" width="672" style="display: block; margin: auto;" />
 
 naïve {brms}  model fit:
 
@@ -3017,7 +3649,7 @@ as_draws_df(brms_c5_model_milk_house_correct_index) %>%
   facet_wrap(~ predictor, scales = "free_y")
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-103-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-122-1.svg" width="672" style="display: block; margin: auto;" />
 
 ### Alternative ways to model multiple categories
 
@@ -3059,7 +3691,7 @@ as_draws_df(brms_c5_model_height_contrast) %>%
   facet_wrap(~ name, scales = "free")
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-105-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-124-1.svg" width="672" style="display: block; margin: auto;" />
 
 ### Multilevel ANOVA
 
@@ -3106,7 +3738,7 @@ as_draws_df(brms_c5_model_milk_anova) %>%
        y = NULL)
 ```
 
-<img src="rethinking_c5_files/figure-html/unnamed-chunk-106-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c5_files/figure-html/unnamed-chunk-125-1.svg" width="672" style="display: block; margin: auto;" />
 
 ---
 
