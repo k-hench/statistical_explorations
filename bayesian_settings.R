@@ -53,7 +53,8 @@ plot_dag <- function(dag, clr_in = clr1){
     geom_dag_edges_link(aes(edge_color = stage, edge_linetype = stage)) +
     geom_dag_node(aes(color = stage, fill = after_scale(clr_lighten(color,.7))),
                   shape = 21, size = 12) +
-    geom_dag_text(aes(label = name), color = "black", size = 4)+
+    geom_dag_text(aes(label = name), color = "black", size = 4, parse = TRUE,
+                  family = fnt_sel, fontface = "bold")+
     scale_color_manual(values = c(predictor = "black",
                                   confounds = clr_dag,
                                   response = clr_in),
@@ -96,3 +97,12 @@ plot_coeftab <- function(ct, prob = .95){
   }
 
 as_tibble_rn <- function(x, nm = "param"){ as_tibble(x) %>% mutate(nm = row.names(x)) %>% set_names(nm = c(names(x), nm))}
+
+
+knit_precis <- function(prec){
+  prec %>% 
+    as_tibble_rn() %>% 
+    mutate(across(where(is.double), round, digits = 2)) %>%
+    dplyr::select(param, everything()) %>% 
+    knitr::kable()
+}

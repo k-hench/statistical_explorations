@@ -3034,6 +3034,8 @@ as_draws_df(brms_c5_model_milk_anova) %>%
        y = NULL)
 ```
 
+## pymc3 section
+
 ---
 
 <div id="myModal" class="modal">

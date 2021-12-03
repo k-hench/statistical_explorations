@@ -3740,6 +3740,8 @@ as_draws_df(brms_c5_model_milk_anova) %>%
 
 <img src="rethinking_c5_files/figure-html/unnamed-chunk-125-1.svg" width="672" style="display: block; margin: auto;" />
 
+## pymc3 section
+
 ---
 
 <div id="myModal" class="modal">

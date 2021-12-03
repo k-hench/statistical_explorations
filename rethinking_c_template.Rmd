@@ -68,6 +68,8 @@ by [Richard McElreath](https://xcelab.net/rm/statistical-rethinking/), building 
 
 ## {brms} section
 
+## pymc3 section
+
 ---
 
 <div id="myModal" class="modal">

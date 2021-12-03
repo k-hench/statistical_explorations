@@ -2,7 +2,8 @@ book_filename: "statistical_explorations"
 chapter_name: ""
 repo: https://github.com/k-hench/statistical_explorations
 output_dir: docs
-rmd_files: ["index.Rmd", "rethinking_c1.Rmd", "rethinking_c2.Rmd", "rethinking_c3.Rmd", "rethinking_c4.Rmd", "rethinking_c5.Rmd", "bayesian_stats_the_fun_way.Rmd", "mixed_models.Rmd", "Z_refs.Rmd"]
+rmd_files: ["index.Rmd", "rethinking_c1.Rmd", "rethinking_c2.Rmd", "rethinking_c3.Rmd", "rethinking_c4.Rmd", 
+            "rethinking_c5.Rmd", "rethinking_c6.Rmd", "bayesian_stats_the_fun_way.Rmd", "mixed_models.Rmd", "Z_refs.Rmd"]
 clean: [packages.bib, bookdown.bbl]
 new_session: yes
 delete_merged_file: True

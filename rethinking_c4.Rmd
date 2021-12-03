@@ -2137,7 +2137,7 @@ brms_c4_matrix_column <- brm(data = data_matrix_columns,
 summary(brms_c4_matrix_column)
 ```
 
-
+## pymc3 section
 
   ---
 
