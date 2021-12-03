@@ -761,6 +761,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li class="chapter" data-level="7.3.1" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#the-haunted-dag"><i class="fa fa-check"></i><b>7.3.1</b> The haunted DAG</a></li>
 <li class="chapter" data-level="7.3.2" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#shutting-the-backdoor"><i class="fa fa-check"></i><b>7.3.2</b> Shutting the Backdoor</a></li>
+<li class="chapter" data-level="7.3.3" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#two-roads"><i class="fa fa-check"></i><b>7.3.3</b> Two Roads</a></li>
+<li class="chapter" data-level="7.3.4" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#backdoor-waffles"><i class="fa fa-check"></i><b>7.3.4</b> Backdoor Waffles</a></li>
 </ul></li>
 <li class="chapter" data-level="7.4" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#homework-4"><i class="fa fa-check"></i><b>7.4</b> Homework</a></li>
 <li class="chapter" data-level="7.5" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#brms-section-4"><i class="fa fa-check"></i><b>7.5</b> {brms} section</a></li>
@@ -2040,6 +2042,81 @@ p &amp; = &amp; \alpha + \beta_{T} T_{i} + \beta_{F} F_{i} &amp; \textrm{[linear
 <li><strong>c. Collider</strong>: <span class="math inline">\(X \perp \!\!\! \perp Y\)</span>, but <span class="math inline">\(X \not\!\perp\!\!\!\perp Y | Z\)</span></li>
 <li><strong>d. Descendant</strong>: <span class="math inline">\(X \perp \!\!\! \perp Y\)</span>, but <span class="math inline">\(X \not\!\perp\!\!\!\perp Y | Z\)</span> (to a lesser extent)</li>
 </ul>
+</div>
+<div id="two-roads" class="section level3" number="7.3.3">
+<h3><span class="header-section-number">7.3.3</span> Two Roads</h3>
+<div class="sourceCode" id="cb489"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb489-1"><a href="rethinking-chapter-6.html#cb489-1" aria-hidden="true" tabindex="-1"></a>dag_roads <span class="ot">&lt;-</span> <span class="fu">dagify</span>(</span>
+<span id="cb489-2"><a href="rethinking-chapter-6.html#cb489-2" aria-hidden="true" tabindex="-1"></a>  U <span class="sc">~</span> A,</span>
+<span id="cb489-3"><a href="rethinking-chapter-6.html#cb489-3" aria-hidden="true" tabindex="-1"></a>  X <span class="sc">~</span> U,</span>
+<span id="cb489-4"><a href="rethinking-chapter-6.html#cb489-4" aria-hidden="true" tabindex="-1"></a>  Y <span class="sc">~</span> X <span class="sc">+</span> C,</span>
+<span id="cb489-5"><a href="rethinking-chapter-6.html#cb489-5" aria-hidden="true" tabindex="-1"></a>  C <span class="sc">~</span> A,</span>
+<span id="cb489-6"><a href="rethinking-chapter-6.html#cb489-6" aria-hidden="true" tabindex="-1"></a>  B <span class="sc">~</span> U <span class="sc">+</span> C,</span>
+<span id="cb489-7"><a href="rethinking-chapter-6.html#cb489-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">exposure =</span> <span class="st">&quot;X&quot;</span>,</span>
+<span id="cb489-8"><a href="rethinking-chapter-6.html#cb489-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>,</span>
+<span id="cb489-9"><a href="rethinking-chapter-6.html#cb489-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">coords =</span> <span class="fu">tibble</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;U&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;X&quot;</span>, <span class="st">&quot;Y&quot;</span>),</span>
+<span id="cb489-10"><a href="rethinking-chapter-6.html#cb489-10" aria-hidden="true" tabindex="-1"></a>                  <span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>, .<span class="dv">5</span>, .<span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb489-11"><a href="rethinking-chapter-6.html#cb489-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">y =</span> <span class="fu">c</span>(.<span class="dv">7</span>, <span class="dv">1</span>, .<span class="dv">4</span> , .<span class="dv">7</span>, <span class="dv">0</span>, <span class="dv">0</span>)))</span>
+<span id="cb489-12"><a href="rethinking-chapter-6.html#cb489-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb489-13"><a href="rethinking-chapter-6.html#cb489-13" aria-hidden="true" tabindex="-1"></a>dag_roads <span class="sc">%&gt;%</span></span>
+<span id="cb489-14"><a href="rethinking-chapter-6.html#cb489-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fortify</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb489-15"><a href="rethinking-chapter-6.html#cb489-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">stage =</span> <span class="fu">if_else</span>(name <span class="sc">==</span> <span class="st">&quot;Y&quot;</span>, <span class="st">&quot;response&quot;</span>,</span>
+<span id="cb489-16"><a href="rethinking-chapter-6.html#cb489-16" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">if_else</span>(name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;X&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>),</span>
+<span id="cb489-17"><a href="rethinking-chapter-6.html#cb489-17" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">&quot;predictor&quot;</span>, <span class="st">&quot;confounds&quot;</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb489-18"><a href="rethinking-chapter-6.html#cb489-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_dag</span>(<span class="at">clr_in =</span> clr3) <span class="sc">+</span></span>
+<span id="cb489-19"><a href="rethinking-chapter-6.html#cb489-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_fixed</span>(<span class="at">ratio =</span> .<span class="dv">6</span>) <span class="sc">&amp;</span></span>
+<span id="cb489-20"><a href="rethinking-chapter-6.html#cb489-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, <span class="fl">1.1</span>)) <span class="sc">&amp;</span></span>
+<span id="cb489-21"><a href="rethinking-chapter-6.html#cb489-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, <span class="fl">1.1</span>)) <span class="sc">&amp;</span></span>
+<span id="cb489-22"><a href="rethinking-chapter-6.html#cb489-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> .<span class="dv">5</span>, <span class="at">family =</span> fnt_sel),</span>
+<span id="cb489-23"><a href="rethinking-chapter-6.html#cb489-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.tag =</span> <span class="fu">element_text</span>(<span class="at">family =</span> fnt_sel))</span></code></pre></div>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-28-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb490"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb490-1"><a href="rethinking-chapter-6.html#cb490-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adjustmentSets</span>(dag_roads,<span class="at">exposure =</span> <span class="st">&quot;X&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>)</span></code></pre></div>
+<pre><code>#&gt; { C }
+#&gt; { A }
+#&gt; { U }</code></pre>
+<div class="sourceCode" id="cb492"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb492-1"><a href="rethinking-chapter-6.html#cb492-1" aria-hidden="true" tabindex="-1"></a>dag_roads <span class="ot">&lt;-</span> <span class="fu">dagitty</span>( <span class="st">&quot;dag {</span></span>
+<span id="cb492-2"><a href="rethinking-chapter-6.html#cb492-2" aria-hidden="true" tabindex="-1"></a><span class="st">         U [unobserved]</span></span>
+<span id="cb492-3"><a href="rethinking-chapter-6.html#cb492-3" aria-hidden="true" tabindex="-1"></a><span class="st">         X -&gt; Y</span></span>
+<span id="cb492-4"><a href="rethinking-chapter-6.html#cb492-4" aria-hidden="true" tabindex="-1"></a><span class="st">         X &lt;- U &lt;- A -&gt; C -&gt; Y</span></span>
+<span id="cb492-5"><a href="rethinking-chapter-6.html#cb492-5" aria-hidden="true" tabindex="-1"></a><span class="st">         U -&gt; B &lt;- C</span></span>
+<span id="cb492-6"><a href="rethinking-chapter-6.html#cb492-6" aria-hidden="true" tabindex="-1"></a><span class="st">}&quot;</span> )</span>
+<span id="cb492-7"><a href="rethinking-chapter-6.html#cb492-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb492-8"><a href="rethinking-chapter-6.html#cb492-8" aria-hidden="true" tabindex="-1"></a><span class="fu">adjustmentSets</span>(dag_roads,<span class="at">exposure =</span> <span class="st">&quot;X&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>)</span></code></pre></div>
+<pre><code>#&gt; { C }
+#&gt; { A }</code></pre>
+<div class="sourceCode" id="cb494"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb494-1"><a href="rethinking-chapter-6.html#cb494-1" aria-hidden="true" tabindex="-1"></a>dag_waffles <span class="ot">&lt;-</span> <span class="fu">dagify</span>(</span>
+<span id="cb494-2"><a href="rethinking-chapter-6.html#cb494-2" aria-hidden="true" tabindex="-1"></a>  D <span class="sc">~</span> A <span class="sc">+</span> M <span class="sc">+</span> W,</span>
+<span id="cb494-3"><a href="rethinking-chapter-6.html#cb494-3" aria-hidden="true" tabindex="-1"></a>  A <span class="sc">~</span> S,</span>
+<span id="cb494-4"><a href="rethinking-chapter-6.html#cb494-4" aria-hidden="true" tabindex="-1"></a>  M <span class="sc">~</span> A <span class="sc">+</span> S,</span>
+<span id="cb494-5"><a href="rethinking-chapter-6.html#cb494-5" aria-hidden="true" tabindex="-1"></a>  W <span class="sc">~</span> S,</span>
+<span id="cb494-6"><a href="rethinking-chapter-6.html#cb494-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">exposure =</span> <span class="st">&quot;W&quot;</span>,</span>
+<span id="cb494-7"><a href="rethinking-chapter-6.html#cb494-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">&quot;D&quot;</span>,</span>
+<span id="cb494-8"><a href="rethinking-chapter-6.html#cb494-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">coords =</span> <span class="fu">tibble</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;M&quot;</span>, <span class="st">&quot;W&quot;</span>, <span class="st">&quot;D&quot;</span>),</span>
+<span id="cb494-9"><a href="rethinking-chapter-6.html#cb494-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, .<span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb494-10"><a href="rethinking-chapter-6.html#cb494-10" aria-hidden="true" tabindex="-1"></a>                  <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, .<span class="dv">5</span> , <span class="dv">1</span>, <span class="dv">0</span>)))</span>
+<span id="cb494-11"><a href="rethinking-chapter-6.html#cb494-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb494-12"><a href="rethinking-chapter-6.html#cb494-12" aria-hidden="true" tabindex="-1"></a>dag_waffles <span class="sc">%&gt;%</span></span>
+<span id="cb494-13"><a href="rethinking-chapter-6.html#cb494-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fortify</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb494-14"><a href="rethinking-chapter-6.html#cb494-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">stage =</span> <span class="fu">if_else</span>(name <span class="sc">==</span> <span class="st">&quot;D&quot;</span>, <span class="st">&quot;response&quot;</span>,</span>
+<span id="cb494-15"><a href="rethinking-chapter-6.html#cb494-15" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">if_else</span>(name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;W&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;M&quot;</span>, <span class="st">&quot;S&quot;</span>),</span>
+<span id="cb494-16"><a href="rethinking-chapter-6.html#cb494-16" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">&quot;predictor&quot;</span>, <span class="st">&quot;confounds&quot;</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb494-17"><a href="rethinking-chapter-6.html#cb494-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_dag</span>(<span class="at">clr_in =</span> clr3) <span class="sc">+</span></span>
+<span id="cb494-18"><a href="rethinking-chapter-6.html#cb494-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_fixed</span>(<span class="at">ratio =</span> .<span class="dv">6</span>) <span class="sc">&amp;</span></span>
+<span id="cb494-19"><a href="rethinking-chapter-6.html#cb494-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, <span class="fl">1.1</span>)) <span class="sc">&amp;</span></span>
+<span id="cb494-20"><a href="rethinking-chapter-6.html#cb494-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, <span class="fl">1.1</span>)) <span class="sc">&amp;</span></span>
+<span id="cb494-21"><a href="rethinking-chapter-6.html#cb494-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> .<span class="dv">5</span>, <span class="at">family =</span> fnt_sel),</span>
+<span id="cb494-22"><a href="rethinking-chapter-6.html#cb494-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.tag =</span> <span class="fu">element_text</span>(<span class="at">family =</span> fnt_sel))</span></code></pre></div>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-29-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb495"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb495-1"><a href="rethinking-chapter-6.html#cb495-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adjustmentSets</span>(dag_waffles)</span></code></pre></div>
+<pre><code>#&gt; { A, M }
+#&gt; { S }</code></pre>
+<p>Test the implications of the DAG by investigating the <em>conditional independencies</em> implied by the DAG in the real data (by conditioning on the respective variables):</p>
+<div class="sourceCode" id="cb497"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb497-1"><a href="rethinking-chapter-6.html#cb497-1" aria-hidden="true" tabindex="-1"></a><span class="fu">impliedConditionalIndependencies</span>(dag_waffles)</span></code></pre></div>
+<pre><code>#&gt; A _||_ W | S
+#&gt; D _||_ S | A, M, W
+#&gt; M _||_ W | S</code></pre>
+</div>
+<div id="backdoor-waffles" class="section level3" number="7.3.4">
+<h3><span class="header-section-number">7.3.4</span> Backdoor Waffles</h3>
 </div>
 </div>
 <div id="homework-4" class="section level2" number="7.4">

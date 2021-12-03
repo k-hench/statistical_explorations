@@ -893,6 +893,117 @@ p_dag1 +
 - **c. Collider**: $X \perp \!\!\! \perp Y$, but $X \not\!\perp\!\!\!\perp Y | Z$
 - **d. Descendant**: $X \perp \!\!\! \perp Y$, but $X \not\!\perp\!\!\!\perp Y | Z$ (to a lesser extent)
 
+### Two Roads
+
+
+```r
+dag_roads <- dagify(
+  U ~ A,
+  X ~ U,
+  Y ~ X + C,
+  C ~ A,
+  B ~ U + C,
+  exposure = "X",
+  outcome = "Y",
+  coords = tibble(name = c("U", "A", "B", "C", "X", "Y"),
+                  x = c(0, .5, .5, 1, 0, 1),
+                  y = c(.7, 1, .4 , .7, 0, 0)))
+
+dag_roads %>%
+  fortify() %>% 
+  mutate(stage = if_else(name == "Y", "response",
+                         if_else(name %in% c("X", "A", "B", "C"),
+                                 "predictor", "confounds"))) %>% 
+  plot_dag(clr_in = clr3) +
+  coord_fixed(ratio = .6) &
+  scale_y_continuous(limits = c(-.1, 1.1)) &
+  scale_x_continuous(limits = c(-.1, 1.1)) &
+  theme(plot.title = element_text(hjust = .5, family = fnt_sel),
+        plot.tag = element_text(family = fnt_sel))
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-28-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+adjustmentSets(dag_roads,exposure = "X", outcome = "Y")
+```
+
+```
+#> { C }
+#> { A }
+#> { U }
+```
+
+```r
+dag_roads <- dagitty( "dag {
+         U [unobserved]
+         X -> Y
+         X <- U <- A -> C -> Y
+         U -> B <- C
+}" )
+
+adjustmentSets(dag_roads,exposure = "X", outcome = "Y")
+```
+
+```
+#> { C }
+#> { A }
+```
+
+
+```r
+dag_waffles <- dagify(
+  D ~ A + M + W,
+  A ~ S,
+  M ~ A + S,
+  W ~ S,
+  exposure = "W",
+  outcome = "D",
+  coords = tibble(name = c("S", "A", "M", "W", "D"),
+                  x = c(0, 0, .5, 1, 1),
+                  y = c(1, 0, .5 , 1, 0)))
+
+dag_waffles %>%
+  fortify() %>% 
+  mutate(stage = if_else(name == "D", "response",
+                         if_else(name %in% c("W", "A", "M", "S"),
+                                 "predictor", "confounds"))) %>% 
+  plot_dag(clr_in = clr3) +
+  coord_fixed(ratio = .6) &
+  scale_y_continuous(limits = c(-.1, 1.1)) &
+  scale_x_continuous(limits = c(-.1, 1.1)) &
+  theme(plot.title = element_text(hjust = .5, family = fnt_sel),
+        plot.tag = element_text(family = fnt_sel))
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-29-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+adjustmentSets(dag_waffles)
+```
+
+```
+#> { A, M }
+#> { S }
+```
+
+Test the implications of the DAG by investigating the *conditional independencies* implied by the DAG in the real data (by conditioning on the respective variables):
+
+
+```r
+impliedConditionalIndependencies(dag_waffles)
+```
+
+```
+#> A _||_ W | S
+#> D _||_ S | A, M, W
+#> M _||_ W | S
+```
+
+
+### Backdoor Waffles
+
+
 ## Homework
 
 **E1**
