@@ -951,6 +951,10 @@ adjustmentSets(dag_roads,exposure = "X", outcome = "Y")
 ```
 
 
+### Backdoor Waffles
+
+
+
 ```r
 dag_waffles <- dagify(
   D ~ A + M + W,
@@ -1001,30 +1005,640 @@ impliedConditionalIndependencies(dag_waffles)
 ```
 
 
-### Backdoor Waffles
-
-
 ## Homework
 
 **E1**
 
+- multicollinearity (including two highly correlated predictors, so that a *ridge of explanatory combinations* prevents the precise estimate of both)
+- post-treatment bias (masking an association by assuming all efects are caused by an intermediate descendant)
+- collider bias (introducing an association as a *selection effect*)
+
 **E2**
+
+Fruit mass as a function of fruitfall *and* crown area
+
+fruitfall $\rightarrow$ Fruit mass $\leftarrow$ crown area
 
 **E3**
 
+In all cases, we wonder about the influence of $X$ on $Y$.
+The elemental confounds influence how conditioning on $Z$ (or $D$) effects our inference.
+
+- The Fork ($X \leftarrow Z \rightarrow Y$): $X \perp \!\!\! \perp Y | Z$, but $X \not\!\perp\!\!\!\perp Y$
+- The Pipe ($X \rightarrow Z \rightarrow Y$): $X \perp \!\!\! \perp Y | Z$, but $X \not\!\perp\!\!\!\perp Y$
+- The Collider ($X \rightarrow Z \leftarrow Y$): $X \perp \!\!\! \perp Y$, but $X \not\!\perp\!\!\!\perp Y | Z$
+- The Descendant ($X \rightarrow Z \leftarrow Y; Z \rightarrow D$, $X \rightarrow Z \rightarrow Y; Z \rightarrow D$): conditioning on $D$ has the same (slightly weaker) effect like conditioning on $Z$
+
 **E4**
+
+As bias sample acts like selection for a specific value of a trait (eg. an article *was selected* for publication).
+This is implicitly conditioning on a third variable (also like eg. the 45-60 percentile of parents).
 
 **M1**
 
+
+```r
+dag_roads_v <- dagify(
+  U ~ A,
+  X ~ U,
+  Y ~ X + C + V,
+  C ~ A + V,
+  B ~ U + C,
+  exposure = "X",
+  outcome = "Y",
+  coords = tibble(name = c("U", "A", "B", "C", "X", "Y", "V"),
+                  x = c(0, .5, .5, 1, 0, 1, 1.3),
+                  y = c(.7, 1, .4 , .7, 0, 0, .35)))
+
+dag_roads_v %>%
+  fortify() %>% 
+  mutate(stage = if_else(name == "Y", "response",
+                         if_else(name %in% c("X", "A", "B", "C"),
+                                 "predictor", "confounds"))) %>% 
+  plot_dag(clr_in = clr3) +
+  coord_fixed(ratio = .6) &
+  scale_y_continuous(limits = c(-.1, 1.4)) &
+  scale_x_continuous(limits = c(-.1, 1.4)) &
+  theme(plot.title = element_text(hjust = .5, family = fnt_sel),
+        plot.tag = element_text(family = fnt_sel))
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-31-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+adjustmentSets(dag_roads_v, exposure = "X", outcome = "Y")
+```
+
+```
+#> { C, V }
+#> { A }
+#> { U }
+```
+
+```r
+dag_roads_v <- dagitty( "dag {
+         U [unobserved]
+         V [unobserved]
+         X -> Y
+         X <- U <- A -> C -> Y
+         U -> B <- C
+         Y <- V -> C
+}" )
+
+adjustmentSets(dag_roads_v, exposure = "X", outcome = "Y")
+```
+
+```
+#> { A }
+```
+
+... there are now $x + 1$ paths.
+
+Condition on `A`, since conditioning on `C` would open the collider between `A` and `V` allowing for the flow of information through the backdoor `V`.
+
 **M2**
+
+
+```r
+dagify(
+  Z ~ X,
+  Y ~ Z,
+  exposure = "X",
+  outcome = "Y",
+  coords = tibble(name = c("X", "Y", "Z"),
+                  x = c(0, 1, .5),
+                  y = c(0, 0, 0))) %>%
+  fortify() %>% 
+  mutate(stage = if_else(name == "Y", "response",
+                         if_else(name %in% c("X", "Z"),
+                                 "predictor", "confounds"))) %>% 
+  plot_dag(clr_in = clr3) +
+  coord_fixed(ratio = .6) &
+  scale_y_continuous(limits = c(-.1, .1)) &
+  scale_x_continuous(limits = c(-.1, 1.1)) &
+  theme(plot.title = element_text(hjust = .5, family = fnt_sel),
+        plot.tag = element_text(family = fnt_sel))
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-32-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+n <- 1e4
+data_sim_multicol <- tibble(x = rnorm(n),
+                   z = rnorm(n, mean = x, sd = .05),
+                   y = rnorm(n, mean = z))
+
+data_sim_multicol %>% 
+  ggpairs(
+    lower = list(continuous = wrap(ggally_points, colour = clr0d, size = 1.5, alpha = .7)),
+    diag = list(continuous = wrap("densityDiag", fill = fll0, color = clr0d, adjust = .9)),
+    upper = list(continuous = wrap(ggally_cor, size = 5, color = "black", family = "Josefin sans"))
+  )
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-33-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+model_sim_multicol <- quap(
+  flist = alist(
+    y ~ dnorm(mu, sigma),
+    mu <- alpha + beta_x * x + beta_z * z,
+    alpha ~ dnorm( 0, .2 ),
+    beta_x ~ dnorm( 0, .5),
+    beta_z ~ dnorm( 0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_sim_multicol
+)
+
+precis(model_sim_multicol) %>% 
+  knit_precis()
+```
+
+
+
+|param  |  mean|   sd|  5.5%| 94.5%|
+|:------|-----:|----:|-----:|-----:|
+|alpha  | -0.01| 0.01| -0.03|  0.00|
+|beta_x | -0.10| 0.17| -0.38|  0.17|
+|beta_z |  1.12| 0.17|  0.84|  1.39|
+|sigma  |  1.00| 0.01|  0.98|  1.01|
+
+
+
+```r
+precis(model_sim_multicol, depth = 2) %>% 
+  as_tibble_rn() %>%
+  ggplot(aes(y = param)) +
+  geom_vline(xintercept = 0, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_linerange(aes(xmin = `5.5%`,
+                     xmax =`94.5%`), color = clr0d) +
+  geom_point(aes(x = mean),
+             shape = 21, size = 3 ,
+             color = clr0d, fill = clr0) +
+  scale_y_discrete(limits = c("sigma", "beta_z", "beta_x", "alpha")) +
+  theme(axis.title.y = element_blank())
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-35-1.svg" width="672" style="display: block; margin: auto;" />
+
+Here the effect of $Z$ on $Y$ is not obscured by including $X$.
+The difference is that here we are breaking a pipe by conditioning on $Z$.
 
 **M3**
 
+
+```r
+dag_h1 <- dagify(
+  X ~ Z,
+  Y ~ X + Z + A,
+  Z ~ A,
+  exposure = "X",
+  outcome = "Y",
+  coords = tibble(name = c("X", "Y", "Z", "A"),
+                  x = c(0, 1, .5, 1),
+                  y = c(0, 0, .7, .7)))
+
+dag_h2 <- dagify(
+  Z ~ X,
+  Y ~ X + Z + A,
+  Z ~ A,
+  exposure = "X",
+  outcome = "Y",
+  coords = tibble(name = c("X", "Y", "Z", "A"),
+                  x = c(0, 1, .5, 1),
+                  y = c(0, 0, .7, .7)))
+
+dag_h3 <- dagify(
+  X ~ A,
+  Y ~ X,
+  Z ~ X + Y + A,
+  exposure = "X",
+  outcome = "Y",
+  coords = tibble(name = c("X", "Y", "Z", "A"),
+                  x = c(0, 1, .5, 0),
+                  y = c(0, 0, .7, .7)))
+
+dag_h4 <- dagify(
+  X ~ A,
+  Y ~ X + Z,
+  Z ~ X + A,
+  exposure = "X",
+  outcome = "Y",
+  coords = tibble(name = c("X", "Y", "Z", "A"),
+                  x = c(0, 1, .5, 0),
+                  y = c(0, 0, .7, .7)))
+
+list(dag_h1, dag_h2,
+     dag_h3, dag_h4) %>% 
+  purrr::map(.f = function(dag){ 
+    dag %>%
+  fortify() %>% 
+  mutate(stage = if_else(name == "Y", "response",
+                         if_else(name %in% c("X", "Z", "A"),
+                                 "predictor", "confounds")))}) %>% 
+  purrr::map(plot_dag, clr_in = clr3)  %>% 
+    wrap_plots() +
+  plot_annotation(tag_levels = "a") &
+  coord_fixed(ratio = .6) &
+  scale_y_continuous(limits = c(-.1, .8)) &
+  scale_x_continuous(limits = c(-.1, 1.1)) &
+  theme(plot.title = element_text(hjust = .5, family = fnt_sel),
+        plot.tag = element_text(family = fnt_sel))
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-36-1.svg" width="672" style="display: block; margin: auto;" />
+
+- **a.** condition on $Z$ to close both backdoor paths into $Y$
+- **b.** none (the information flow through $Z$ is causal and thus desired, and $A$ is blocked by the collider in $Z$)
+- **c.** none - there are no open backdoors into $Y$
+- **d.** condition on $A$ to enable the information from desired (causal) information from $Z$ while removing the undesired information from $A$
+
+
+
+```r
+list(dag_h1, dag_h2,
+     dag_h3, dag_h4) %>% 
+  purrr::map(adjustmentSets)
+```
+
+```
+#> [[1]]
+#> { Z }
+#> 
+#> [[2]]
+#>  {}
+#> 
+#> [[3]]
+#>  {}
+#> 
+#> [[4]]
+#> { A }
+```
+
 **H1**
+
+
+```r
+data(WaffleDivorce)
+
+data_waffle <- WaffleDivorce %>%
+  as_tibble() %>% 
+  drop_na(everything()) %>%
+  mutate(across(where(is.double), standardize,
+                .names = "{str_to_lower(.col)}_std"),
+         waffle_std = standardize(WaffleHouses)) %>% 
+  dplyr::select(Location,MedianAgeMarriage, Marriage, Divorce, WaffleHouses, South,
+                medianagemarriage_std, marriage_std, divorce_std, waffle_std)
+
+dag_waffles <- dagify(D ~ A + M + W,
+       M ~ A + S,
+       A ~ S,
+       W ~ S,
+       exposure = "W",
+       outcome = "D",
+       coords = tibble(name = c("S", "A", "M", "D", "W"),
+                     x = c(0, 0, .5, 1, 1),
+                     y = c(1, 0, .5, 0, 1)))
+
+dag_waffles %>%
+  fortify() %>% 
+  mutate(stage = if_else(name == "D", "response",
+                         if_else(name %in% c("A", "M", "S", "W"),
+                                 "predictor", "confounds"))) %>% 
+  plot_dag(clr_in = clr3) + 
+  scale_y_continuous(limits = c(-.1, 1.1)) +
+  coord_fixed(ratio = .6)
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-38-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+adjustmentSets(dag_waffles)
+```
+
+```
+#> { A, M }
+#> { S }
+```
+
+$\rightarrow$ there are four paths from $W$ to $D$ - the only causal one being $W \rightarrow D$.
+To close the other three, we can condition on $S$ which will close two different forks, efectiffley removing all non-causaul backdoor paths.
+
+
+```r
+model_waffle <- quap(
+  flist = alist(
+    divorce_std ~ dnorm(mu, sigma),
+    mu <- alpha[South] + beta_w * waffle_std,
+    alpha[South] ~ dnorm(0, .5),
+    beta_w ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_waffle
+)
+
+precis(model_waffle, depth = 2) %>% 
+  knit_precis()
+```
+
+
+
+|param    | mean|   sd|  5.5%| 94.5%|
+|:--------|----:|----:|-----:|-----:|
+|alpha[1] | 0.00| 0.13| -0.21|  0.21|
+|alpha[2] | 0.00| 0.50| -0.80|  0.80|
+|beta_w   | 0.24| 0.13|  0.03|  0.45|
+|sigma    | 0.95| 0.09|  0.80|  1.10|
+
+```r
+precis(model_waffle, depth = 2) %>% 
+  as_tibble_rn() %>%
+  ggplot(aes(y = param)) +
+  geom_vline(xintercept = 0, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_linerange(aes(xmin = `5.5%`,
+                     xmax =`94.5%`), color = clr0d) +
+  geom_point(aes(x = mean),
+             shape = 21, size = 3 ,
+             color = clr0d, fill = clr0) +
+  scale_y_discrete(limits = c("sigma", "beta_w", "alpha[2]", "alpha[1]")) +
+  theme(axis.title.y = element_blank())
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-39-1.svg" width="672" style="display: block; margin: auto;" />
+
+$\rightarrow$ The total causal influence of $W$ on $D$ should be in the order of 0.24 standard deviations.
 
 **H2**
 
+
+```r
+impliedConditionalIndependencies(dag_waffles)
+```
+
+```
+#> A _||_ W | S
+#> D _||_ S | A, M, W
+#> M _||_ W | S
+```
+
+
+```r
+model_waffel_test1 <- quap(
+  flist = alist(
+    medianagemarriage_std ~ dnorm(mu, sigma),
+    mu <- alpha[South] + beta_w * waffle_std,
+    alpha[South] ~ dnorm(0, .2),
+    beta_w ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_waffle
+)
+precis(model_waffel_test1, depth = 2) %>% 
+  knit_precis()
+```
+
+
+
+|param    |  mean|   sd|  5.5%| 94.5%|
+|:--------|-----:|----:|-----:|-----:|
+|alpha[1] |  0.00| 0.11| -0.18|  0.18|
+|alpha[2] |  0.00| 0.20| -0.32|  0.32|
+|beta_w   | -0.11| 0.13| -0.32|  0.10|
+|sigma    |  0.97| 0.10|  0.82|  1.13|
+
+$\rightarrow$ the influence of $W$ on $A$ is moderate (-0.11), with a wide posterior distribution both on either side of zero (-0.32, 0.1).
+Based on this we can not find a definitive influence from $W$ on $A$,
+
+
+```r
+model_waffel_test2 <- quap(
+  flist = alist(
+    divorce_std ~ dnorm(mu, sigma),
+    mu <- alpha[South] +  beta_a * medianagemarriage_std + beta_m * marriage_std + beta_w * waffle_std,
+    alpha[South] ~ dnorm(0, .2),
+    c(beta_a, beta_m, beta_w) ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_waffle
+)
+
+precis(model_waffel_test2, depth = 2) %>% 
+  knit_precis()
+```
+
+
+
+|param    |  mean|   sd|  5.5%| 94.5%|
+|:--------|-----:|----:|-----:|-----:|
+|alpha[1] |  0.00| 0.10| -0.15|  0.15|
+|alpha[2] |  0.00| 0.20| -0.32|  0.32|
+|beta_a   | -0.58| 0.15| -0.82| -0.35|
+|beta_m   | -0.05| 0.15| -0.29|  0.19|
+|beta_w   |  0.18| 0.11|  0.01|  0.35|
+|sigma    |  0.77| 0.08|  0.64|  0.89|
+
+
+
+```r
+waffel_test2_samples <- extract.samples(model_waffel_test2) %>% 
+  as_tibble() %>% 
+  mutate(contrast = alpha[,1] - alpha[,2])
+
+waffel_test2_samples_quantiles <- tibble(x = quantile(waffel_test2_samples$contrast, prob = c(.055, .5, .945)),
+                                   percentile = c("lower", "median", "upper")) %>% 
+  pivot_wider(names_from = "percentile", values_from = "x")
+
+waffel_test2_samples %>% 
+  ggplot(aes(x = contrast)) +
+  geom_density(color = clr0d, fill = fll0) +
+  geom_pointrange(data = waffel_test2_samples_quantiles, 
+                  aes(xmin = lower, x = median, xmax = upper, y = 0), color = clr0d, fill = clr0, shape = 21)
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-43-1.svg" width="672" style="display: block; margin: auto;" />
+
+$\rightarrow$ the influence of $S$ on $D$ is moderate after conditioning on $A$, $M$ and $W$ (median of the contrast effect: 0.0026)
+
+
+```r
+model_waffel_test3 <- quap(
+  flist = alist(
+    marriage_std ~ dnorm(mu, sigma),
+    mu <- alpha[South] + beta_w * waffle_std,
+    alpha[South] ~ dnorm(0, .2),
+    beta_w ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_waffle
+)
+
+precis(model_waffel_test3, depth = 2) %>% 
+  knit_precis()
+```
+
+
+
+|param    | mean|   sd|  5.5%| 94.5%|
+|:--------|----:|----:|-----:|-----:|
+|alpha[1] | 0.00| 0.11| -0.18|  0.18|
+|alpha[2] | 0.00| 0.20| -0.32|  0.32|
+|beta_w   | 0.03| 0.13| -0.19|  0.24|
+|sigma    | 0.98| 0.10|  0.83|  1.13|
+
+$\rightarrow$ the influence of $W$ on $M$ is moderate (0.03), with a wide posterior distribution both on either side of zero (-0.19, 0.24).
+Based on this we can not find a definitive influence from $W$ on $M$,
+
 **H3**
+
+<img src="img/fox.svg" width="250" style="display: block; margin: auto;" />
+
+
+From Wikipedia:
+
+> Weights range from 2.2–14 kg 
+
+
+```r
+data(foxes)
+
+data_fox <- foxes %>%
+  as_tibble() %>% 
+  drop_na(everything()) %>%
+  mutate(across(-group, standardize,
+                .names = "{str_to_lower(.col)}_std"))
+
+fox_weight_range <- tibble(weight = c(2.2, 14),
+                           weight_std = (weight - mean(data_fox$weight))/ sd(data_fox$weight))
+
+dag_fox <- dagify(
+  W ~ F + G,
+  G ~ F,
+  F ~ A,
+  exposure = "A",
+  outcome = "W",
+  coords = tibble(name = c("W", "F", "G", "A"),
+                  x = c(.5, 0, 1, .5),
+                  y = c(0, .5, .5, 1)))
+
+dag_fox %>%
+  fortify() %>% 
+  mutate(stage = if_else(name == "W", "response",
+                         if_else(name %in% c("A", "F", "G"),
+                                 "predictor", "confounds"))) %>% 
+  plot_dag(clr_in = clr2) + 
+  scale_y_continuous(limits = c(-.1, 1.1)) +
+  coord_fixed(ratio = .6)
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-46-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+adjustmentSets(dag_fox)
+```
+
+```
+#>  {}
+```
+
+
+```r
+model_fox_area <- quap(
+  flist = alist(
+    weight_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_area * area_std,
+    alpha ~ dnorm(0,.2),
+    beta_area ~ dnorm(0, .25),
+    sigma ~ dexp(1)
+  ),
+  data = data_fox
+)
+
+extract.prior(model_fox_area) %>% 
+  as_tibble() %>% 
+  filter(row_number() < 150) %>% 
+  ggplot() +
+  geom_abline(aes(slope = beta_area, intercept = alpha), color = clr_alpha(clr0d)) +
+  geom_hline(data = fox_weight_range, aes(yintercept = weight_std),
+             color = clr_dark, linetype = 3) +
+  scale_x_continuous(limits = c(-3,3)) +
+  scale_y_continuous(limits = c(-3,3)) +
+  labs(x = "area_std", y = "weight_std")
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-47-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+precis(model_fox_area) %>% 
+  knit_precis()
+```
+
+
+
+|param     | mean|   sd|  5.5%| 94.5%|
+|:---------|----:|----:|-----:|-----:|
+|alpha     | 0.00| 0.08| -0.13|  0.13|
+|beta_area | 0.02| 0.09| -0.12|  0.16|
+|sigma     | 0.99| 0.06|  0.89|  1.09|
+
+The slope of area very close to zero with the posterior distribution heavy on either side 🤷`
+
+
+```r
+model_fox_food <- quap(
+  flist = alist(
+    weight_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_food * avgfood_std + beta_group * groupsize_std,
+    alpha ~ dnorm(0,.2),
+    c(beta_food, beta_group) ~ dnorm(0, .25),
+    sigma ~ dexp(1)
+  ),
+  data = data_fox
+)
+
+precis(model_fox_food, depth = 2) %>% 
+  knit_precis()
+```
+
+
+
+|param      |  mean|   sd|  5.5%| 94.5%|
+|:----------|-----:|----:|-----:|-----:|
+|alpha      |  0.00| 0.08| -0.13|  0.13|
+|beta_food  |  0.26| 0.14|  0.03|  0.48|
+|beta_group | -0.35| 0.14| -0.57| -0.12|
+|sigma      |  0.95| 0.06|  0.85|  1.06|
+
+Compare without closing the backdoor:
+
+
+```r
+model_fox_food2 <- quap(
+  flist = alist(
+    weight_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_food * avgfood_std,
+    alpha ~ dnorm(0,.2),
+    beta_food ~ dnorm(0, .25),
+    sigma ~ dexp(1)
+  ),
+  data = data_fox
+)
+
+precis(model_fox_food2, depth = 2) %>% 
+  knit_precis()
+```
+
+
+
+|param     |  mean|   sd|  5.5%| 94.5%|
+|:---------|-----:|----:|-----:|-----:|
+|alpha     |  0.00| 0.08| -0.13|  0.13|
+|beta_food | -0.02| 0.09| -0.16|  0.12|
+|sigma     |  0.99| 0.06|  0.89|  1.09|
 
 **H4**
 

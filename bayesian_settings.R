@@ -60,9 +60,11 @@ plot_dag <- function(dag, clr_in = clr1){
                                   response = clr_in),
                        guide = "none") +
     scale_edge_linetype_manual(values = c(confounds = 3,
-                                          predictor = 1), guide = "none") +
+                                          predictor = 1,
+                                          response = 1), guide = "none") +
     scale_edge_color_manual(values = c(confounds = "gray70",
-                                       predictor = "black"), guide = "none") +
+                                       predictor = "black",
+                                       response = "black"), guide = "none") +
     theme_dag()
 }
 
