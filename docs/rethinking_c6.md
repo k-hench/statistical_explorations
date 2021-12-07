@@ -21,6 +21,7 @@ Simulating section-distortion (*Berkson's paradox*)
 ```r
 n <- 200
 p <- .1
+set.seed(42)
 
 data_sim <- tibble(newsworthy = rnorm(n),
        trustworthy = rnorm(n),
@@ -37,7 +38,8 @@ data_sim %>%
   coord_cartesian(xlim = range(data_sim$newsworthy) * 1.05,
                   ylim = range(data_sim$trustworthy) * 1.05,
                   expand = 0) +
-  coord_equal(ylim = range(data_sim$trustworthy) * 1.05)
+  coord_equal(ylim = range(data_sim$trustworthy) * 1.05) +
+  theme(legend.position = "bottom")
 ```
 
 <img src="rethinking_c6_files/figure-html/unnamed-chunk-1-1.svg" width="672" style="display: block; margin: auto;" />
@@ -1035,9 +1037,9 @@ impliedConditionalIndependencies(dag_waffles)
 
 **E2**
 
-Fruit mass as a function of fruitfall *and* crown area
+Fruit mass as a function of FF *and* crown area
 
-fruitfall $\rightarrow$ Fruit mass $\leftarrow$ crown area
+FF $\rightarrow$ Fruit mass $\leftarrow$ crown area
 
 **E3**
 
@@ -1700,7 +1702,87 @@ precis(model_fox_group, depth = 2) %>%
 
 **H6**
 
+
+```r
+dag <- dagify(
+  OD ~ FD + GS + DD,
+  FD ~ DD + FF,
+  exposure = "FD",
+  outcome = "OD",
+  coords = tibble(name = c("FF", "FD", "DD", "OD", "GS"),
+                  x = c(0, .5, 0, 1, 1.5),
+                  y = c(1, .5, 0, .5, .5)))
+dag %>% 
+  tidy_dagitty() %>%
+  mutate(stage = if_else(name == "OD", "response",
+                         "predictor")) %>% 
+  plot_dag(clr_in = clr3) +
+  coord_fixed(ratio = .6)
+```
+
+<img src="rethinking_c6_files/figure-html/H6-1.svg" width="672" style="display: block; margin: auto;" />
+
+```r
+adjustmentSets(dag)
+```
+
+```
+#> { DD }
+```
+
+```r
+impliedConditionalIndependencies(dag)
+```
+
+```
+#> DD _||_ FF
+#> DD _||_ GS
+#> FD _||_ GS
+#> FF _||_ GS
+#> FF _||_ OD | DD, FD
+```
+
 **H7**
+
+
+
+
+
+```r
+n <- 1e4
+
+data_fruit <- tibble(
+  fruitfall = rnorm(n),
+  dipteryx_density = rnorm(n),
+  fruit_density = rnorm(n, mean = fruitfall + dipteryx_density),
+  group_size = rnorm(n),
+  od_area = rlnorm(n = n, meanlog = fruit_density + dipteryx_density - group_size)) %>% 
+  mutate(across(everything(), standardize, .names = "{.col}_std"))
+
+model_fruit <- quap(
+  flist = alist(
+    od_area_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_fd * fruit_density_std + beta_dd * dipteryx_density_std,
+    alpha ~ dnorm(0, .2),
+    c(beta_fd, beta_dd) ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_fruit
+)
+
+precis(model_fruit) %>% 
+  knit_precis()
+```
+
+
+
+|param   | mean|   sd|  5.5%| 94.5%|
+|:-------|----:|----:|-----:|-----:|
+|alpha   | 0.00| 0.01| -0.02|  0.02|
+|beta_fd | 0.12| 0.01|  0.10|  0.14|
+|beta_dd | 0.05| 0.01|  0.04|  0.07|
+|sigma   | 0.99| 0.01|  0.98|  1.00|
+
 
 ## {brms} section
 
@@ -1741,7 +1823,7 @@ as_draws_df(brms_c6_model_legs_multicollinear) %>%
   theme(axis.title = element_blank())
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-54-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-55-1.svg" width="672" style="display: block; margin: auto;" />
 
 Check various seeds to illustrate the difficulty to fit the legs jointly:
 
@@ -1783,7 +1865,7 @@ simulate_leg_data <- function(seed = 42){
   theme(axis.title = element_blank())
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-55-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-56-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1806,7 +1888,7 @@ p_sum <- as_draws_df(brms_c6_model_legs_multicollinear) %>%
 p_ridge + p_sum
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-56-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-57-1.svg" width="672" style="display: block; margin: auto;" />
 
 Model single leg
 
@@ -1838,7 +1920,7 @@ as_draws_df(brms_c6_model_model_leg) %>%
   theme(axis.title = element_blank())
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-57-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-58-1.svg" width="672" style="display: block; margin: auto;" />
 
 Multicollinear milk model
 
@@ -2238,7 +2320,7 @@ tibble(model = 1:5,
         legend.position = "none")
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-68-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-69-1.svg" width="672" style="display: block; margin: auto;" />
 
 ## pymc3 section
 

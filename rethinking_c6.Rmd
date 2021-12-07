@@ -816,9 +816,9 @@ impliedConditionalIndependencies(dag_waffles)
 
 **E2**
 
-Fruit mass as a function of fruitfall *and* crown area
+Fruit mass as a function of FF *and* crown area
 
-fruitfall $\rightarrow$ Fruit mass $\leftarrow$ crown area
+FF $\rightarrow$ Fruit mass $\leftarrow$ crown area
 
 **E3**
 
@@ -1308,7 +1308,85 @@ precis(model_fox_group, depth = 2) %>%
 
 **H6**
 
+```{r H6}
+dag <- dagify(
+  OD ~ FD + GS + DD,
+  FD ~ DD + FF,
+  exposure = "FD",
+  outcome = "OD",
+  coords = tibble(name = c("FF", "FD", "DD", "OD", "GS"),
+                  x = c(0, .5, 0, 1, 1.5),
+                  y = c(1, .5, 0, .5, .5)))
+dag %>% 
+  tidy_dagitty() %>%
+  mutate(stage = if_else(name == "OD", "response",
+                         "predictor")) %>% 
+  plot_dag(clr_in = clr3) +
+  coord_fixed(ratio = .6)
+
+adjustmentSets(dag)
+impliedConditionalIndependencies(dag)
+```
+
 **H7**
+
+```{r, fig.asp = .3, eval = FALSE, include = FALSE}
+n <- 40
+ggplot() +
+  stat_function(fun = function(x){ dnbinom(x, size = n/2, prob = .7)},
+                xlim = c(0,n), geom = "bar", n = n+1,
+                color = clr3,fill = fll3)
+
+ggplot() +
+  stat_function(fun = function(x){ dbeta(x, shape1 = 5, shape2 = 5)},
+                xlim = c(0,1), geom = "area", n = 301,
+                color = clr3,fill = fll3)
+
+testdat <- tibble(x = rnbinom(n = 1e4, size = 16, mu = 9))
+testdat %>% 
+  ggplot(aes(x) ) +
+  geom_histogram(bins = max(testdat$x) +1 ,
+                 color = clr3,
+                 fill = fll3) +
+  scale_x_continuous(limits = c(0, max(testdat$x)))
+
+n <- 1e4
+data_fruit <- tibble(
+  fruitfall = rnbinom(n = 1e4, size = 14, mu = 30),
+  dipteryx_density = rbeta(n, shape1 = 5, shape2 = 5),
+  fruit_density = fruitfall * dipteryx_density * rbeta(n, shape1 = 5, shape2 = 1.5),
+  group_size = rnbinom(n = n, size = 16, mu = 9),
+  od_area = rlnorm(n = n, meanlog = dipteryx_density + fruit_density + group_size)) %>%
+  mutate(across(everything(), standardize, .names = "{.col}_std"))
+```
+
+
+```{r H7}
+n <- 1e4
+
+data_fruit <- tibble(
+  fruitfall = rnorm(n),
+  dipteryx_density = rnorm(n),
+  fruit_density = rnorm(n, mean = fruitfall + dipteryx_density),
+  group_size = rnorm(n),
+  od_area = rlnorm(n = n, meanlog = fruit_density + dipteryx_density - group_size)) %>% 
+  mutate(across(everything(), standardize, .names = "{.col}_std"))
+
+model_fruit <- quap(
+  flist = alist(
+    od_area_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_fd * fruit_density_std + beta_dd * dipteryx_density_std,
+    alpha ~ dnorm(0, .2),
+    c(beta_fd, beta_dd) ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_fruit
+)
+
+precis(model_fruit) %>% 
+  knit_precis()
+```
+
 
 ## {brms} section
 

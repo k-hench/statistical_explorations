@@ -1,0 +1,138 @@
+---
+output:
+  html_document:
+  theme: yeti
+pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+# Rethinking: Chapter 7
+
+**Ullysses' Compass**
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      comment = "#>", 
+                      dev = "svg",         # for html rendering
+                      # dev = "cairo_pdf", # for pdf rendering
+                      fig.asp = .5, 
+                      fig.align = "center",
+                      message = FALSE,
+                      warning = FALSE)
+
+source("bayesian_settings.R")
+source("knitr_matrix.R")
+```
+
+by [Richard McElreath](https://xcelab.net/rm/statistical-rethinking/), building on the Summaries by [Solomon Kurz](https://bookdown.org/content/4857/) and [Jake Thompson](https://sr2-solutions.wjakethompson.com/linear-models.html).
+
+```{r, echo = FALSE, out.width = 250, fig.cap = "<i>Between Scylla and Charybdis</i> by <a href='https://commons.wikimedia.org/wiki/File:Adolf_Hiremy-Hirschl_-_Zwischen_Skylla_und_Charybdis.jpg'>Adolf Hirémy-Hirschl</a> (1910). "}
+knitr::include_graphics("img/Skylla_and_Charybdis.svg")
+```
+
+## Homework
+
+**E1**
+
+```{r E1}
+
+```
+
+**E2**
+
+```{r E2}
+
+```
+
+**E3**
+
+```{r E3}
+
+```
+
+**E4**
+
+```{r E4}
+
+```
+
+**M1**
+
+```{r M1}
+
+```
+
+**M2**
+
+```{r M2}
+
+```
+
+**M3**
+
+```{r M3}
+
+```
+
+**M4**
+
+```{r M4}
+
+```
+
+**M5**
+
+```{r M5}
+
+```
+
+**M6**
+
+```{r M6}
+
+```
+
+**H1**
+
+```{r H1}
+
+```
+
+**H2**
+
+```{r H2}
+
+```
+
+**H3**
+
+```{r H3}
+
+```
+
+**H4**
+
+```{r H4}
+
+```
+
+**H5**
+
+```{r H5}
+
+```
+
+## {brms} section
+
+## pymc3 section
+
+---
+
+<div id="myModal" class="modal">
+  <span class="close">&times;</span>
+  <img class="modal-content" id="img01">
+  <div id="caption"></div>
+</div>
+
+<script src="./js/zoom.js"></script>
