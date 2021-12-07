@@ -317,13 +317,6 @@ precis(data_fungus) %>%
 |fungus    |  0.23| 0.42|  0.00|  1.00|▇▁▁▁▁▁▁▁▁▂   |
 |h_1       | 14.40| 2.69| 10.62| 17.93|▁▁▃▇▇▇▁▁     |
 
-$$
-\begin{array}{rclr}
-h_{1,i} & \sim & Normal( \mu_i, \sigma) & \textrm{[likelihood]}\\
-\mu_i & = & h_{0,i} \times p & \textrm{[linear model]}\\
-\end{array}
-$$
-
 selecting a prior
 
 
@@ -337,6 +330,15 @@ precis(tibble(sim_p = rlnorm(1e4, 0, .25))) %>%
 |param | mean|   sd| 5.5%| 94.5%|histogram    |
 |:-----|----:|----:|----:|-----:|:------------|
 |sim_p | 1.04| 0.26| 0.67|   1.5|▁▁▃▇▇▃▁▁▁▁▁▁ |
+
+$$
+\begin{array}{rclr}
+h_{1,i} & \sim & Normal( \mu_i, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & h_{0,i} \times p & \textrm{[linear model]}\\
+p & \sim & Log-Normal(0, 0.25) & \textrm{[$p$ prior]}\\
+\sigma & \sim & Exponential(1)  & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
 
 $\rightarrow$ the main mass of the prior is between 40% shrinkage and 50% growth.
 
@@ -364,7 +366,6 @@ precis(model_fungus_no_treatment) %>%
 |:-----|----:|----:|----:|-----:|
 |p     | 1.43| 0.02| 1.40|  1.45|
 |sigma | 1.79| 0.13| 1.59|  1.99|
-
 
 Model *with treatment* and *fungus* (post-treatment variable)
 
@@ -409,6 +410,17 @@ precis(model_fungus_post_treatment) %>%
 |sigma          |  1.41| 0.10|  1.25|  1.57|
 
 Model *with treatment* but without *fungus*
+
+$$
+\begin{array}{rclr}
+h_{1,i} & \sim & Normal( \mu_i, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & h_{0,i} \times p & \textrm{[linear model]}\\
+p & = & \alpha + \beta_{T} T_{i} & \textrm{[linear model]}\\
+\alpha & \sim & Log-Normal(0, 0.25) & \textrm{[$\alpha$ prior]}\\
+\beta_{T} & \sim & Normal(0, 0.5) & \textrm{[$\beta_{T}$ prior]}\\
+\sigma & \sim & Exponential(1) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
 
 
 ```r
@@ -613,7 +625,7 @@ sim_tidy <- function(seed = 1977, n_years = 1000, max_age = 65, n_births = 20, a
            max_age = max_age, n_births = n_births, aom = aom)
 }
 
-data_married <- sim_tidy(seed = 1977, n_years = 65, n_births = 21)
+data_married <- sim_tidy(seed = 2021, n_years = 65, n_births = 21)
 
 data_married %>% 
   mutate(married = factor(married,
@@ -629,6 +641,14 @@ data_married %>%
 ```
 
 <img src="rethinking_c6_files/figure-html/unnamed-chunk-22-1.svg" width="672" style="display: block; margin: auto;" />
+
+$$
+\begin{array}{rclr}
+happyness_{i} & \sim & Normal( \mu_i, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & \alpha_{married[i]} + \beta_{age} age_{i} & \textrm{[linear model]}\\
+\end{array}
+$$
+
 
 ```r
 data_married_adults <- data_married %>% 
@@ -655,10 +675,10 @@ precis(model_happy_married, depth = 2) %>%
 
 |param    |  mean|   sd|  5.5%| 94.5%|
 |:--------|-----:|----:|-----:|-----:|
-|alpha[1] | -0.24| 0.06| -0.34| -0.14|
-|alpha[2] |  1.20| 0.08|  1.07|  1.33|
-|beta_age | -0.70| 0.11| -0.88| -0.53|
-|sigma    |  1.00| 0.02|  0.96|  1.04|
+|alpha[1] | -0.21| 0.06| -0.31| -0.11|
+|alpha[2] |  1.33| 0.08|  1.20|  1.47|
+|beta_age | -0.81| 0.11| -0.99| -0.64|
+|sigma    |  0.97| 0.02|  0.94|  1.01|
 
 ```r
 model_happy <- quap(
@@ -721,7 +741,7 @@ p_dag2 <- dagify(C ~ P + G + U,
 p_dag1 + p_dag2 + plot_annotation(tag_levels = "a") & theme(plot.tag = element_text(family = fnt_sel))
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-23-1.svg" width="864" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-24-1.svg" width="864" style="display: block; margin: auto;" />
 
 
 ```r
@@ -786,7 +806,7 @@ data_education_plot %>%
   coord_equal()
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-25-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-26-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -886,7 +906,7 @@ p_dag1 +
         plot.tag = element_text(family = fnt_sel))
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-27-1.svg" width="1152" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-28-1.svg" width="1152" style="display: block; margin: auto;" />
 
 - **a. Fork**: $X \perp \!\!\! \perp Y | Z$
 - **b. Pipe**: $X \perp \!\!\! \perp Y | Z$
@@ -922,7 +942,7 @@ dag_roads %>%
         plot.tag = element_text(family = fnt_sel))
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-28-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-29-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
 adjustmentSets(dag_roads,exposure = "X", outcome = "Y")
@@ -980,7 +1000,7 @@ dag_waffles %>%
         plot.tag = element_text(family = fnt_sel))
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-29-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-30-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
 adjustmentSets(dag_waffles)
@@ -1063,7 +1083,7 @@ dag_roads_v %>%
         plot.tag = element_text(family = fnt_sel))
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-31-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-32-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
 adjustmentSets(dag_roads_v, exposure = "X", outcome = "Y")
@@ -1120,7 +1140,7 @@ dagify(
         plot.tag = element_text(family = fnt_sel))
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-32-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-33-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -1138,7 +1158,7 @@ data_sim_multicol %>%
   )
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-33-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-34-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -1184,7 +1204,7 @@ precis(model_sim_multicol, depth = 2) %>%
   theme(axis.title.y = element_blank())
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-35-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-36-1.svg" width="672" style="display: block; margin: auto;" />
 
 Here the effect of $Z$ on $Y$ is not obscured by including $X$.
 The difference is that here we are breaking a pipe by conditioning on $Z$.
@@ -1251,7 +1271,7 @@ list(dag_h1, dag_h2,
         plot.tag = element_text(family = fnt_sel))
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-36-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-37-1.svg" width="672" style="display: block; margin: auto;" />
 
 - **a.** condition on $Z$ to close both backdoor paths into $Y$
 - **b.** none (the information flow through $Z$ is causal and thus desired, and $A$ is blocked by the collider in $Z$)
@@ -1315,7 +1335,7 @@ dag_waffles %>%
   coord_fixed(ratio = .6)
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-38-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-39-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
 adjustmentSets(dag_waffles)
@@ -1369,7 +1389,7 @@ precis(model_waffle, depth = 2) %>%
   theme(axis.title.y = element_blank())
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-39-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-40-1.svg" width="672" style="display: block; margin: auto;" />
 
 $\rightarrow$ The total causal influence of $W$ on $D$ should be in the order of 0.24 standard deviations.
 
@@ -1460,7 +1480,7 @@ waffel_test2_samples %>%
                   aes(xmin = lower, x = median, xmax = upper, y = 0), color = clr0d, fill = clr0, shape = 21)
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-43-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-44-1.svg" width="672" style="display: block; margin: auto;" />
 
 $\rightarrow$ the influence of $S$ on $D$ is moderate after conditioning on $A$, $M$ and $W$ (median of the contrast effect: 0.0026)
 
@@ -1535,7 +1555,7 @@ dag_fox %>%
   coord_fixed(ratio = .6)
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-46-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-47-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
 adjustmentSets(dag_fox)
@@ -1570,7 +1590,7 @@ extract.prior(model_fox_area) %>%
   labs(x = "area_std", y = "weight_std")
 ```
 
-<img src="rethinking_c6_files/figure-html/unnamed-chunk-47-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-48-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
 precis(model_fox_area) %>% 
@@ -1585,16 +1605,26 @@ precis(model_fox_area) %>%
 |beta_area | 0.02| 0.09| -0.12|  0.16|
 |sigma     | 0.99| 0.06|  0.89|  1.09|
 
-The slope of area very close to zero with the posterior distribution heavy on either side 🤷`
+The slope of area very close to zero with the posterior distribution heavy on either side 🤷
 
+**H4**
+
+
+```r
+adjustmentSets(dag_fox, exposure = "F", outcome = "W")
+```
+
+```
+#>  {}
+```
 
 ```r
 model_fox_food <- quap(
   flist = alist(
     weight_std ~ dnorm(mu, sigma),
-    mu <- alpha + beta_food * avgfood_std + beta_group * groupsize_std,
+    mu <- alpha + beta_food * avgfood_std,
     alpha ~ dnorm(0,.2),
-    c(beta_food, beta_group) ~ dnorm(0, .25),
+    beta_food ~ dnorm(0, .25),
     sigma ~ dexp(1)
   ),
   data = data_fox
@@ -1606,49 +1636,609 @@ precis(model_fox_food, depth = 2) %>%
 
 
 
-|param      |  mean|   sd|  5.5%| 94.5%|
-|:----------|-----:|----:|-----:|-----:|
-|alpha      |  0.00| 0.08| -0.13|  0.13|
-|beta_food  |  0.26| 0.14|  0.03|  0.48|
-|beta_group | -0.35| 0.14| -0.57| -0.12|
-|sigma      |  0.95| 0.06|  0.85|  1.06|
-
-Compare without closing the backdoor:
-
-
-```r
-model_fox_food2 <- quap(
-  flist = alist(
-    weight_std ~ dnorm(mu, sigma),
-    mu <- alpha + beta_food * avgfood_std,
-    alpha ~ dnorm(0,.2),
-    beta_food ~ dnorm(0, .25),
-    sigma ~ dexp(1)
-  ),
-  data = data_fox
-)
-
-precis(model_fox_food2, depth = 2) %>% 
-  knit_precis()
-```
-
-
-
 |param     |  mean|   sd|  5.5%| 94.5%|
 |:---------|-----:|----:|-----:|-----:|
 |alpha     |  0.00| 0.08| -0.13|  0.13|
 |beta_food | -0.02| 0.09| -0.16|  0.12|
 |sigma     |  0.99| 0.06|  0.89|  1.09|
 
-**H4**
-
 **H5**
+
+
+```r
+adjustmentSets(dag_fox, exposure = "G", outcome = "W")
+```
+
+```
+#> { F }
+```
+
+... we need to condition on $F$.
+
+
+```r
+model_fox_group <- quap(
+  flist = alist(
+    weight_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_food * avgfood_std + beta_group * groupsize_std,
+    alpha ~ dnorm(0,.2),
+    c(beta_food, beta_group) ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_fox
+)
+
+precis(model_fox_group, depth = 2) %>% 
+  knit_precis()
+```
+
+
+
+|param      |  mean|   sd|  5.5%| 94.5%|
+|:----------|-----:|----:|-----:|-----:|
+|alpha      |  0.00| 0.08| -0.13|  0.13|
+|beta_food  |  0.48| 0.18|  0.19|  0.76|
+|beta_group | -0.57| 0.18| -0.86| -0.29|
+|sigma      |  0.94| 0.06|  0.84|  1.04|
+
+
+```r
+precis(model_fox_group, depth = 2) %>% 
+  as_tibble_rn() %>%
+  ggplot(aes(y = param)) +
+  geom_vline(xintercept = 0, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_linerange(aes(xmin = `5.5%`,
+                     xmax =`94.5%`), color = clr0d) +
+  geom_point(aes(x = mean),
+             shape = 21, size = 3 ,
+             color = clr0d, fill = clr0) +
+  scale_y_discrete(limits = c("sigma", "beta_group", "beta_food", "alpha")) +
+  theme(axis.title.y = element_blank())
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-52-1.svg" width="672" style="display: block; margin: auto;" />
 
 **H6**
 
 **H7**
 
 ## {brms} section
+
+### Multicolliniarity
+
+Legs Model
+
+
+```r
+brms_c6_model_legs_multicollinear <- brm(
+  data = data_legs, 
+  family = gaussian,
+  height ~ 1 + left_leg + right_leg,
+  prior = c(prior(normal(10, 100), class = Intercept),
+            prior(normal(2, 10), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  sample_prior = TRUE,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_legs_multicollinear")
+```
+
+
+```r
+library(tidybayes)
+library(ggdist)
+as_draws_df(brms_c6_model_legs_multicollinear) %>% 
+  dplyr::select(starts_with("b"), sigma) %>% 
+  as_tibble() %>% 
+  set_names(x = . , nm = names(.) %>% str_remove("b_")) %>% 
+  pivot_longer(everything()) %>% 
+  ggplot(aes(x = value, y = reorder(name, value))) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  stat_pointinterval(color = clr0dd, fill = clr0, shape = 21) +
+  scale_y_discrete(limits = c("sigma", "left_leg", "Intercept")) +
+  theme_minimal(base_family = fnt_sel) +
+  theme(axis.title = element_blank())
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-54-1.svg" width="672" style="display: block; margin: auto;" />
+
+Check various seeds to illustrate the difficulty to fit the legs jointly:
+
+
+```r
+simulate_leg_data <- function(seed = 42){
+  n <- 100
+  set.seed(seed)
+  data_legs <- tibble(
+    height = rnorm(n = n, mean = 10, sd = 2),
+    leg_proportion = runif(n, min = 0.4, max = 0.5),
+    left_leg = leg_proportion * height + rnorm(n, 0, .02),
+    right_leg = leg_proportion * height + rnorm(n, 0, .02),
+  )
+  
+  tibble(seed = seed,
+         fit = list(update(brms_c6_model_legs_multicollinear,
+                           newdata = data_legs,
+                           seed = 42, refresh = 0))) 
+}
+
+1:4 %>% 
+  map_dfr(simulate_leg_data) %>%
+  mutate(posterior = purrr::map(fit, as_draws_df )) %>%
+  unnest(cols = posterior) %>% 
+  dplyr::select(seed, starts_with("b"), sigma) %>% 
+  set_names(x = . , nm = names(.) %>% str_remove("b_")) %>% 
+  pivot_longer(-seed) %>% 
+  ggplot(aes(x = value, y = reorder(name, value))) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  stat_halfeye(aes(fill_ramp = stat(cut_cdf_qi(cdf, .width = c(0.66, 0.95,1)))),
+               fill = fll0dd, adjust = .7, normalize = "groups", height = .8) +
+  scale_fill_ramp_discrete(range = c(.85, 0.15), guide = "none") +
+  scale_y_discrete(limits = c("sigma", "left_leg", "right_leg", "Intercept")) +
+  coord_cartesian(ylim = c(0.9, 5),
+                  expand = 0) +
+  facet_wrap(seed ~ ., ncol = 1, labeller = label_both) +
+  theme_minimal(base_family = fnt_sel) +
+  theme(axis.title = element_blank())
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-55-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+p_ridge <- as_draws_df(brms_c6_model_legs_multicollinear) %>% 
+  as_tibble() %>% 
+  dplyr::select(starts_with("b"), sigma) %>% 
+  set_names(x = . , nm = names(.) %>% str_remove("b_")) %>% 
+  ggplot(aes(x = left_leg, y = right_leg)) +
+  geom_point(color = clr0d, fill = fll0, shape = 21, size = .6)
+
+p_sum <- as_draws_df(brms_c6_model_legs_multicollinear) %>% 
+  as_tibble() %>% 
+  dplyr::select(starts_with("b"), sigma) %>% 
+  set_names(x = . , nm = names(.) %>% str_remove("b_")) %>% 
+  ggplot(aes(x = left_leg + right_leg)) +
+   stat_halfeye(aes(fill_ramp = stat(cut_cdf_qi(cdf, .width = c(0.66, 0.95,1)))),
+               fill = fll0dd, adjust = .7, normalize = "groups", height = .8) +
+  scale_fill_ramp_discrete(range = c(.85, 0.15), guide = "none") 
+  
+p_ridge + p_sum
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-56-1.svg" width="672" style="display: block; margin: auto;" />
+
+Model single leg
+
+
+```r
+brms_c6_model_model_leg <- brm(
+  data = data_legs, 
+  family = gaussian,
+  height ~ 1 + left_leg,
+  prior = c(prior(normal(10, 100), class = Intercept),
+            prior(normal(2, 10), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  sample_prior = TRUE,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_leg")
+
+as_draws_df(brms_c6_model_model_leg) %>% 
+  dplyr::select(starts_with("b"), sigma) %>% 
+  as_tibble() %>% 
+  set_names(x = . , nm = names(.) %>% str_remove("b_")) %>% 
+  pivot_longer(everything()) %>% 
+  ggplot(aes(x = value, y = reorder(name, value))) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  stat_pointinterval(color = clr0dd, fill = clr0, shape = 21) +
+  scale_y_discrete(limits = c("sigma", "left_leg", "Intercept")) +
+  theme_minimal(base_family = fnt_sel) +
+  theme(axis.title = element_blank())
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-57-1.svg" width="672" style="display: block; margin: auto;" />
+
+Multicollinear milk model
+
+
+```r
+brms_c6_model_milk_multicollinear_1 <- brm(
+  data = data_milk,
+  family = gaussian,
+  kcal_std ~ 1 + lactose_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+                prior(normal(0, 0.5), class = b),
+                prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_milk_multicollinear1"
+)
+
+brms_c6_model_milk_multicollinear_2 <- update(
+  brms_c6_model_milk_multicollinear_1,
+  newdata = data_milk,
+  formula = kcal_std ~ 1 + fat_std,
+  seed = 42,
+  file = "brms/brms_c6_model_milk_multicollinear2"
+)
+
+brms_c6_model_milk_multicollinear_3 <- update(
+  brms_c6_model_milk_multicollinear_1,
+  newdata = data_milk,
+  formula = kcal_std ~ 1 + lactose_std + fat_std,
+  seed = 42,
+  file = "brms/brms_c6_model_milk_multicollinear3"
+)
+
+posterior_summary(brms_c6_model_milk_multicollinear_3) %>% 
+  round(digits = 2) %>% 
+  knitr::kable()
+```
+
+
+
+|              | Estimate| Est.Error|   Q2.5|  Q97.5|
+|:-------------|--------:|---------:|------:|------:|
+|b_Intercept   |     0.00|      0.07|  -0.15|   0.14|
+|b_lactose_std |    -0.67|      0.20|  -1.06|  -0.27|
+|b_fat_std     |     0.25|      0.20|  -0.15|   0.65|
+|sigma         |     0.41|      0.06|   0.32|   0.55|
+|lp__          |   -17.30|      1.51| -21.09| -15.42|
+
+### Post-treatment bias
+
+
+```r
+brms_c6_model_fungus_no_treatment <- brm(
+  data = data_fungus,
+  family = gaussian,
+  h_1 ~ 0 + h_0,
+  prior = c(prior(lognormal(0, 0.25), class = b, lb = 0),
+                prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_fungus_no_treatment"
+)
+
+mixedup::summarise_model(brms_c6_model_fungus_no_treatment)
+```
+
+```
+#>     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#>  Residual            3.33 1.82   1.58    2.10     1.00
+#>  Term Value   SE Lower_2.5 Upper_97.5
+#>   h_0  1.43 0.02      1.39       1.46
+```
+
+
+To fit the original model also in {brms}, we are translating
+
+$$
+\begin{array}{rclr}
+\mu_i & = & h_{0,i} \times p & \textrm{[linear model]}\\
+p & = & \alpha + \beta_{T} T_{i} + \beta_{F} F_{i} & \textrm{[linear model]}\\
+\end{array}
+$$
+
+into
+
+$$
+\begin{array}{rclr}
+\mu_i & = & h_{0,i} \times ( \alpha + \beta_{T} T_{i} + \beta_{F} F_{i}) & \textrm{[linear model]}\\
+\end{array}
+$$
+
+$\rightarrow$ beware of the [non-linear {brms} syntax](https://cran.r-project.org/web/packages/brms/vignettes/brms_nonlinear.html) used here!
+
+
+```r
+brms_c6_model_fungus_post_treatment <- brm(
+  data = data_fungus,
+  family = gaussian,
+  bf(h_1 ~ h_0 * (a + t * treatment + f * fungus),
+     a + t + f ~ 1,
+     nl = TRUE),
+  prior = c(prior(lognormal(0, 0.2), nlpar = a, lb = 0),
+            prior(normal(0, 0.5), nlpar = t),
+            prior(normal(0, 0.5), nlpar = f),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_fungus_post_treatment"
+)
+
+mixedup::summarise_model(brms_c6_model_fungus_post_treatment)
+```
+
+```
+#>     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#>  Residual            2.09 1.45   1.26    1.67     1.00
+#>         Term Value   SE Lower_2.5 Upper_97.5
+#>  a_Intercept  1.48 0.03      1.43       1.53
+#>  t_Intercept  0.00 0.03     -0.05       0.06
+#>  f_Intercept -0.27 0.04     -0.34      -0.19
+```
+
+omitting `fungus` from the model:
+
+
+```r
+brms_c6_model_fungus_only_treatment <- brm(
+  data = data_fungus,
+  family = gaussian,
+  bf(h_1 ~ h_0 * (a + t * treatment),
+     a + t ~ 1,
+     nl = TRUE),
+  prior = c(prior(lognormal(0, 0.2), nlpar = a, lb = 0),
+            prior(normal(0, 0.5), nlpar = t),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_fungus_only_treatment"
+)
+
+mixedup::summarise_model(brms_c6_model_fungus_only_treatment)
+```
+
+```
+#>     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#>  Residual            3.18 1.78   1.56    2.04     1.00
+#>         Term Value   SE Lower_2.5 Upper_97.5
+#>  a_Intercept  1.38 0.03      1.33       1.43
+#>  t_Intercept  0.09 0.04      0.02       0.16
+```
+
+including `moisture` as a fork:
+
+
+```r
+brms_c6_model_moisture_post_treatment <- update(
+  brms_c6_model_fungus_post_treatment,
+  newdata = data_moisture,
+  seed = 42,
+  file = "brms/brms_c6_model_moisture_post_treatment"
+)
+
+mixedup::summarise_model(brms_c6_model_moisture_post_treatment)
+```
+
+```
+#>     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#>  Residual            4.54 2.13   2.10    2.16     1.00
+#>         Term Value   SE Lower_2.5 Upper_97.5
+#>  a_Intercept  1.53 0.00      1.52       1.54
+#>  t_Intercept  0.05 0.00      0.05       0.06
+#>  f_Intercept  0.13 0.00      0.12       0.14
+```
+
+```r
+brms_c6_model_moisture_only_treatment <- update(
+  brms_c6_model_fungus_only_treatment,
+  newdata = data_moisture,
+  seed = 42,
+  file = "brms/brms_c6_model_moisture_only_treatment"
+)
+
+mixedup::summarise_model(brms_c6_model_moisture_only_treatment)
+```
+
+```
+#>     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#>  Residual            4.93 2.22   2.19    2.25     1.00
+#>         Term Value   SE Lower_2.5 Upper_97.5
+#>  a_Intercept  1.62 0.00      1.61       1.63
+#>  t_Intercept  0.00 0.00     -0.01       0.01
+```
+
+### Collider Bias
+
+
+```r
+data_married_factor <- data_married_adults %>% 
+  mutate(married_f = c("single", "married")[married + 1] %>% factor())
+
+brms_c6_model_happy_married <-brm(
+  data = data_married_factor, 
+  family = gaussian,
+  happiness ~ 0 + married_f + age_trans,
+  prior = c(prior(normal(0, 1), class = b, coef = married_fmarried),
+            prior(normal(0, 1), class = b, coef = married_fsingle),
+            prior(normal(0, 2), class = b, coef = age_trans),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_happy_married")
+
+mixedup::summarise_model(brms_c6_model_happy_married)
+```
+
+```
+#>     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#>  Residual            0.96 0.98   0.94    1.02     1.00
+#>              Term Value   SE Lower_2.5 Upper_97.5
+#>  married_fmarried  1.34 0.08      1.18       1.50
+#>   married_fsingle -0.21 0.06     -0.33      -0.09
+#>         age_trans -0.81 0.11     -1.03      -0.61
+```
+
+
+```r
+brms_c6_model_happy <-brm(
+  data = data_married_factor, 
+  family = gaussian,
+  happiness ~ 0 + Intercept + age_trans,
+  prior = c(prior(normal(0, 1), class = b, coef = Intercept),
+            prior(normal(0, 2), class = b, coef = age_trans),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_happy")
+
+mixedup::summarise_model(brms_c6_model_happy)
+```
+
+```
+#>     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#>  Residual            1.47 1.21   1.16    1.27     1.00
+#>       Term Value   SE Lower_2.5 Upper_97.5
+#>  age_trans  0.00 0.07     -0.13       0.13
+```
+
+**The haunted DAG**
+
+
+```r
+brms_c6_model_education <-brm(
+  data = data_education, 
+  family = gaussian,
+  children ~ 0 + Intercept + parents + grandparents,
+  prior = c(prior(normal(0, 1), class = b),
+                prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_education")
+
+mixedup::summarise_model(brms_c6_model_education)
+```
+
+```
+#>     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#>  Residual            2.04 1.43   1.30    1.58     1.00
+#>          Term Value   SE Lower_2.5 Upper_97.5
+#>     Intercept -0.12 0.10     -0.32       0.08
+#>       parents  1.79 0.04      1.70       1.88
+#>  grandparents -0.83 0.11     -1.04      -0.63
+```
+
+
+```r
+brms_c6_model_education_resolved <- update(
+  brms_c6_model_education,
+  newdata = data_education, 
+  formula = children ~ 0 + Intercept + parents + grandparents + unobserved,
+  seed = 42,
+  file = "brms/brms_c6_model_education_resolved"
+)
+
+mixedup::summarise_model(brms_c6_model_education_resolved)
+```
+
+```
+#>     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#>  Residual            1.07 1.04   0.94    1.15     1.00
+#>          Term Value   SE Lower_2.5 Upper_97.5
+#>     Intercept -0.12 0.07     -0.26       0.02
+#>       parents  1.01 0.07      0.88       1.15
+#>  grandparents -0.04 0.10     -0.24       0.15
+#>    unobserved  2.00 0.15      1.70       2.27
+```
+
+### Summary
+
+
+```r
+data_waffle <- data_waffle %>% mutate(south_f = factor(South))
+
+brms_c6_model_waffle_1 <- brm(
+  data = data_waffle, 
+  family = gaussian,
+  divorce_std ~ 1 + waffle_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_waffle_1")
+
+brms_c6_model_waffle_2 <- brm(
+  data = data_waffle, 
+  family = gaussian,
+  divorce_std ~ 1 + waffle_std + south_f,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_waffle_2")
+
+brms_c6_model_waffle_3 <- brm(
+  data = data_waffle, 
+  family = gaussian,
+  divorce_std ~ 1 + waffle_std + medianagemarriage_std + marriage_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_waffle_3")
+
+brms_c6_model_waffle_4 <- brm(
+  data = data_waffle, 
+  family = gaussian,
+  divorce_std ~ 1 + waffle_std + medianagemarriage_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_waffle_4")
+
+brms_c6_model_waffle_5 <- brm(
+  data = data_waffle, 
+  family = gaussian,
+  divorce_std ~ 1 + waffle_std + marriage_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_waffle_5")
+```
+
+
+
+```r
+formula <- c(glue("d {mth('\U007E')} 1 + w"), 
+             glue("d {mth('\U007E')} 1 + w + s"), 
+             glue("d {mth('\U007E')} 1 + w + a + m"), 
+             glue("d {mth('\U007E')} 1 + w + a"), 
+             glue("d {mth('\U007E')} 1 + w + m"))
+
+tibble(model = 1:5,
+       fit = str_c("brms_c6_model_waffle_", model)) %>% 
+  mutate(y = str_c(model, ": ", formula),
+         post = purrr::map(fit, ~get(.) %>% 
+                               as_draws_df() %>% 
+                               dplyr::select(waffle_std = b_waffle_std))) %>% 
+  unnest(post) %>% 
+  ggplot(aes(x = waffle_std, y = y,
+             color = fit %in% c("brms_c6_model_waffle_2", "brms_c6_model_waffle_3"))) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  stat_pointinterval(aes(fill = after_scale(clr_lighten(color))), shape = 21) +
+  scale_color_manual(values = c(clr0dd, clr2)) +
+  labs(x = str_c("*",mth("\U03B2"),"<sub>w</sub>*"),
+       y = NULL) +
+  coord_cartesian(xlim = c(-0.4, 0.6)) +
+  theme(axis.text.y = element_markdown(hjust = 0),
+        axis.title.x = element_markdown(),
+        legend.position = "none")
+```
+
+<img src="rethinking_c6_files/figure-html/unnamed-chunk-68-1.svg" width="672" style="display: block; margin: auto;" />
 
 ## pymc3 section
 

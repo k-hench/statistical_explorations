@@ -67,7 +67,7 @@ tibble(draws = 1:3,
 ```
 
 ```{=html}
-<template id="3b0c5565-88c7-41a0-ab99-7672dc90f07d"><style>
+<template id="e534118a-3dfc-42ee-ba7a-92765df7d5d4"><style>
 .tabwid table{
   border-spacing:0px !important;
   border-collapse:collapse;
@@ -101,15 +101,15 @@ tibble(draws = 1:3,
 .tabwid table tr {
 background-color: transparent;
 }
-</style><div class="tabwid"><style>.cl-cec9a420{}.cl-cec4975a{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-cec4aaba{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-cec4d742{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cec4d760{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cec4d76a{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-cec9a420'>
+</style><div class="tabwid"><style>.cl-0e5feb76{}.cl-0e5a937e{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-0e5aa742{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-0e5ad410{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-0e5ad42e{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-0e5ad438{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-0e5feb76'>
 ```
 
 ```{=html}
-<thead><tr style="overflow-wrap:break-word;"><td class="cl-cec4d76a"><p class="cl-cec4aaba"><span class="cl-cec4975a">draws</span></p></td><td class="cl-cec4d76a"><p class="cl-cec4aaba"><span class="cl-cec4975a">marbles</span></p></td><td class="cl-cec4d76a"><p class="cl-cec4aaba"><span class="cl-cec4975a">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-cec4d742"><p class="cl-cec4aaba"><span class="cl-cec4975a">1</span></p></td><td class="cl-cec4d742"><p class="cl-cec4aaba"><span class="cl-cec4975a">4</span></p></td><td class="cl-cec4d742"><p class="cl-cec4aaba"><span class="cl-cec4975a">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-cec4d742"><p class="cl-cec4aaba"><span class="cl-cec4975a">2</span></p></td><td class="cl-cec4d742"><p class="cl-cec4aaba"><span class="cl-cec4975a">4</span></p></td><td class="cl-cec4d742"><p class="cl-cec4aaba"><span class="cl-cec4975a">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-cec4d760"><p class="cl-cec4aaba"><span class="cl-cec4975a">3</span></p></td><td class="cl-cec4d760"><p class="cl-cec4aaba"><span class="cl-cec4975a">4</span></p></td><td class="cl-cec4d760"><p class="cl-cec4aaba"><span class="cl-cec4975a">64</span></p></td></tr></tbody></table></div></template>
-<div class="flextable-shadow-host" id="205ad839-1d91-4314-9b27-53179bef9285"></div>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-0e5ad438"><p class="cl-0e5aa742"><span class="cl-0e5a937e">draws</span></p></td><td class="cl-0e5ad438"><p class="cl-0e5aa742"><span class="cl-0e5a937e">marbles</span></p></td><td class="cl-0e5ad438"><p class="cl-0e5aa742"><span class="cl-0e5a937e">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-0e5ad410"><p class="cl-0e5aa742"><span class="cl-0e5a937e">1</span></p></td><td class="cl-0e5ad410"><p class="cl-0e5aa742"><span class="cl-0e5a937e">4</span></p></td><td class="cl-0e5ad410"><p class="cl-0e5aa742"><span class="cl-0e5a937e">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-0e5ad410"><p class="cl-0e5aa742"><span class="cl-0e5a937e">2</span></p></td><td class="cl-0e5ad410"><p class="cl-0e5aa742"><span class="cl-0e5a937e">4</span></p></td><td class="cl-0e5ad410"><p class="cl-0e5aa742"><span class="cl-0e5a937e">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-0e5ad42e"><p class="cl-0e5aa742"><span class="cl-0e5a937e">3</span></p></td><td class="cl-0e5ad42e"><p class="cl-0e5aa742"><span class="cl-0e5a937e">4</span></p></td><td class="cl-0e5ad42e"><p class="cl-0e5aa742"><span class="cl-0e5a937e">64</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="e4f4684e-2011-4839-b695-2bfb44fb2bdf"></div>
 <script>
-var dest = document.getElementById("205ad839-1d91-4314-9b27-53179bef9285");
-var template = document.getElementById("3b0c5565-88c7-41a0-ab99-7672dc90f07d");
+var dest = document.getElementById("e4f4684e-2011-4839-b695-2bfb44fb2bdf");
+var template = document.getElementById("e534118a-3dfc-42ee-ba7a-92765df7d5d4");
 var caption = template.content.querySelector("caption");
 if(caption) {
   caption.style.cssText = "display:block;text-align:center;";
@@ -516,14 +516,14 @@ conpare_qa(w_in = 24, l_in = 12)
 ```
 #> 
 #> 
-#> |      mean|        sd|      5.5%|     94.5%|qa         |
-#> |---------:|---------:|---------:|---------:|:----------|
-#> | 0.6666664| 0.1571338| 0.4155362| 0.9177966|W: 6, L: 3 |
+#> |      mean|        sd|     5.5%|     94.5%|qa         |
+#> |---------:|---------:|--------:|---------:|:----------|
+#> | 0.6666423| 0.1571395| 0.415503| 0.9177816|W: 6, L: 3 |
 #> 
 #> 
 #> |      mean|        sd|      5.5%|     94.5%|qa          |
 #> |---------:|---------:|---------:|---------:|:-----------|
-#> | 0.6666663| 0.1111104| 0.4890904| 0.8442422|W: 12, L: 6 |
+#> | 0.6666667| 0.1111104| 0.4890908| 0.8442425|W: 12, L: 6 |
 #> 
 #> 
 #> |     mean|        sd|     5.5%|    94.5%|qa           |
@@ -905,7 +905,7 @@ as_draws_df(brms_c2_36_tosses) %>%
   geom_density(color = clr1, fill = fll1) +
   scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
   labs(y = "density", x = "proportion water",
-       title = "{brms} posterior probability (n = 36")
+       title = "{brms} posterior probability (n = 36)")
 ```
 
 <img src="rethinking_c2_files/figure-html/unnamed-chunk-30-1.svg" width="672" style="display: block; margin: auto;" />

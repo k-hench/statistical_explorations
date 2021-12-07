@@ -12,6 +12,7 @@ library(ggdag)
 
 clr0 <- "#E9E5D9" # "#A9A9A9"
 clr0d <- clr_darken(clr0, .1)
+clr0dd <- clr_darken(clr0, .4)
 clr1 <- "#54436D" # "#083F82"
 clr2 <- "#B35136" #"#FF8029"
 clr1l <- clr_lighten(clr1, .3)
@@ -24,6 +25,7 @@ clr_theme <- rgb(0,0,0,.1)
 fll_theme <- clr_alpha(clr_theme, .03)
 
 fll0 <- clr_alpha(clr0)
+fll0dd <- clr_alpha(clr0dd)
 fll1 <- clr_alpha(clr1)
 fll2 <- clr_alpha(clr2)
 fll3 <- clr_alpha(clr3)

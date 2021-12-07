@@ -29,9 +29,10 @@ by [Richard McElreath](https://xcelab.net/rm/statistical-rethinking/), building 
 
 Simulating section-distortion (*Berkson's paradox*)
 
-```{r}
+```{r, fig.asp =1}
 n <- 200
 p <- .1
+set.seed(42)
 
 data_sim <- tibble(newsworthy = rnorm(n),
        trustworthy = rnorm(n),
@@ -48,7 +49,8 @@ data_sim %>%
   coord_cartesian(xlim = range(data_sim$newsworthy) * 1.05,
                   ylim = range(data_sim$trustworthy) * 1.05,
                   expand = 0) +
-  coord_equal(ylim = range(data_sim$trustworthy) * 1.05)
+  coord_equal(ylim = range(data_sim$trustworthy) * 1.05) +
+  theme(legend.position = "bottom")
 ```
 
 ## Multicolliniarity
@@ -261,19 +263,21 @@ precis(data_fungus) %>%
   knit_precis()
 ```
 
-$$
-\begin{array}{rclr}
-h_{1,i} & \sim & Normal( \mu_i, \sigma) & \textrm{[likelihood]}\\
-\mu_i & = & h_{0,i} \times p & \textrm{[linear model]}\\
-\end{array}
-$$
-
 selecting a prior
 
 ```{r}
 precis(tibble(sim_p = rlnorm(1e4, 0, .25))) %>% 
   knit_precis()
 ```
+
+$$
+\begin{array}{rclr}
+h_{1,i} & \sim & Normal( \mu_i, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & h_{0,i} \times p & \textrm{[linear model]}\\
+p & \sim & Log-Normal(0, 0.25) & \textrm{[$p$ prior]}\\
+\sigma & \sim & Exponential(1)  & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
 
 $\rightarrow$ the main mass of the prior is between 40% shrinkage and 50% growth.
 
@@ -293,7 +297,6 @@ model_fungus_no_treatment <- quap(
 precis(model_fungus_no_treatment) %>% 
   knit_precis()
 ```
-
 
 Model *with treatment* and *fungus* (post-treatment variable)
 
@@ -328,6 +331,17 @@ precis(model_fungus_post_treatment) %>%
 ```
 
 Model *with treatment* but without *fungus*
+
+$$
+\begin{array}{rclr}
+h_{1,i} & \sim & Normal( \mu_i, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & h_{0,i} \times p & \textrm{[linear model]}\\
+p & = & \alpha + \beta_{T} T_{i} & \textrm{[linear model]}\\
+\alpha & \sim & Log-Normal(0, 0.25) & \textrm{[$\alpha$ prior]}\\
+\beta_{T} & \sim & Normal(0, 0.5) & \textrm{[$\beta_{T}$ prior]}\\
+\sigma & \sim & Exponential(1) & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
 
 ```{r}
 model_fungus_only_treatment <- quap(
@@ -479,7 +493,7 @@ sim_tidy <- function(seed = 1977, n_years = 1000, max_age = 65, n_births = 20, a
            max_age = max_age, n_births = n_births, aom = aom)
 }
 
-data_married <- sim_tidy(seed = 1977, n_years = 65, n_births = 21)
+data_married <- sim_tidy(seed = 2021, n_years = 65, n_births = 21)
 
 data_married %>% 
   mutate(married = factor(married,
@@ -492,7 +506,16 @@ data_married %>%
   scale_x_continuous(expand = c(.015, .015)) +
   theme(panel.grid = element_blank(),
         legend.position = "bottom")
+```
 
+$$
+\begin{array}{rclr}
+happyness_{i} & \sim & Normal( \mu_i, \sigma) & \textrm{[likelihood]}\\
+\mu_i & = & \alpha_{married[i]} + \beta_{age} age_{i} & \textrm{[linear model]}\\
+\end{array}
+$$
+
+```{r}
 data_married_adults <- data_married %>% 
   filter(age >= 18) %>% 
   mutate(age_trans = (age - 18)/ diff(c(18, 65)),
@@ -1223,28 +1246,14 @@ precis(model_fox_area) %>%
   knit_precis()
 ```
 
-The slope of area very close to zero with the posterior distribution heavy on either side `r emo::ji("shrug")``
+The slope of area very close to zero with the posterior distribution heavy on either side `r emo::ji("shrug")`
+
+**H4**
 
 ```{r}
+adjustmentSets(dag_fox, exposure = "F", outcome = "W")
+
 model_fox_food <- quap(
-  flist = alist(
-    weight_std ~ dnorm(mu, sigma),
-    mu <- alpha + beta_food * avgfood_std + beta_group * groupsize_std,
-    alpha ~ dnorm(0,.2),
-    c(beta_food, beta_group) ~ dnorm(0, .25),
-    sigma ~ dexp(1)
-  ),
-  data = data_fox
-)
-
-precis(model_fox_food, depth = 2) %>% 
-  knit_precis()
-```
-
-Compare without closing the backdoor:
-
-```{r}
-model_fox_food2 <- quap(
   flist = alist(
     weight_std ~ dnorm(mu, sigma),
     mu <- alpha + beta_food * avgfood_std,
@@ -1255,19 +1264,475 @@ model_fox_food2 <- quap(
   data = data_fox
 )
 
-precis(model_fox_food2, depth = 2) %>% 
+precis(model_fox_food, depth = 2) %>% 
   knit_precis()
 ```
 
-**H4**
-
 **H5**
+
+```{r}
+adjustmentSets(dag_fox, exposure = "G", outcome = "W")
+```
+
+... we need to condition on $F$.
+
+```{r}
+model_fox_group <- quap(
+  flist = alist(
+    weight_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_food * avgfood_std + beta_group * groupsize_std,
+    alpha ~ dnorm(0,.2),
+    c(beta_food, beta_group) ~ dnorm(0, .5),
+    sigma ~ dexp(1)
+  ),
+  data = data_fox
+)
+
+precis(model_fox_group, depth = 2) %>% 
+  knit_precis()
+```
+
+```{r, fig.asp = .3}
+precis(model_fox_group, depth = 2) %>% 
+  as_tibble_rn() %>%
+  ggplot(aes(y = param)) +
+  geom_vline(xintercept = 0, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_linerange(aes(xmin = `5.5%`,
+                     xmax =`94.5%`), color = clr0d) +
+  geom_point(aes(x = mean),
+             shape = 21, size = 3 ,
+             color = clr0d, fill = clr0) +
+  scale_y_discrete(limits = c("sigma", "beta_group", "beta_food", "alpha")) +
+  theme(axis.title.y = element_blank())
+```
 
 **H6**
 
 **H7**
 
 ## {brms} section
+
+### Multicolliniarity
+
+Legs Model
+
+```{r}
+brms_c6_model_legs_multicollinear <- brm(
+  data = data_legs, 
+  family = gaussian,
+  height ~ 1 + left_leg + right_leg,
+  prior = c(prior(normal(10, 100), class = Intercept),
+            prior(normal(2, 10), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  sample_prior = TRUE,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_legs_multicollinear")
+```
+
+```{r, fig.asp = .3}
+library(tidybayes)
+library(ggdist)
+as_draws_df(brms_c6_model_legs_multicollinear) %>% 
+  dplyr::select(starts_with("b"), sigma) %>% 
+  as_tibble() %>% 
+  set_names(x = . , nm = names(.) %>% str_remove("b_")) %>% 
+  pivot_longer(everything()) %>% 
+  ggplot(aes(x = value, y = reorder(name, value))) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  stat_pointinterval(color = clr0dd, fill = clr0, shape = 21) +
+  scale_y_discrete(limits = c("sigma", "left_leg", "Intercept")) +
+  theme_minimal(base_family = fnt_sel) +
+  theme(axis.title = element_blank())
+```
+
+Check various seeds to illustrate the difficulty to fit the legs jointly:
+
+```{r, fig.asp = .8}
+simulate_leg_data <- function(seed = 42){
+  n <- 100
+  set.seed(seed)
+  data_legs <- tibble(
+    height = rnorm(n = n, mean = 10, sd = 2),
+    leg_proportion = runif(n, min = 0.4, max = 0.5),
+    left_leg = leg_proportion * height + rnorm(n, 0, .02),
+    right_leg = leg_proportion * height + rnorm(n, 0, .02),
+  )
+  
+  tibble(seed = seed,
+         fit = list(update(brms_c6_model_legs_multicollinear,
+                           newdata = data_legs,
+                           seed = 42, refresh = 0))) 
+}
+
+1:4 %>% 
+  map_dfr(simulate_leg_data) %>%
+  mutate(posterior = purrr::map(fit, as_draws_df )) %>%
+  unnest(cols = posterior) %>% 
+  dplyr::select(seed, starts_with("b"), sigma) %>% 
+  set_names(x = . , nm = names(.) %>% str_remove("b_")) %>% 
+  pivot_longer(-seed) %>% 
+  ggplot(aes(x = value, y = reorder(name, value))) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  stat_halfeye(aes(fill_ramp = stat(cut_cdf_qi(cdf, .width = c(0.66, 0.95,1)))),
+               fill = fll0dd, adjust = .7, normalize = "groups", height = .8) +
+  scale_fill_ramp_discrete(range = c(.85, 0.15), guide = "none") +
+  scale_y_discrete(limits = c("sigma", "left_leg", "right_leg", "Intercept")) +
+  coord_cartesian(ylim = c(0.9, 5),
+                  expand = 0) +
+  facet_wrap(seed ~ ., ncol = 1, labeller = label_both) +
+  theme_minimal(base_family = fnt_sel) +
+  theme(axis.title = element_blank())
+```
+
+```{r}
+p_ridge <- as_draws_df(brms_c6_model_legs_multicollinear) %>% 
+  as_tibble() %>% 
+  dplyr::select(starts_with("b"), sigma) %>% 
+  set_names(x = . , nm = names(.) %>% str_remove("b_")) %>% 
+  ggplot(aes(x = left_leg, y = right_leg)) +
+  geom_point(color = clr0d, fill = fll0, shape = 21, size = .6)
+
+p_sum <- as_draws_df(brms_c6_model_legs_multicollinear) %>% 
+  as_tibble() %>% 
+  dplyr::select(starts_with("b"), sigma) %>% 
+  set_names(x = . , nm = names(.) %>% str_remove("b_")) %>% 
+  ggplot(aes(x = left_leg + right_leg)) +
+   stat_halfeye(aes(fill_ramp = stat(cut_cdf_qi(cdf, .width = c(0.66, 0.95,1)))),
+               fill = fll0dd, adjust = .7, normalize = "groups", height = .8) +
+  scale_fill_ramp_discrete(range = c(.85, 0.15), guide = "none") 
+  
+p_ridge + p_sum
+```
+
+Model single leg
+
+```{r, fig.asp = .25}
+brms_c6_model_model_leg <- brm(
+  data = data_legs, 
+  family = gaussian,
+  height ~ 1 + left_leg,
+  prior = c(prior(normal(10, 100), class = Intercept),
+            prior(normal(2, 10), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  sample_prior = TRUE,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_leg")
+
+as_draws_df(brms_c6_model_model_leg) %>% 
+  dplyr::select(starts_with("b"), sigma) %>% 
+  as_tibble() %>% 
+  set_names(x = . , nm = names(.) %>% str_remove("b_")) %>% 
+  pivot_longer(everything()) %>% 
+  ggplot(aes(x = value, y = reorder(name, value))) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  stat_pointinterval(color = clr0dd, fill = clr0, shape = 21) +
+  scale_y_discrete(limits = c("sigma", "left_leg", "Intercept")) +
+  theme_minimal(base_family = fnt_sel) +
+  theme(axis.title = element_blank())
+```
+
+Multicollinear milk model
+
+```{r}
+brms_c6_model_milk_multicollinear_1 <- brm(
+  data = data_milk,
+  family = gaussian,
+  kcal_std ~ 1 + lactose_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+                prior(normal(0, 0.5), class = b),
+                prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_milk_multicollinear1"
+)
+
+brms_c6_model_milk_multicollinear_2 <- update(
+  brms_c6_model_milk_multicollinear_1,
+  newdata = data_milk,
+  formula = kcal_std ~ 1 + fat_std,
+  seed = 42,
+  file = "brms/brms_c6_model_milk_multicollinear2"
+)
+
+brms_c6_model_milk_multicollinear_3 <- update(
+  brms_c6_model_milk_multicollinear_1,
+  newdata = data_milk,
+  formula = kcal_std ~ 1 + lactose_std + fat_std,
+  seed = 42,
+  file = "brms/brms_c6_model_milk_multicollinear3"
+)
+
+posterior_summary(brms_c6_model_milk_multicollinear_3) %>% 
+  round(digits = 2) %>% 
+  knitr::kable()
+```
+
+### Post-treatment bias
+
+```{r}
+brms_c6_model_fungus_no_treatment <- brm(
+  data = data_fungus,
+  family = gaussian,
+  h_1 ~ 0 + h_0,
+  prior = c(prior(lognormal(0, 0.25), class = b, lb = 0),
+                prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_fungus_no_treatment"
+)
+
+mixedup::summarise_model(brms_c6_model_fungus_no_treatment)
+```
+
+
+To fit the original model also in {brms}, we are translating
+
+$$
+\begin{array}{rclr}
+\mu_i & = & h_{0,i} \times p & \textrm{[linear model]}\\
+p & = & \alpha + \beta_{T} T_{i} + \beta_{F} F_{i} & \textrm{[linear model]}\\
+\end{array}
+$$
+
+into
+
+$$
+\begin{array}{rclr}
+\mu_i & = & h_{0,i} \times ( \alpha + \beta_{T} T_{i} + \beta_{F} F_{i}) & \textrm{[linear model]}\\
+\end{array}
+$$
+
+$\rightarrow$ beware of the [non-linear {brms} syntax](https://cran.r-project.org/web/packages/brms/vignettes/brms_nonlinear.html) used here!
+
+```{r}
+brms_c6_model_fungus_post_treatment <- brm(
+  data = data_fungus,
+  family = gaussian,
+  bf(h_1 ~ h_0 * (a + t * treatment + f * fungus),
+     a + t + f ~ 1,
+     nl = TRUE),
+  prior = c(prior(lognormal(0, 0.2), nlpar = a, lb = 0),
+            prior(normal(0, 0.5), nlpar = t),
+            prior(normal(0, 0.5), nlpar = f),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_fungus_post_treatment"
+)
+
+mixedup::summarise_model(brms_c6_model_fungus_post_treatment)
+```
+
+omitting `fungus` from the model:
+
+```{r}
+brms_c6_model_fungus_only_treatment <- brm(
+  data = data_fungus,
+  family = gaussian,
+  bf(h_1 ~ h_0 * (a + t * treatment),
+     a + t ~ 1,
+     nl = TRUE),
+  prior = c(prior(lognormal(0, 0.2), nlpar = a, lb = 0),
+            prior(normal(0, 0.5), nlpar = t),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_fungus_only_treatment"
+)
+
+mixedup::summarise_model(brms_c6_model_fungus_only_treatment)
+```
+
+including `moisture` as a fork:
+
+```{r}
+brms_c6_model_moisture_post_treatment <- update(
+  brms_c6_model_fungus_post_treatment,
+  newdata = data_moisture,
+  seed = 42,
+  file = "brms/brms_c6_model_moisture_post_treatment"
+)
+
+mixedup::summarise_model(brms_c6_model_moisture_post_treatment)
+
+brms_c6_model_moisture_only_treatment <- update(
+  brms_c6_model_fungus_only_treatment,
+  newdata = data_moisture,
+  seed = 42,
+  file = "brms/brms_c6_model_moisture_only_treatment"
+)
+
+mixedup::summarise_model(brms_c6_model_moisture_only_treatment)
+```
+
+### Collider Bias
+
+```{r}
+data_married_factor <- data_married_adults %>% 
+  mutate(married_f = c("single", "married")[married + 1] %>% factor())
+
+brms_c6_model_happy_married <-brm(
+  data = data_married_factor, 
+  family = gaussian,
+  happiness ~ 0 + married_f + age_trans,
+  prior = c(prior(normal(0, 1), class = b, coef = married_fmarried),
+            prior(normal(0, 1), class = b, coef = married_fsingle),
+            prior(normal(0, 2), class = b, coef = age_trans),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_happy_married")
+
+mixedup::summarise_model(brms_c6_model_happy_married)
+```
+
+```{r}
+brms_c6_model_happy <-brm(
+  data = data_married_factor, 
+  family = gaussian,
+  happiness ~ 0 + Intercept + age_trans,
+  prior = c(prior(normal(0, 1), class = b, coef = Intercept),
+            prior(normal(0, 2), class = b, coef = age_trans),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_happy")
+
+mixedup::summarise_model(brms_c6_model_happy)
+```
+
+**The haunted DAG**
+
+```{r}
+brms_c6_model_education <-brm(
+  data = data_education, 
+  family = gaussian,
+  children ~ 0 + Intercept + parents + grandparents,
+  prior = c(prior(normal(0, 1), class = b),
+                prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_education")
+
+mixedup::summarise_model(brms_c6_model_education)
+```
+
+```{r}
+brms_c6_model_education_resolved <- update(
+  brms_c6_model_education,
+  newdata = data_education, 
+  formula = children ~ 0 + Intercept + parents + grandparents + unobserved,
+  seed = 42,
+  file = "brms/brms_c6_model_education_resolved"
+)
+
+mixedup::summarise_model(brms_c6_model_education_resolved)
+```
+
+### Summary
+
+```{r}
+data_waffle <- data_waffle %>% mutate(south_f = factor(South))
+
+brms_c6_model_waffle_1 <- brm(
+  data = data_waffle, 
+  family = gaussian,
+  divorce_std ~ 1 + waffle_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_waffle_1")
+
+brms_c6_model_waffle_2 <- brm(
+  data = data_waffle, 
+  family = gaussian,
+  divorce_std ~ 1 + waffle_std + south_f,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_waffle_2")
+
+brms_c6_model_waffle_3 <- brm(
+  data = data_waffle, 
+  family = gaussian,
+  divorce_std ~ 1 + waffle_std + medianagemarriage_std + marriage_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_waffle_3")
+
+brms_c6_model_waffle_4 <- brm(
+  data = data_waffle, 
+  family = gaussian,
+  divorce_std ~ 1 + waffle_std + medianagemarriage_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_waffle_4")
+
+brms_c6_model_waffle_5 <- brm(
+  data = data_waffle, 
+  family = gaussian,
+  divorce_std ~ 1 + waffle_std + marriage_std,
+  prior = c(prior(normal(0, 0.2), class = Intercept),
+            prior(normal(0, 0.5), class = b),
+            prior(exponential(1), class = sigma)),
+  iter = 2000, warmup = 1000, 
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c6_model_waffle_5")
+```
+
+
+```{r, fig.asp = .3}
+formula <- c(glue("d {mth('\U007E')} 1 + w"), 
+             glue("d {mth('\U007E')} 1 + w + s"), 
+             glue("d {mth('\U007E')} 1 + w + a + m"), 
+             glue("d {mth('\U007E')} 1 + w + a"), 
+             glue("d {mth('\U007E')} 1 + w + m"))
+
+tibble(model = 1:5,
+       fit = str_c("brms_c6_model_waffle_", model)) %>% 
+  mutate(y = str_c(model, ": ", formula),
+         post = purrr::map(fit, ~get(.) %>% 
+                               as_draws_df() %>% 
+                               dplyr::select(waffle_std = b_waffle_std))) %>% 
+  unnest(post) %>% 
+  ggplot(aes(x = waffle_std, y = y,
+             color = fit %in% c("brms_c6_model_waffle_2", "brms_c6_model_waffle_3"))) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  stat_pointinterval(aes(fill = after_scale(clr_lighten(color))), shape = 21) +
+  scale_color_manual(values = c(clr0dd, clr2)) +
+  labs(x = str_c("*",mth("\U03B2"),"<sub>w</sub>*"),
+       y = NULL) +
+  coord_cartesian(xlim = c(-0.4, 0.6)) +
+  theme(axis.text.y = element_markdown(hjust = 0),
+        axis.title.x = element_markdown(),
+        legend.position = "none")
+```
 
 ## pymc3 section
 

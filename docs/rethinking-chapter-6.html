@@ -24,7 +24,7 @@
 <meta name="author" content="Kosmas Hench" />
 
 
-<meta name="date" content="2021-12-05" />
+<meta name="date" content="2021-12-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -765,7 +765,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.3.4" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#backdoor-waffles"><i class="fa fa-check"></i><b>7.3.4</b> Backdoor Waffles</a></li>
 </ul></li>
 <li class="chapter" data-level="7.4" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#homework-4"><i class="fa fa-check"></i><b>7.4</b> Homework</a></li>
-<li class="chapter" data-level="7.5" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#brms-section-4"><i class="fa fa-check"></i><b>7.5</b> {brms} section</a></li>
+<li class="chapter" data-level="7.5" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#brms-section-4"><i class="fa fa-check"></i><b>7.5</b> {brms} section</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#multicolliniarity-1"><i class="fa fa-check"></i><b>7.5.1</b> Multicolliniarity</a></li>
+<li class="chapter" data-level="7.5.2" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#post-treatment-bias-1"><i class="fa fa-check"></i><b>7.5.2</b> Post-treatment bias</a></li>
+<li class="chapter" data-level="7.5.3" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#collider-bias-1"><i class="fa fa-check"></i><b>7.5.3</b> Collider Bias</a></li>
+<li class="chapter" data-level="7.5.4" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#summary"><i class="fa fa-check"></i><b>7.5.4</b> Summary</a></li>
+</ul></li>
 <li class="chapter" data-level="7.6" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#pymc3-section-4"><i class="fa fa-check"></i><b>7.6</b> pymc3 section</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html"><i class="fa fa-check"></i><b>8</b> Bayesian Statistics the Fun Way</a>
@@ -1234,12 +1240,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 </tbody>
 </table>
-<p><span class="math display">\[
-\begin{array}{rclr}
-h_{1,i} &amp; \sim &amp; Normal( \mu_i, \sigma) &amp; \textrm{[likelihood]}\\
-\mu_i &amp; = &amp; h_{0,i} \times p &amp; \textrm{[linear model]}\\
-\end{array}
-\]</span></p>
 <p>selecting a prior</p>
 <div class="sourceCode" id="cb470"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb470-1"><a href="rethinking-chapter-6.html#cb470-1" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(<span class="fu">tibble</span>(<span class="at">sim_p =</span> <span class="fu">rlnorm</span>(<span class="fl">1e4</span>, <span class="dv">0</span>, .<span class="dv">25</span>))) <span class="sc">%&gt;%</span> </span>
 <span id="cb470-2"><a href="rethinking-chapter-6.html#cb470-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">knit_precis</span>()</span></code></pre></div>
@@ -1265,6 +1265,14 @@ h_{1,i} &amp; \sim &amp; Normal( \mu_i, \sigma) &amp; \textrm{[likelihood]}\\
 </tr>
 </tbody>
 </table>
+<p><span class="math display">\[
+\begin{array}{rclr}
+h_{1,i} &amp; \sim &amp; Normal( \mu_i, \sigma) &amp; \textrm{[likelihood]}\\
+\mu_i &amp; = &amp; h_{0,i} \times p &amp; \textrm{[linear model]}\\
+p &amp; \sim &amp; Log-Normal(0, 0.25) &amp; \textrm{[$p$ prior]}\\
+\sigma &amp; \sim &amp; Exponential(1)  &amp; \textrm{[$\sigma$ prior]}
+\end{array}
+\]</span></p>
 <p><span class="math inline">\(\rightarrow\)</span> the main mass of the prior is between 40% shrinkage and 50% growth.</p>
 <p>Model <em>without treatment</em></p>
 <div class="sourceCode" id="cb471"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb471-1"><a href="rethinking-chapter-6.html#cb471-1" aria-hidden="true" tabindex="-1"></a>model_fungus_no_treatment <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
@@ -1375,6 +1383,16 @@ p &amp; = &amp; \alpha + \beta_{T} T_{i} + \beta_{F} F_{i} &amp; \textrm{[linear
 </tbody>
 </table>
 <p>Model <em>with treatment</em> but without <em>fungus</em></p>
+<p><span class="math display">\[
+\begin{array}{rclr}
+h_{1,i} &amp; \sim &amp; Normal( \mu_i, \sigma) &amp; \textrm{[likelihood]}\\
+\mu_i &amp; = &amp; h_{0,i} \times p &amp; \textrm{[linear model]}\\
+p &amp; = &amp; \alpha + \beta_{T} T_{i} &amp; \textrm{[linear model]}\\
+\alpha &amp; \sim &amp; Log-Normal(0, 0.25) &amp; \textrm{[$\alpha$ prior]}\\
+\beta_{T} &amp; \sim &amp; Normal(0, 0.5) &amp; \textrm{[$\beta_{T}$ prior]}\\
+\sigma &amp; \sim &amp; Exponential(1) &amp; \textrm{[$\sigma$ prior]}
+\end{array}
+\]</span></p>
 <div class="sourceCode" id="cb473"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb473-1"><a href="rethinking-chapter-6.html#cb473-1" aria-hidden="true" tabindex="-1"></a>model_fungus_only_treatment <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
 <span id="cb473-2"><a href="rethinking-chapter-6.html#cb473-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">flist =</span> <span class="fu">alist</span>(</span>
 <span id="cb473-3"><a href="rethinking-chapter-6.html#cb473-3" aria-hidden="true" tabindex="-1"></a>    h_1 <span class="sc">~</span> <span class="fu">dnorm</span>( mu, sigma ),</span>
@@ -1668,7 +1686,7 @@ p &amp; = &amp; \alpha + \beta_{T} T_{i} + \beta_{F} F_{i} &amp; \textrm{[linear
 <span id="cb481-30"><a href="rethinking-chapter-6.html#cb481-30" aria-hidden="true" tabindex="-1"></a>           <span class="at">max_age =</span> max_age, <span class="at">n_births =</span> n_births, <span class="at">aom =</span> aom)</span>
 <span id="cb481-31"><a href="rethinking-chapter-6.html#cb481-31" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb481-32"><a href="rethinking-chapter-6.html#cb481-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb481-33"><a href="rethinking-chapter-6.html#cb481-33" aria-hidden="true" tabindex="-1"></a>data_married <span class="ot">&lt;-</span> <span class="fu">sim_tidy</span>(<span class="at">seed =</span> <span class="dv">1977</span>, <span class="at">n_years =</span> <span class="dv">65</span>, <span class="at">n_births =</span> <span class="dv">21</span>)</span>
+<span id="cb481-33"><a href="rethinking-chapter-6.html#cb481-33" aria-hidden="true" tabindex="-1"></a>data_married <span class="ot">&lt;-</span> <span class="fu">sim_tidy</span>(<span class="at">seed =</span> <span class="dv">2021</span>, <span class="at">n_years =</span> <span class="dv">65</span>, <span class="at">n_births =</span> <span class="dv">21</span>)</span>
 <span id="cb481-34"><a href="rethinking-chapter-6.html#cb481-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb481-35"><a href="rethinking-chapter-6.html#cb481-35" aria-hidden="true" tabindex="-1"></a>data_married <span class="sc">%&gt;%</span> </span>
 <span id="cb481-36"><a href="rethinking-chapter-6.html#cb481-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">married =</span> <span class="fu">factor</span>(married,</span>
@@ -1682,6 +1700,12 @@ p &amp; = &amp; \alpha + \beta_{T} T_{i} + \beta_{F} F_{i} &amp; \textrm{[linear
 <span id="cb481-44"><a href="rethinking-chapter-6.html#cb481-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>(),</span>
 <span id="cb481-45"><a href="rethinking-chapter-6.html#cb481-45" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
 <p><img src="rethinking_c6_files/figure-html/unnamed-chunk-22-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><span class="math display">\[
+\begin{array}{rclr}
+happyness_{i} &amp; \sim &amp; Normal( \mu_i, \sigma) &amp; \textrm{[likelihood]}\\
+\mu_i &amp; = &amp; \alpha_{married[i]} + \beta_{age} age_{i} &amp; \textrm{[linear model]}\\
+\end{array}
+\]</span></p>
 <div class="sourceCode" id="cb482"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb482-1"><a href="rethinking-chapter-6.html#cb482-1" aria-hidden="true" tabindex="-1"></a>data_married_adults <span class="ot">&lt;-</span> data_married <span class="sc">%&gt;%</span> </span>
 <span id="cb482-2"><a href="rethinking-chapter-6.html#cb482-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(age <span class="sc">&gt;=</span> <span class="dv">18</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb482-3"><a href="rethinking-chapter-6.html#cb482-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_trans =</span> (age <span class="sc">-</span> <span class="dv">18</span>)<span class="sc">/</span> <span class="fu">diff</span>(<span class="fu">c</span>(<span class="dv">18</span>, <span class="dv">65</span>)),</span>
@@ -1713,31 +1737,31 @@ p &amp; = &amp; \alpha + \beta_{T} T_{i} + \beta_{F} F_{i} &amp; \textrm{[linear
 <tbody>
 <tr class="odd">
 <td align="left">alpha[1]</td>
-<td align="right">-0.24</td>
+<td align="right">-0.21</td>
 <td align="right">0.06</td>
-<td align="right">-0.34</td>
-<td align="right">-0.14</td>
+<td align="right">-0.31</td>
+<td align="right">-0.11</td>
 </tr>
 <tr class="even">
 <td align="left">alpha[2]</td>
-<td align="right">1.20</td>
-<td align="right">0.08</td>
-<td align="right">1.07</td>
 <td align="right">1.33</td>
+<td align="right">0.08</td>
+<td align="right">1.20</td>
+<td align="right">1.47</td>
 </tr>
 <tr class="odd">
 <td align="left">beta_age</td>
-<td align="right">-0.70</td>
+<td align="right">-0.81</td>
 <td align="right">0.11</td>
-<td align="right">-0.88</td>
-<td align="right">-0.53</td>
+<td align="right">-0.99</td>
+<td align="right">-0.64</td>
 </tr>
 <tr class="even">
 <td align="left">sigma</td>
-<td align="right">1.00</td>
+<td align="right">0.97</td>
 <td align="right">0.02</td>
-<td align="right">0.96</td>
-<td align="right">1.04</td>
+<td align="right">0.94</td>
+<td align="right">1.01</td>
 </tr>
 </tbody>
 </table>
@@ -1820,7 +1844,7 @@ p &amp; = &amp; \alpha + \beta_{T} T_{i} + \beta_{F} F_{i} &amp; \textrm{[linear
 <span id="cb484-27"><a href="rethinking-chapter-6.html#cb484-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_equal</span>()</span>
 <span id="cb484-28"><a href="rethinking-chapter-6.html#cb484-28" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb484-29"><a href="rethinking-chapter-6.html#cb484-29" aria-hidden="true" tabindex="-1"></a>p_dag1 <span class="sc">+</span> p_dag2 <span class="sc">+</span> <span class="fu">plot_annotation</span>(<span class="at">tag_levels =</span> <span class="st">&quot;a&quot;</span>) <span class="sc">&amp;</span> <span class="fu">theme</span>(<span class="at">plot.tag =</span> <span class="fu">element_text</span>(<span class="at">family =</span> fnt_sel))</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-23-1.svg" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-24-1.svg" width="864" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb485"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb485-1"><a href="rethinking-chapter-6.html#cb485-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">200</span></span>
 <span id="cb485-2"><a href="rethinking-chapter-6.html#cb485-2" aria-hidden="true" tabindex="-1"></a>beta_gp <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="co"># direct effect of G -&gt; P</span></span>
 <span id="cb485-3"><a href="rethinking-chapter-6.html#cb485-3" aria-hidden="true" tabindex="-1"></a>beta_gc <span class="ot">&lt;-</span> <span class="dv">0</span> <span class="co"># direct effect of G -&gt; C</span></span>
@@ -1907,7 +1931,7 @@ p &amp; = &amp; \alpha + \beta_{T} T_{i} + \beta_{F} F_{i} &amp; \textrm{[linear
 <span id="cb486-16"><a href="rethinking-chapter-6.html#cb486-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(clr0d, clr2), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
 <span id="cb486-17"><a href="rethinking-chapter-6.html#cb486-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">FALSE</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">1</span>, <span class="st">`</span><span class="at">TRUE</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">21</span>), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
 <span id="cb486-18"><a href="rethinking-chapter-6.html#cb486-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_equal</span>()</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-25-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-26-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb487"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb487-1"><a href="rethinking-chapter-6.html#cb487-1" aria-hidden="true" tabindex="-1"></a>model_education_resolved <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
 <span id="cb487-2"><a href="rethinking-chapter-6.html#cb487-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">flist =</span> <span class="fu">alist</span>(</span>
 <span id="cb487-3"><a href="rethinking-chapter-6.html#cb487-3" aria-hidden="true" tabindex="-1"></a>    children <span class="sc">~</span> <span class="fu">dnorm</span>(mu, sigma),</span>
@@ -2035,7 +2059,7 @@ p &amp; = &amp; \alpha + \beta_{T} T_{i} + \beta_{F} F_{i} &amp; \textrm{[linear
 <span id="cb488-60"><a href="rethinking-chapter-6.html#cb488-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, <span class="fl">1.1</span>)) <span class="sc">&amp;</span></span>
 <span id="cb488-61"><a href="rethinking-chapter-6.html#cb488-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> .<span class="dv">5</span>, <span class="at">family =</span> fnt_sel),</span>
 <span id="cb488-62"><a href="rethinking-chapter-6.html#cb488-62" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.tag =</span> <span class="fu">element_text</span>(<span class="at">family =</span> fnt_sel))</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-27-1.svg" width="1152" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-28-1.svg" width="1152" style="display: block; margin: auto;" /></p>
 <ul>
 <li><strong>a. Fork</strong>: <span class="math inline">\(X \perp \!\!\! \perp Y | Z\)</span></li>
 <li><strong>b. Pipe</strong>: <span class="math inline">\(X \perp \!\!\! \perp Y | Z\)</span></li>
@@ -2068,7 +2092,7 @@ p &amp; = &amp; \alpha + \beta_{T} T_{i} + \beta_{F} F_{i} &amp; \textrm{[linear
 <span id="cb489-21"><a href="rethinking-chapter-6.html#cb489-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, <span class="fl">1.1</span>)) <span class="sc">&amp;</span></span>
 <span id="cb489-22"><a href="rethinking-chapter-6.html#cb489-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> .<span class="dv">5</span>, <span class="at">family =</span> fnt_sel),</span>
 <span id="cb489-23"><a href="rethinking-chapter-6.html#cb489-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.tag =</span> <span class="fu">element_text</span>(<span class="at">family =</span> fnt_sel))</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-28-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-29-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb490"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb490-1"><a href="rethinking-chapter-6.html#cb490-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adjustmentSets</span>(dag_roads,<span class="at">exposure =</span> <span class="st">&quot;X&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; { C }
 #&gt; { A }
@@ -2108,7 +2132,7 @@ p &amp; = &amp; \alpha + \beta_{T} T_{i} + \beta_{F} F_{i} &amp; \textrm{[linear
 <span id="cb494-20"><a href="rethinking-chapter-6.html#cb494-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, <span class="fl">1.1</span>)) <span class="sc">&amp;</span></span>
 <span id="cb494-21"><a href="rethinking-chapter-6.html#cb494-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> .<span class="dv">5</span>, <span class="at">family =</span> fnt_sel),</span>
 <span id="cb494-22"><a href="rethinking-chapter-6.html#cb494-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.tag =</span> <span class="fu">element_text</span>(<span class="at">family =</span> fnt_sel))</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-29-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-30-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb495"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb495-1"><a href="rethinking-chapter-6.html#cb495-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adjustmentSets</span>(dag_waffles)</span></code></pre></div>
 <pre><code>#&gt; { A, M }
 #&gt; { S }</code></pre>
@@ -2166,7 +2190,7 @@ This is implicitly conditioning on a third variable (also like eg. the 45-60 per
 <span id="cb499-21"><a href="rethinking-chapter-6.html#cb499-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, <span class="fl">1.4</span>)) <span class="sc">&amp;</span></span>
 <span id="cb499-22"><a href="rethinking-chapter-6.html#cb499-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> .<span class="dv">5</span>, <span class="at">family =</span> fnt_sel),</span>
 <span id="cb499-23"><a href="rethinking-chapter-6.html#cb499-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.tag =</span> <span class="fu">element_text</span>(<span class="at">family =</span> fnt_sel))</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-31-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-32-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb500"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb500-1"><a href="rethinking-chapter-6.html#cb500-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adjustmentSets</span>(dag_roads_v, <span class="at">exposure =</span> <span class="st">&quot;X&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; { C, V }
 #&gt; { A }
@@ -2203,7 +2227,7 @@ This is implicitly conditioning on a third variable (also like eg. the 45-60 per
 <span id="cb504-16"><a href="rethinking-chapter-6.html#cb504-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, <span class="fl">1.1</span>)) <span class="sc">&amp;</span></span>
 <span id="cb504-17"><a href="rethinking-chapter-6.html#cb504-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> .<span class="dv">5</span>, <span class="at">family =</span> fnt_sel),</span>
 <span id="cb504-18"><a href="rethinking-chapter-6.html#cb504-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.tag =</span> <span class="fu">element_text</span>(<span class="at">family =</span> fnt_sel))</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-32-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-33-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb505"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb505-1"><a href="rethinking-chapter-6.html#cb505-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fl">1e4</span></span>
 <span id="cb505-2"><a href="rethinking-chapter-6.html#cb505-2" aria-hidden="true" tabindex="-1"></a>data_sim_multicol <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">rnorm</span>(n),</span>
 <span id="cb505-3"><a href="rethinking-chapter-6.html#cb505-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">z =</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> x, <span class="at">sd =</span> .<span class="dv">05</span>),</span>
@@ -2215,7 +2239,7 @@ This is implicitly conditioning on a third variable (also like eg. the 45-60 per
 <span id="cb505-9"><a href="rethinking-chapter-6.html#cb505-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">diag =</span> <span class="fu">list</span>(<span class="at">continuous =</span> <span class="fu">wrap</span>(<span class="st">&quot;densityDiag&quot;</span>, <span class="at">fill =</span> fll0, <span class="at">color =</span> clr0d, <span class="at">adjust =</span> .<span class="dv">9</span>)),</span>
 <span id="cb505-10"><a href="rethinking-chapter-6.html#cb505-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">upper =</span> <span class="fu">list</span>(<span class="at">continuous =</span> <span class="fu">wrap</span>(ggally_cor, <span class="at">size =</span> <span class="dv">5</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">family =</span> <span class="st">&quot;Josefin sans&quot;</span>))</span>
 <span id="cb505-11"><a href="rethinking-chapter-6.html#cb505-11" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-33-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-34-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb506"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb506-1"><a href="rethinking-chapter-6.html#cb506-1" aria-hidden="true" tabindex="-1"></a>model_sim_multicol <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
 <span id="cb506-2"><a href="rethinking-chapter-6.html#cb506-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">flist =</span> <span class="fu">alist</span>(</span>
 <span id="cb506-3"><a href="rethinking-chapter-6.html#cb506-3" aria-hidden="true" tabindex="-1"></a>    y <span class="sc">~</span> <span class="fu">dnorm</span>(mu, sigma),</span>
@@ -2282,7 +2306,7 @@ This is implicitly conditioning on a third variable (also like eg. the 45-60 per
 <span id="cb507-9"><a href="rethinking-chapter-6.html#cb507-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> clr0d, <span class="at">fill =</span> clr0) <span class="sc">+</span></span>
 <span id="cb507-10"><a href="rethinking-chapter-6.html#cb507-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="st">&quot;sigma&quot;</span>, <span class="st">&quot;beta_z&quot;</span>, <span class="st">&quot;beta_x&quot;</span>, <span class="st">&quot;alpha&quot;</span>)) <span class="sc">+</span></span>
 <span id="cb507-11"><a href="rethinking-chapter-6.html#cb507-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>())</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-35-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-36-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <p>Here the effect of <span class="math inline">\(Z\)</span> on <span class="math inline">\(Y\)</span> is not obscured by including <span class="math inline">\(X\)</span>.
 The difference is that here we are breaking a pipe by conditioning on <span class="math inline">\(Z\)</span>.</p>
 <p><strong>M3</strong></p>
@@ -2342,7 +2366,7 @@ The difference is that here we are breaking a pipe by conditioning on <span clas
 <span id="cb508-54"><a href="rethinking-chapter-6.html#cb508-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, <span class="fl">1.1</span>)) <span class="sc">&amp;</span></span>
 <span id="cb508-55"><a href="rethinking-chapter-6.html#cb508-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> .<span class="dv">5</span>, <span class="at">family =</span> fnt_sel),</span>
 <span id="cb508-56"><a href="rethinking-chapter-6.html#cb508-56" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.tag =</span> <span class="fu">element_text</span>(<span class="at">family =</span> fnt_sel))</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-36-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-37-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <ul>
 <li><strong>a.</strong> condition on <span class="math inline">\(Z\)</span> to close both backdoor paths into <span class="math inline">\(Y\)</span></li>
 <li><strong>b.</strong> none (the information flow through <span class="math inline">\(Z\)</span> is causal and thus desired, and <span class="math inline">\(A\)</span> is blocked by the collider in <span class="math inline">\(Z\)</span>)</li>
@@ -2393,7 +2417,7 @@ The difference is that here we are breaking a pipe by conditioning on <span clas
 <span id="cb511-27"><a href="rethinking-chapter-6.html#cb511-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_dag</span>(<span class="at">clr_in =</span> clr3) <span class="sc">+</span> </span>
 <span id="cb511-28"><a href="rethinking-chapter-6.html#cb511-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, <span class="fl">1.1</span>)) <span class="sc">+</span></span>
 <span id="cb511-29"><a href="rethinking-chapter-6.html#cb511-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_fixed</span>(<span class="at">ratio =</span> .<span class="dv">6</span>)</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-38-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-39-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb512"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb512-1"><a href="rethinking-chapter-6.html#cb512-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adjustmentSets</span>(dag_waffles)</span></code></pre></div>
 <pre><code>#&gt; { A, M }
 #&gt; { S }</code></pre>
@@ -2464,7 +2488,7 @@ To close the other three, we can condition on <span class="math inline">\(S\)</s
 <span id="cb515-9"><a href="rethinking-chapter-6.html#cb515-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> clr0d, <span class="at">fill =</span> clr0) <span class="sc">+</span></span>
 <span id="cb515-10"><a href="rethinking-chapter-6.html#cb515-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="st">&quot;sigma&quot;</span>, <span class="st">&quot;beta_w&quot;</span>, <span class="st">&quot;alpha[2]&quot;</span>, <span class="st">&quot;alpha[1]&quot;</span>)) <span class="sc">+</span></span>
 <span id="cb515-11"><a href="rethinking-chapter-6.html#cb515-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>())</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-39-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-40-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <p><span class="math inline">\(\rightarrow\)</span> The total causal influence of <span class="math inline">\(W\)</span> on <span class="math inline">\(D\)</span> should be in the order of 0.24 standard deviations.</p>
 <p><strong>H2</strong></p>
 <div class="sourceCode" id="cb516"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb516-1"><a href="rethinking-chapter-6.html#cb516-1" aria-hidden="true" tabindex="-1"></a><span class="fu">impliedConditionalIndependencies</span>(dag_waffles)</span></code></pre></div>
@@ -2607,7 +2631,7 @@ Based on this we can not find a definitive influence from <span class="math inli
 <span id="cb520-11"><a href="rethinking-chapter-6.html#cb520-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">color =</span> clr0d, <span class="at">fill =</span> fll0) <span class="sc">+</span></span>
 <span id="cb520-12"><a href="rethinking-chapter-6.html#cb520-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="at">data =</span> waffel_test2_samples_quantiles, </span>
 <span id="cb520-13"><a href="rethinking-chapter-6.html#cb520-13" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">aes</span>(<span class="at">xmin =</span> lower, <span class="at">x =</span> median, <span class="at">xmax =</span> upper, <span class="at">y =</span> <span class="dv">0</span>), <span class="at">color =</span> clr0d, <span class="at">fill =</span> clr0, <span class="at">shape =</span> <span class="dv">21</span>)</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-43-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-44-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <p><span class="math inline">\(\rightarrow\)</span> the influence of <span class="math inline">\(S\)</span> on <span class="math inline">\(D\)</span> is moderate after conditioning on <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(W\)</span> (median of the contrast effect: 0.0026)</p>
 <div class="sourceCode" id="cb521"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb521-1"><a href="rethinking-chapter-6.html#cb521-1" aria-hidden="true" tabindex="-1"></a>model_waffel_test3 <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
 <span id="cb521-2"><a href="rethinking-chapter-6.html#cb521-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">flist =</span> <span class="fu">alist</span>(</span>
@@ -2700,7 +2724,7 @@ Based on this we can not find a definitive influence from <span class="math inli
 <span id="cb522-27"><a href="rethinking-chapter-6.html#cb522-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_dag</span>(<span class="at">clr_in =</span> clr2) <span class="sc">+</span> </span>
 <span id="cb522-28"><a href="rethinking-chapter-6.html#cb522-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, <span class="fl">1.1</span>)) <span class="sc">+</span></span>
 <span id="cb522-29"><a href="rethinking-chapter-6.html#cb522-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_fixed</span>(<span class="at">ratio =</span> .<span class="dv">6</span>)</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-46-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-47-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb523"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb523-1"><a href="rethinking-chapter-6.html#cb523-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adjustmentSets</span>(dag_fox)</span></code></pre></div>
 <pre><code>#&gt;  {}</code></pre>
 <div class="sourceCode" id="cb525"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb525-1"><a href="rethinking-chapter-6.html#cb525-1" aria-hidden="true" tabindex="-1"></a>model_fox_area <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
@@ -2724,7 +2748,7 @@ Based on this we can not find a definitive influence from <span class="math inli
 <span id="cb525-19"><a href="rethinking-chapter-6.html#cb525-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>,<span class="dv">3</span>)) <span class="sc">+</span></span>
 <span id="cb525-20"><a href="rethinking-chapter-6.html#cb525-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>,<span class="dv">3</span>)) <span class="sc">+</span></span>
 <span id="cb525-21"><a href="rethinking-chapter-6.html#cb525-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;area_std&quot;</span>, <span class="at">y =</span> <span class="st">&quot;weight_std&quot;</span>)</span></code></pre></div>
-<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-47-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-48-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb526"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb526-1"><a href="rethinking-chapter-6.html#cb526-1" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(model_fox_area) <span class="sc">%&gt;%</span> </span>
 <span id="cb526-2"><a href="rethinking-chapter-6.html#cb526-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">knit_precis</span>()</span></code></pre></div>
 <table>
@@ -2761,75 +2785,23 @@ Based on this we can not find a definitive influence from <span class="math inli
 </tr>
 </tbody>
 </table>
-<p>The slope of area very close to zero with the posterior distribution heavy on either side 🤷`</p>
-<div class="sourceCode" id="cb527"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb527-1"><a href="rethinking-chapter-6.html#cb527-1" aria-hidden="true" tabindex="-1"></a>model_fox_food <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
-<span id="cb527-2"><a href="rethinking-chapter-6.html#cb527-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">flist =</span> <span class="fu">alist</span>(</span>
-<span id="cb527-3"><a href="rethinking-chapter-6.html#cb527-3" aria-hidden="true" tabindex="-1"></a>    weight_std <span class="sc">~</span> <span class="fu">dnorm</span>(mu, sigma),</span>
-<span id="cb527-4"><a href="rethinking-chapter-6.html#cb527-4" aria-hidden="true" tabindex="-1"></a>    mu <span class="ot">&lt;-</span> alpha <span class="sc">+</span> beta_food <span class="sc">*</span> avgfood_std <span class="sc">+</span> beta_group <span class="sc">*</span> groupsize_std,</span>
-<span id="cb527-5"><a href="rethinking-chapter-6.html#cb527-5" aria-hidden="true" tabindex="-1"></a>    alpha <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>,.<span class="dv">2</span>),</span>
-<span id="cb527-6"><a href="rethinking-chapter-6.html#cb527-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(beta_food, beta_group) <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, .<span class="dv">25</span>),</span>
-<span id="cb527-7"><a href="rethinking-chapter-6.html#cb527-7" aria-hidden="true" tabindex="-1"></a>    sigma <span class="sc">~</span> <span class="fu">dexp</span>(<span class="dv">1</span>)</span>
-<span id="cb527-8"><a href="rethinking-chapter-6.html#cb527-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb527-9"><a href="rethinking-chapter-6.html#cb527-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_fox</span>
-<span id="cb527-10"><a href="rethinking-chapter-6.html#cb527-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb527-11"><a href="rethinking-chapter-6.html#cb527-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb527-12"><a href="rethinking-chapter-6.html#cb527-12" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(model_fox_food, <span class="at">depth =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb527-13"><a href="rethinking-chapter-6.html#cb527-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">knit_precis</span>()</span></code></pre></div>
-<table>
-<thead>
-<tr class="header">
-<th align="left">param</th>
-<th align="right">mean</th>
-<th align="right">sd</th>
-<th align="right">5.5%</th>
-<th align="right">94.5%</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">alpha</td>
-<td align="right">0.00</td>
-<td align="right">0.08</td>
-<td align="right">-0.13</td>
-<td align="right">0.13</td>
-</tr>
-<tr class="even">
-<td align="left">beta_food</td>
-<td align="right">0.26</td>
-<td align="right">0.14</td>
-<td align="right">0.03</td>
-<td align="right">0.48</td>
-</tr>
-<tr class="odd">
-<td align="left">beta_group</td>
-<td align="right">-0.35</td>
-<td align="right">0.14</td>
-<td align="right">-0.57</td>
-<td align="right">-0.12</td>
-</tr>
-<tr class="even">
-<td align="left">sigma</td>
-<td align="right">0.95</td>
-<td align="right">0.06</td>
-<td align="right">0.85</td>
-<td align="right">1.06</td>
-</tr>
-</tbody>
-</table>
-<p>Compare without closing the backdoor:</p>
-<div class="sourceCode" id="cb528"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb528-1"><a href="rethinking-chapter-6.html#cb528-1" aria-hidden="true" tabindex="-1"></a>model_fox_food2 <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
-<span id="cb528-2"><a href="rethinking-chapter-6.html#cb528-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">flist =</span> <span class="fu">alist</span>(</span>
-<span id="cb528-3"><a href="rethinking-chapter-6.html#cb528-3" aria-hidden="true" tabindex="-1"></a>    weight_std <span class="sc">~</span> <span class="fu">dnorm</span>(mu, sigma),</span>
-<span id="cb528-4"><a href="rethinking-chapter-6.html#cb528-4" aria-hidden="true" tabindex="-1"></a>    mu <span class="ot">&lt;-</span> alpha <span class="sc">+</span> beta_food <span class="sc">*</span> avgfood_std,</span>
-<span id="cb528-5"><a href="rethinking-chapter-6.html#cb528-5" aria-hidden="true" tabindex="-1"></a>    alpha <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>,.<span class="dv">2</span>),</span>
-<span id="cb528-6"><a href="rethinking-chapter-6.html#cb528-6" aria-hidden="true" tabindex="-1"></a>    beta_food <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, .<span class="dv">25</span>),</span>
-<span id="cb528-7"><a href="rethinking-chapter-6.html#cb528-7" aria-hidden="true" tabindex="-1"></a>    sigma <span class="sc">~</span> <span class="fu">dexp</span>(<span class="dv">1</span>)</span>
-<span id="cb528-8"><a href="rethinking-chapter-6.html#cb528-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb528-9"><a href="rethinking-chapter-6.html#cb528-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_fox</span>
-<span id="cb528-10"><a href="rethinking-chapter-6.html#cb528-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb528-11"><a href="rethinking-chapter-6.html#cb528-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb528-12"><a href="rethinking-chapter-6.html#cb528-12" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(model_fox_food2, <span class="at">depth =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb528-13"><a href="rethinking-chapter-6.html#cb528-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">knit_precis</span>()</span></code></pre></div>
+<p>The slope of area very close to zero with the posterior distribution heavy on either side 🤷</p>
+<p><strong>H4</strong></p>
+<div class="sourceCode" id="cb527"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb527-1"><a href="rethinking-chapter-6.html#cb527-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adjustmentSets</span>(dag_fox, <span class="at">exposure =</span> <span class="st">&quot;F&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;W&quot;</span>)</span></code></pre></div>
+<pre><code>#&gt;  {}</code></pre>
+<div class="sourceCode" id="cb529"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb529-1"><a href="rethinking-chapter-6.html#cb529-1" aria-hidden="true" tabindex="-1"></a>model_fox_food <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
+<span id="cb529-2"><a href="rethinking-chapter-6.html#cb529-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">flist =</span> <span class="fu">alist</span>(</span>
+<span id="cb529-3"><a href="rethinking-chapter-6.html#cb529-3" aria-hidden="true" tabindex="-1"></a>    weight_std <span class="sc">~</span> <span class="fu">dnorm</span>(mu, sigma),</span>
+<span id="cb529-4"><a href="rethinking-chapter-6.html#cb529-4" aria-hidden="true" tabindex="-1"></a>    mu <span class="ot">&lt;-</span> alpha <span class="sc">+</span> beta_food <span class="sc">*</span> avgfood_std,</span>
+<span id="cb529-5"><a href="rethinking-chapter-6.html#cb529-5" aria-hidden="true" tabindex="-1"></a>    alpha <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>,.<span class="dv">2</span>),</span>
+<span id="cb529-6"><a href="rethinking-chapter-6.html#cb529-6" aria-hidden="true" tabindex="-1"></a>    beta_food <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, .<span class="dv">25</span>),</span>
+<span id="cb529-7"><a href="rethinking-chapter-6.html#cb529-7" aria-hidden="true" tabindex="-1"></a>    sigma <span class="sc">~</span> <span class="fu">dexp</span>(<span class="dv">1</span>)</span>
+<span id="cb529-8"><a href="rethinking-chapter-6.html#cb529-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb529-9"><a href="rethinking-chapter-6.html#cb529-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_fox</span>
+<span id="cb529-10"><a href="rethinking-chapter-6.html#cb529-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb529-11"><a href="rethinking-chapter-6.html#cb529-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb529-12"><a href="rethinking-chapter-6.html#cb529-12" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(model_fox_food, <span class="at">depth =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb529-13"><a href="rethinking-chapter-6.html#cb529-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">knit_precis</span>()</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -2864,13 +2836,546 @@ Based on this we can not find a definitive influence from <span class="math inli
 </tr>
 </tbody>
 </table>
-<p><strong>H4</strong></p>
 <p><strong>H5</strong></p>
+<div class="sourceCode" id="cb530"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb530-1"><a href="rethinking-chapter-6.html#cb530-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adjustmentSets</span>(dag_fox, <span class="at">exposure =</span> <span class="st">&quot;G&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;W&quot;</span>)</span></code></pre></div>
+<pre><code>#&gt; { F }</code></pre>
+<p>… we need to condition on <span class="math inline">\(F\)</span>.</p>
+<div class="sourceCode" id="cb532"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb532-1"><a href="rethinking-chapter-6.html#cb532-1" aria-hidden="true" tabindex="-1"></a>model_fox_group <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
+<span id="cb532-2"><a href="rethinking-chapter-6.html#cb532-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">flist =</span> <span class="fu">alist</span>(</span>
+<span id="cb532-3"><a href="rethinking-chapter-6.html#cb532-3" aria-hidden="true" tabindex="-1"></a>    weight_std <span class="sc">~</span> <span class="fu">dnorm</span>(mu, sigma),</span>
+<span id="cb532-4"><a href="rethinking-chapter-6.html#cb532-4" aria-hidden="true" tabindex="-1"></a>    mu <span class="ot">&lt;-</span> alpha <span class="sc">+</span> beta_food <span class="sc">*</span> avgfood_std <span class="sc">+</span> beta_group <span class="sc">*</span> groupsize_std,</span>
+<span id="cb532-5"><a href="rethinking-chapter-6.html#cb532-5" aria-hidden="true" tabindex="-1"></a>    alpha <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>,.<span class="dv">2</span>),</span>
+<span id="cb532-6"><a href="rethinking-chapter-6.html#cb532-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(beta_food, beta_group) <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, .<span class="dv">5</span>),</span>
+<span id="cb532-7"><a href="rethinking-chapter-6.html#cb532-7" aria-hidden="true" tabindex="-1"></a>    sigma <span class="sc">~</span> <span class="fu">dexp</span>(<span class="dv">1</span>)</span>
+<span id="cb532-8"><a href="rethinking-chapter-6.html#cb532-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb532-9"><a href="rethinking-chapter-6.html#cb532-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_fox</span>
+<span id="cb532-10"><a href="rethinking-chapter-6.html#cb532-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb532-11"><a href="rethinking-chapter-6.html#cb532-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb532-12"><a href="rethinking-chapter-6.html#cb532-12" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(model_fox_group, <span class="at">depth =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb532-13"><a href="rethinking-chapter-6.html#cb532-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">knit_precis</span>()</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">param</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">5.5%</th>
+<th align="right">94.5%</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">alpha</td>
+<td align="right">0.00</td>
+<td align="right">0.08</td>
+<td align="right">-0.13</td>
+<td align="right">0.13</td>
+</tr>
+<tr class="even">
+<td align="left">beta_food</td>
+<td align="right">0.48</td>
+<td align="right">0.18</td>
+<td align="right">0.19</td>
+<td align="right">0.76</td>
+</tr>
+<tr class="odd">
+<td align="left">beta_group</td>
+<td align="right">-0.57</td>
+<td align="right">0.18</td>
+<td align="right">-0.86</td>
+<td align="right">-0.29</td>
+</tr>
+<tr class="even">
+<td align="left">sigma</td>
+<td align="right">0.94</td>
+<td align="right">0.06</td>
+<td align="right">0.84</td>
+<td align="right">1.04</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb533"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb533-1"><a href="rethinking-chapter-6.html#cb533-1" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(model_fox_group, <span class="at">depth =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb533-2"><a href="rethinking-chapter-6.html#cb533-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble_rn</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb533-3"><a href="rethinking-chapter-6.html#cb533-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> param)) <span class="sc">+</span></span>
+<span id="cb533-4"><a href="rethinking-chapter-6.html#cb533-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">3</span>, <span class="at">color =</span> <span class="fu">rgb</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,.<span class="dv">6</span>)) <span class="sc">+</span></span>
+<span id="cb533-5"><a href="rethinking-chapter-6.html#cb533-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_linerange</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> <span class="st">`</span><span class="at">5.5%</span><span class="st">`</span>,</span>
+<span id="cb533-6"><a href="rethinking-chapter-6.html#cb533-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">xmax =</span><span class="st">`</span><span class="at">94.5%</span><span class="st">`</span>), <span class="at">color =</span> clr0d) <span class="sc">+</span></span>
+<span id="cb533-7"><a href="rethinking-chapter-6.html#cb533-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> mean),</span>
+<span id="cb533-8"><a href="rethinking-chapter-6.html#cb533-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">size =</span> <span class="dv">3</span> ,</span>
+<span id="cb533-9"><a href="rethinking-chapter-6.html#cb533-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> clr0d, <span class="at">fill =</span> clr0) <span class="sc">+</span></span>
+<span id="cb533-10"><a href="rethinking-chapter-6.html#cb533-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="st">&quot;sigma&quot;</span>, <span class="st">&quot;beta_group&quot;</span>, <span class="st">&quot;beta_food&quot;</span>, <span class="st">&quot;alpha&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb533-11"><a href="rethinking-chapter-6.html#cb533-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>())</span></code></pre></div>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-52-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <p><strong>H6</strong></p>
 <p><strong>H7</strong></p>
 </div>
 <div id="brms-section-4" class="section level2" number="7.5">
 <h2><span class="header-section-number">7.5</span> {brms} section</h2>
+<div id="multicolliniarity-1" class="section level3" number="7.5.1">
+<h3><span class="header-section-number">7.5.1</span> Multicolliniarity</h3>
+<p>Legs Model</p>
+<div class="sourceCode" id="cb534"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb534-1"><a href="rethinking-chapter-6.html#cb534-1" aria-hidden="true" tabindex="-1"></a>brms_c6_model_legs_multicollinear <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb534-2"><a href="rethinking-chapter-6.html#cb534-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_legs, </span>
+<span id="cb534-3"><a href="rethinking-chapter-6.html#cb534-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb534-4"><a href="rethinking-chapter-6.html#cb534-4" aria-hidden="true" tabindex="-1"></a>  height <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> left_leg <span class="sc">+</span> right_leg,</span>
+<span id="cb534-5"><a href="rethinking-chapter-6.html#cb534-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">10</span>, <span class="dv">100</span>), <span class="at">class =</span> Intercept),</span>
+<span id="cb534-6"><a href="rethinking-chapter-6.html#cb534-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">10</span>), <span class="at">class =</span> b),</span>
+<span id="cb534-7"><a href="rethinking-chapter-6.html#cb534-7" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb534-8"><a href="rethinking-chapter-6.html#cb534-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, </span>
+<span id="cb534-9"><a href="rethinking-chapter-6.html#cb534-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_prior =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb534-10"><a href="rethinking-chapter-6.html#cb534-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb534-11"><a href="rethinking-chapter-6.html#cb534-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb534-12"><a href="rethinking-chapter-6.html#cb534-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_legs_multicollinear&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb535"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb535-1"><a href="rethinking-chapter-6.html#cb535-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidybayes)</span>
+<span id="cb535-2"><a href="rethinking-chapter-6.html#cb535-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggdist)</span>
+<span id="cb535-3"><a href="rethinking-chapter-6.html#cb535-3" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_df</span>(brms_c6_model_legs_multicollinear) <span class="sc">%&gt;%</span> </span>
+<span id="cb535-4"><a href="rethinking-chapter-6.html#cb535-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;b&quot;</span>), sigma) <span class="sc">%&gt;%</span> </span>
+<span id="cb535-5"><a href="rethinking-chapter-6.html#cb535-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb535-6"><a href="rethinking-chapter-6.html#cb535-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="at">x =</span> . , <span class="at">nm =</span> <span class="fu">names</span>(.) <span class="sc">%&gt;%</span> <span class="fu">str_remove</span>(<span class="st">&quot;b_&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb535-7"><a href="rethinking-chapter-6.html#cb535-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb535-8"><a href="rethinking-chapter-6.html#cb535-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">y =</span> <span class="fu">reorder</span>(name, value))) <span class="sc">+</span></span>
+<span id="cb535-9"><a href="rethinking-chapter-6.html#cb535-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> clr_dark, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb535-10"><a href="rethinking-chapter-6.html#cb535-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_pointinterval</span>(<span class="at">color =</span> clr0dd, <span class="at">fill =</span> clr0, <span class="at">shape =</span> <span class="dv">21</span>) <span class="sc">+</span></span>
+<span id="cb535-11"><a href="rethinking-chapter-6.html#cb535-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="st">&quot;sigma&quot;</span>, <span class="st">&quot;left_leg&quot;</span>, <span class="st">&quot;Intercept&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb535-12"><a href="rethinking-chapter-6.html#cb535-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_family =</span> fnt_sel) <span class="sc">+</span></span>
+<span id="cb535-13"><a href="rethinking-chapter-6.html#cb535-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title =</span> <span class="fu">element_blank</span>())</span></code></pre></div>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-54-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p>Check various seeds to illustrate the difficulty to fit the legs jointly:</p>
+<div class="sourceCode" id="cb536"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb536-1"><a href="rethinking-chapter-6.html#cb536-1" aria-hidden="true" tabindex="-1"></a>simulate_leg_data <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">seed =</span> <span class="dv">42</span>){</span>
+<span id="cb536-2"><a href="rethinking-chapter-6.html#cb536-2" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb536-3"><a href="rethinking-chapter-6.html#cb536-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb536-4"><a href="rethinking-chapter-6.html#cb536-4" aria-hidden="true" tabindex="-1"></a>  data_legs <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb536-5"><a href="rethinking-chapter-6.html#cb536-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">height =</span> <span class="fu">rnorm</span>(<span class="at">n =</span> n, <span class="at">mean =</span> <span class="dv">10</span>, <span class="at">sd =</span> <span class="dv">2</span>),</span>
+<span id="cb536-6"><a href="rethinking-chapter-6.html#cb536-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">leg_proportion =</span> <span class="fu">runif</span>(n, <span class="at">min =</span> <span class="fl">0.4</span>, <span class="at">max =</span> <span class="fl">0.5</span>),</span>
+<span id="cb536-7"><a href="rethinking-chapter-6.html#cb536-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">left_leg =</span> leg_proportion <span class="sc">*</span> height <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, .<span class="dv">02</span>),</span>
+<span id="cb536-8"><a href="rethinking-chapter-6.html#cb536-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">right_leg =</span> leg_proportion <span class="sc">*</span> height <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, .<span class="dv">02</span>),</span>
+<span id="cb536-9"><a href="rethinking-chapter-6.html#cb536-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb536-10"><a href="rethinking-chapter-6.html#cb536-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb536-11"><a href="rethinking-chapter-6.html#cb536-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">seed =</span> seed,</span>
+<span id="cb536-12"><a href="rethinking-chapter-6.html#cb536-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">fit =</span> <span class="fu">list</span>(<span class="fu">update</span>(brms_c6_model_legs_multicollinear,</span>
+<span id="cb536-13"><a href="rethinking-chapter-6.html#cb536-13" aria-hidden="true" tabindex="-1"></a>                           <span class="at">newdata =</span> data_legs,</span>
+<span id="cb536-14"><a href="rethinking-chapter-6.html#cb536-14" aria-hidden="true" tabindex="-1"></a>                           <span class="at">seed =</span> <span class="dv">42</span>, <span class="at">refresh =</span> <span class="dv">0</span>))) </span>
+<span id="cb536-15"><a href="rethinking-chapter-6.html#cb536-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb536-16"><a href="rethinking-chapter-6.html#cb536-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb536-17"><a href="rethinking-chapter-6.html#cb536-17" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span><span class="sc">:</span><span class="dv">4</span> <span class="sc">%&gt;%</span> </span>
+<span id="cb536-18"><a href="rethinking-chapter-6.html#cb536-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(simulate_leg_data) <span class="sc">%&gt;%</span></span>
+<span id="cb536-19"><a href="rethinking-chapter-6.html#cb536-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">posterior =</span> purrr<span class="sc">::</span><span class="fu">map</span>(fit, as_draws_df )) <span class="sc">%&gt;%</span></span>
+<span id="cb536-20"><a href="rethinking-chapter-6.html#cb536-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="at">cols =</span> posterior) <span class="sc">%&gt;%</span> </span>
+<span id="cb536-21"><a href="rethinking-chapter-6.html#cb536-21" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(seed, <span class="fu">starts_with</span>(<span class="st">&quot;b&quot;</span>), sigma) <span class="sc">%&gt;%</span> </span>
+<span id="cb536-22"><a href="rethinking-chapter-6.html#cb536-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="at">x =</span> . , <span class="at">nm =</span> <span class="fu">names</span>(.) <span class="sc">%&gt;%</span> <span class="fu">str_remove</span>(<span class="st">&quot;b_&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb536-23"><a href="rethinking-chapter-6.html#cb536-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>seed) <span class="sc">%&gt;%</span> </span>
+<span id="cb536-24"><a href="rethinking-chapter-6.html#cb536-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">y =</span> <span class="fu">reorder</span>(name, value))) <span class="sc">+</span></span>
+<span id="cb536-25"><a href="rethinking-chapter-6.html#cb536-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> clr_dark, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb536-26"><a href="rethinking-chapter-6.html#cb536-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_halfeye</span>(<span class="fu">aes</span>(<span class="at">fill_ramp =</span> <span class="fu">stat</span>(<span class="fu">cut_cdf_qi</span>(cdf, <span class="at">.width =</span> <span class="fu">c</span>(<span class="fl">0.66</span>, <span class="fl">0.95</span>,<span class="dv">1</span>)))),</span>
+<span id="cb536-27"><a href="rethinking-chapter-6.html#cb536-27" aria-hidden="true" tabindex="-1"></a>               <span class="at">fill =</span> fll0dd, <span class="at">adjust =</span> .<span class="dv">7</span>, <span class="at">normalize =</span> <span class="st">&quot;groups&quot;</span>, <span class="at">height =</span> .<span class="dv">8</span>) <span class="sc">+</span></span>
+<span id="cb536-28"><a href="rethinking-chapter-6.html#cb536-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_ramp_discrete</span>(<span class="at">range =</span> <span class="fu">c</span>(.<span class="dv">85</span>, <span class="fl">0.15</span>), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb536-29"><a href="rethinking-chapter-6.html#cb536-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="st">&quot;sigma&quot;</span>, <span class="st">&quot;left_leg&quot;</span>, <span class="st">&quot;right_leg&quot;</span>, <span class="st">&quot;Intercept&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb536-30"><a href="rethinking-chapter-6.html#cb536-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.9</span>, <span class="dv">5</span>),</span>
+<span id="cb536-31"><a href="rethinking-chapter-6.html#cb536-31" aria-hidden="true" tabindex="-1"></a>                  <span class="at">expand =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb536-32"><a href="rethinking-chapter-6.html#cb536-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(seed <span class="sc">~</span> ., <span class="at">ncol =</span> <span class="dv">1</span>, <span class="at">labeller =</span> label_both) <span class="sc">+</span></span>
+<span id="cb536-33"><a href="rethinking-chapter-6.html#cb536-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_family =</span> fnt_sel) <span class="sc">+</span></span>
+<span id="cb536-34"><a href="rethinking-chapter-6.html#cb536-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title =</span> <span class="fu">element_blank</span>())</span></code></pre></div>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-55-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb537"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb537-1"><a href="rethinking-chapter-6.html#cb537-1" aria-hidden="true" tabindex="-1"></a>p_ridge <span class="ot">&lt;-</span> <span class="fu">as_draws_df</span>(brms_c6_model_legs_multicollinear) <span class="sc">%&gt;%</span> </span>
+<span id="cb537-2"><a href="rethinking-chapter-6.html#cb537-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb537-3"><a href="rethinking-chapter-6.html#cb537-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;b&quot;</span>), sigma) <span class="sc">%&gt;%</span> </span>
+<span id="cb537-4"><a href="rethinking-chapter-6.html#cb537-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="at">x =</span> . , <span class="at">nm =</span> <span class="fu">names</span>(.) <span class="sc">%&gt;%</span> <span class="fu">str_remove</span>(<span class="st">&quot;b_&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb537-5"><a href="rethinking-chapter-6.html#cb537-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> left_leg, <span class="at">y =</span> right_leg)) <span class="sc">+</span></span>
+<span id="cb537-6"><a href="rethinking-chapter-6.html#cb537-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> clr0d, <span class="at">fill =</span> fll0, <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">size =</span> .<span class="dv">6</span>)</span>
+<span id="cb537-7"><a href="rethinking-chapter-6.html#cb537-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb537-8"><a href="rethinking-chapter-6.html#cb537-8" aria-hidden="true" tabindex="-1"></a>p_sum <span class="ot">&lt;-</span> <span class="fu">as_draws_df</span>(brms_c6_model_legs_multicollinear) <span class="sc">%&gt;%</span> </span>
+<span id="cb537-9"><a href="rethinking-chapter-6.html#cb537-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb537-10"><a href="rethinking-chapter-6.html#cb537-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;b&quot;</span>), sigma) <span class="sc">%&gt;%</span> </span>
+<span id="cb537-11"><a href="rethinking-chapter-6.html#cb537-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="at">x =</span> . , <span class="at">nm =</span> <span class="fu">names</span>(.) <span class="sc">%&gt;%</span> <span class="fu">str_remove</span>(<span class="st">&quot;b_&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb537-12"><a href="rethinking-chapter-6.html#cb537-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> left_leg <span class="sc">+</span> right_leg)) <span class="sc">+</span></span>
+<span id="cb537-13"><a href="rethinking-chapter-6.html#cb537-13" aria-hidden="true" tabindex="-1"></a>   <span class="fu">stat_halfeye</span>(<span class="fu">aes</span>(<span class="at">fill_ramp =</span> <span class="fu">stat</span>(<span class="fu">cut_cdf_qi</span>(cdf, <span class="at">.width =</span> <span class="fu">c</span>(<span class="fl">0.66</span>, <span class="fl">0.95</span>,<span class="dv">1</span>)))),</span>
+<span id="cb537-14"><a href="rethinking-chapter-6.html#cb537-14" aria-hidden="true" tabindex="-1"></a>               <span class="at">fill =</span> fll0dd, <span class="at">adjust =</span> .<span class="dv">7</span>, <span class="at">normalize =</span> <span class="st">&quot;groups&quot;</span>, <span class="at">height =</span> .<span class="dv">8</span>) <span class="sc">+</span></span>
+<span id="cb537-15"><a href="rethinking-chapter-6.html#cb537-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_ramp_discrete</span>(<span class="at">range =</span> <span class="fu">c</span>(.<span class="dv">85</span>, <span class="fl">0.15</span>), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>) </span>
+<span id="cb537-16"><a href="rethinking-chapter-6.html#cb537-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb537-17"><a href="rethinking-chapter-6.html#cb537-17" aria-hidden="true" tabindex="-1"></a>p_ridge <span class="sc">+</span> p_sum</span></code></pre></div>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-56-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p>Model single leg</p>
+<div class="sourceCode" id="cb538"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb538-1"><a href="rethinking-chapter-6.html#cb538-1" aria-hidden="true" tabindex="-1"></a>brms_c6_model_model_leg <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb538-2"><a href="rethinking-chapter-6.html#cb538-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_legs, </span>
+<span id="cb538-3"><a href="rethinking-chapter-6.html#cb538-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb538-4"><a href="rethinking-chapter-6.html#cb538-4" aria-hidden="true" tabindex="-1"></a>  height <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> left_leg,</span>
+<span id="cb538-5"><a href="rethinking-chapter-6.html#cb538-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">10</span>, <span class="dv">100</span>), <span class="at">class =</span> Intercept),</span>
+<span id="cb538-6"><a href="rethinking-chapter-6.html#cb538-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">2</span>, <span class="dv">10</span>), <span class="at">class =</span> b),</span>
+<span id="cb538-7"><a href="rethinking-chapter-6.html#cb538-7" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb538-8"><a href="rethinking-chapter-6.html#cb538-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, </span>
+<span id="cb538-9"><a href="rethinking-chapter-6.html#cb538-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_prior =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb538-10"><a href="rethinking-chapter-6.html#cb538-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb538-11"><a href="rethinking-chapter-6.html#cb538-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb538-12"><a href="rethinking-chapter-6.html#cb538-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_leg&quot;</span>)</span>
+<span id="cb538-13"><a href="rethinking-chapter-6.html#cb538-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb538-14"><a href="rethinking-chapter-6.html#cb538-14" aria-hidden="true" tabindex="-1"></a><span class="fu">as_draws_df</span>(brms_c6_model_model_leg) <span class="sc">%&gt;%</span> </span>
+<span id="cb538-15"><a href="rethinking-chapter-6.html#cb538-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;b&quot;</span>), sigma) <span class="sc">%&gt;%</span> </span>
+<span id="cb538-16"><a href="rethinking-chapter-6.html#cb538-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb538-17"><a href="rethinking-chapter-6.html#cb538-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="at">x =</span> . , <span class="at">nm =</span> <span class="fu">names</span>(.) <span class="sc">%&gt;%</span> <span class="fu">str_remove</span>(<span class="st">&quot;b_&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb538-18"><a href="rethinking-chapter-6.html#cb538-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb538-19"><a href="rethinking-chapter-6.html#cb538-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value, <span class="at">y =</span> <span class="fu">reorder</span>(name, value))) <span class="sc">+</span></span>
+<span id="cb538-20"><a href="rethinking-chapter-6.html#cb538-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> clr_dark, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb538-21"><a href="rethinking-chapter-6.html#cb538-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_pointinterval</span>(<span class="at">color =</span> clr0dd, <span class="at">fill =</span> clr0, <span class="at">shape =</span> <span class="dv">21</span>) <span class="sc">+</span></span>
+<span id="cb538-22"><a href="rethinking-chapter-6.html#cb538-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="st">&quot;sigma&quot;</span>, <span class="st">&quot;left_leg&quot;</span>, <span class="st">&quot;Intercept&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb538-23"><a href="rethinking-chapter-6.html#cb538-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_family =</span> fnt_sel) <span class="sc">+</span></span>
+<span id="cb538-24"><a href="rethinking-chapter-6.html#cb538-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title =</span> <span class="fu">element_blank</span>())</span></code></pre></div>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-57-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p>Multicollinear milk model</p>
+<div class="sourceCode" id="cb539"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb539-1"><a href="rethinking-chapter-6.html#cb539-1" aria-hidden="true" tabindex="-1"></a>brms_c6_model_milk_multicollinear_1 <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb539-2"><a href="rethinking-chapter-6.html#cb539-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_milk,</span>
+<span id="cb539-3"><a href="rethinking-chapter-6.html#cb539-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb539-4"><a href="rethinking-chapter-6.html#cb539-4" aria-hidden="true" tabindex="-1"></a>  kcal_std <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> lactose_std,</span>
+<span id="cb539-5"><a href="rethinking-chapter-6.html#cb539-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.2</span>), <span class="at">class =</span> Intercept),</span>
+<span id="cb539-6"><a href="rethinking-chapter-6.html#cb539-6" aria-hidden="true" tabindex="-1"></a>                <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">class =</span> b),</span>
+<span id="cb539-7"><a href="rethinking-chapter-6.html#cb539-7" aria-hidden="true" tabindex="-1"></a>                <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb539-8"><a href="rethinking-chapter-6.html#cb539-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, </span>
+<span id="cb539-9"><a href="rethinking-chapter-6.html#cb539-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb539-10"><a href="rethinking-chapter-6.html#cb539-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb539-11"><a href="rethinking-chapter-6.html#cb539-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_milk_multicollinear1&quot;</span></span>
+<span id="cb539-12"><a href="rethinking-chapter-6.html#cb539-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb539-13"><a href="rethinking-chapter-6.html#cb539-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb539-14"><a href="rethinking-chapter-6.html#cb539-14" aria-hidden="true" tabindex="-1"></a>brms_c6_model_milk_multicollinear_2 <span class="ot">&lt;-</span> <span class="fu">update</span>(</span>
+<span id="cb539-15"><a href="rethinking-chapter-6.html#cb539-15" aria-hidden="true" tabindex="-1"></a>  brms_c6_model_milk_multicollinear_1,</span>
+<span id="cb539-16"><a href="rethinking-chapter-6.html#cb539-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> data_milk,</span>
+<span id="cb539-17"><a href="rethinking-chapter-6.html#cb539-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> kcal_std <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> fat_std,</span>
+<span id="cb539-18"><a href="rethinking-chapter-6.html#cb539-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb539-19"><a href="rethinking-chapter-6.html#cb539-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_milk_multicollinear2&quot;</span></span>
+<span id="cb539-20"><a href="rethinking-chapter-6.html#cb539-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb539-21"><a href="rethinking-chapter-6.html#cb539-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb539-22"><a href="rethinking-chapter-6.html#cb539-22" aria-hidden="true" tabindex="-1"></a>brms_c6_model_milk_multicollinear_3 <span class="ot">&lt;-</span> <span class="fu">update</span>(</span>
+<span id="cb539-23"><a href="rethinking-chapter-6.html#cb539-23" aria-hidden="true" tabindex="-1"></a>  brms_c6_model_milk_multicollinear_1,</span>
+<span id="cb539-24"><a href="rethinking-chapter-6.html#cb539-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> data_milk,</span>
+<span id="cb539-25"><a href="rethinking-chapter-6.html#cb539-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> kcal_std <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> lactose_std <span class="sc">+</span> fat_std,</span>
+<span id="cb539-26"><a href="rethinking-chapter-6.html#cb539-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb539-27"><a href="rethinking-chapter-6.html#cb539-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_milk_multicollinear3&quot;</span></span>
+<span id="cb539-28"><a href="rethinking-chapter-6.html#cb539-28" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb539-29"><a href="rethinking-chapter-6.html#cb539-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb539-30"><a href="rethinking-chapter-6.html#cb539-30" aria-hidden="true" tabindex="-1"></a><span class="fu">posterior_summary</span>(brms_c6_model_milk_multicollinear_3) <span class="sc">%&gt;%</span> </span>
+<span id="cb539-31"><a href="rethinking-chapter-6.html#cb539-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="at">digits =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb539-32"><a href="rethinking-chapter-6.html#cb539-32" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">Estimate</th>
+<th align="right">Est.Error</th>
+<th align="right">Q2.5</th>
+<th align="right">Q97.5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">b_Intercept</td>
+<td align="right">0.00</td>
+<td align="right">0.07</td>
+<td align="right">-0.15</td>
+<td align="right">0.14</td>
+</tr>
+<tr class="even">
+<td align="left">b_lactose_std</td>
+<td align="right">-0.67</td>
+<td align="right">0.20</td>
+<td align="right">-1.06</td>
+<td align="right">-0.27</td>
+</tr>
+<tr class="odd">
+<td align="left">b_fat_std</td>
+<td align="right">0.25</td>
+<td align="right">0.20</td>
+<td align="right">-0.15</td>
+<td align="right">0.65</td>
+</tr>
+<tr class="even">
+<td align="left">sigma</td>
+<td align="right">0.41</td>
+<td align="right">0.06</td>
+<td align="right">0.32</td>
+<td align="right">0.55</td>
+</tr>
+<tr class="odd">
+<td align="left">lp__</td>
+<td align="right">-17.30</td>
+<td align="right">1.51</td>
+<td align="right">-21.09</td>
+<td align="right">-15.42</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="post-treatment-bias-1" class="section level3" number="7.5.2">
+<h3><span class="header-section-number">7.5.2</span> Post-treatment bias</h3>
+<div class="sourceCode" id="cb540"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb540-1"><a href="rethinking-chapter-6.html#cb540-1" aria-hidden="true" tabindex="-1"></a>brms_c6_model_fungus_no_treatment <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb540-2"><a href="rethinking-chapter-6.html#cb540-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_fungus,</span>
+<span id="cb540-3"><a href="rethinking-chapter-6.html#cb540-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb540-4"><a href="rethinking-chapter-6.html#cb540-4" aria-hidden="true" tabindex="-1"></a>  h_1 <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> h_0,</span>
+<span id="cb540-5"><a href="rethinking-chapter-6.html#cb540-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">lognormal</span>(<span class="dv">0</span>, <span class="fl">0.25</span>), <span class="at">class =</span> b, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb540-6"><a href="rethinking-chapter-6.html#cb540-6" aria-hidden="true" tabindex="-1"></a>                <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb540-7"><a href="rethinking-chapter-6.html#cb540-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, </span>
+<span id="cb540-8"><a href="rethinking-chapter-6.html#cb540-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb540-9"><a href="rethinking-chapter-6.html#cb540-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb540-10"><a href="rethinking-chapter-6.html#cb540-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_fungus_no_treatment&quot;</span></span>
+<span id="cb540-11"><a href="rethinking-chapter-6.html#cb540-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb540-12"><a href="rethinking-chapter-6.html#cb540-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb540-13"><a href="rethinking-chapter-6.html#cb540-13" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">summarise_model</span>(brms_c6_model_fungus_no_treatment)</span></code></pre></div>
+<pre><code>#&gt;     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#&gt;  Residual            3.33 1.82   1.58    2.10     1.00
+#&gt;  Term Value   SE Lower_2.5 Upper_97.5
+#&gt;   h_0  1.43 0.02      1.39       1.46</code></pre>
+<p>To fit the original model also in {brms}, we are translating</p>
+<p><span class="math display">\[
+\begin{array}{rclr}
+\mu_i &amp; = &amp; h_{0,i} \times p &amp; \textrm{[linear model]}\\
+p &amp; = &amp; \alpha + \beta_{T} T_{i} + \beta_{F} F_{i} &amp; \textrm{[linear model]}\\
+\end{array}
+\]</span></p>
+<p>into</p>
+<p><span class="math display">\[
+\begin{array}{rclr}
+\mu_i &amp; = &amp; h_{0,i} \times ( \alpha + \beta_{T} T_{i} + \beta_{F} F_{i}) &amp; \textrm{[linear model]}\\
+\end{array}
+\]</span></p>
+<p><span class="math inline">\(\rightarrow\)</span> beware of the <a href="https://cran.r-project.org/web/packages/brms/vignettes/brms_nonlinear.html">non-linear {brms} syntax</a> used here!</p>
+<div class="sourceCode" id="cb542"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb542-1"><a href="rethinking-chapter-6.html#cb542-1" aria-hidden="true" tabindex="-1"></a>brms_c6_model_fungus_post_treatment <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb542-2"><a href="rethinking-chapter-6.html#cb542-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_fungus,</span>
+<span id="cb542-3"><a href="rethinking-chapter-6.html#cb542-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb542-4"><a href="rethinking-chapter-6.html#cb542-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bf</span>(h_1 <span class="sc">~</span> h_0 <span class="sc">*</span> (a <span class="sc">+</span> t <span class="sc">*</span> treatment <span class="sc">+</span> f <span class="sc">*</span> fungus),</span>
+<span id="cb542-5"><a href="rethinking-chapter-6.html#cb542-5" aria-hidden="true" tabindex="-1"></a>     a <span class="sc">+</span> t <span class="sc">+</span> f <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb542-6"><a href="rethinking-chapter-6.html#cb542-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">nl =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb542-7"><a href="rethinking-chapter-6.html#cb542-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">lognormal</span>(<span class="dv">0</span>, <span class="fl">0.2</span>), <span class="at">nlpar =</span> a, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb542-8"><a href="rethinking-chapter-6.html#cb542-8" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">nlpar =</span> t),</span>
+<span id="cb542-9"><a href="rethinking-chapter-6.html#cb542-9" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">nlpar =</span> f),</span>
+<span id="cb542-10"><a href="rethinking-chapter-6.html#cb542-10" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb542-11"><a href="rethinking-chapter-6.html#cb542-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, </span>
+<span id="cb542-12"><a href="rethinking-chapter-6.html#cb542-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb542-13"><a href="rethinking-chapter-6.html#cb542-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb542-14"><a href="rethinking-chapter-6.html#cb542-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_fungus_post_treatment&quot;</span></span>
+<span id="cb542-15"><a href="rethinking-chapter-6.html#cb542-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb542-16"><a href="rethinking-chapter-6.html#cb542-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb542-17"><a href="rethinking-chapter-6.html#cb542-17" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">summarise_model</span>(brms_c6_model_fungus_post_treatment)</span></code></pre></div>
+<pre><code>#&gt;     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#&gt;  Residual            2.09 1.45   1.26    1.67     1.00
+#&gt;         Term Value   SE Lower_2.5 Upper_97.5
+#&gt;  a_Intercept  1.48 0.03      1.43       1.53
+#&gt;  t_Intercept  0.00 0.03     -0.05       0.06
+#&gt;  f_Intercept -0.27 0.04     -0.34      -0.19</code></pre>
+<p>omitting <code>fungus</code> from the model:</p>
+<div class="sourceCode" id="cb544"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb544-1"><a href="rethinking-chapter-6.html#cb544-1" aria-hidden="true" tabindex="-1"></a>brms_c6_model_fungus_only_treatment <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb544-2"><a href="rethinking-chapter-6.html#cb544-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_fungus,</span>
+<span id="cb544-3"><a href="rethinking-chapter-6.html#cb544-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb544-4"><a href="rethinking-chapter-6.html#cb544-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bf</span>(h_1 <span class="sc">~</span> h_0 <span class="sc">*</span> (a <span class="sc">+</span> t <span class="sc">*</span> treatment),</span>
+<span id="cb544-5"><a href="rethinking-chapter-6.html#cb544-5" aria-hidden="true" tabindex="-1"></a>     a <span class="sc">+</span> t <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb544-6"><a href="rethinking-chapter-6.html#cb544-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">nl =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb544-7"><a href="rethinking-chapter-6.html#cb544-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">lognormal</span>(<span class="dv">0</span>, <span class="fl">0.2</span>), <span class="at">nlpar =</span> a, <span class="at">lb =</span> <span class="dv">0</span>),</span>
+<span id="cb544-8"><a href="rethinking-chapter-6.html#cb544-8" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">nlpar =</span> t),</span>
+<span id="cb544-9"><a href="rethinking-chapter-6.html#cb544-9" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb544-10"><a href="rethinking-chapter-6.html#cb544-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, </span>
+<span id="cb544-11"><a href="rethinking-chapter-6.html#cb544-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb544-12"><a href="rethinking-chapter-6.html#cb544-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb544-13"><a href="rethinking-chapter-6.html#cb544-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_fungus_only_treatment&quot;</span></span>
+<span id="cb544-14"><a href="rethinking-chapter-6.html#cb544-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb544-15"><a href="rethinking-chapter-6.html#cb544-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb544-16"><a href="rethinking-chapter-6.html#cb544-16" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">summarise_model</span>(brms_c6_model_fungus_only_treatment)</span></code></pre></div>
+<pre><code>#&gt;     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#&gt;  Residual            3.18 1.78   1.56    2.04     1.00
+#&gt;         Term Value   SE Lower_2.5 Upper_97.5
+#&gt;  a_Intercept  1.38 0.03      1.33       1.43
+#&gt;  t_Intercept  0.09 0.04      0.02       0.16</code></pre>
+<p>including <code>moisture</code> as a fork:</p>
+<div class="sourceCode" id="cb546"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb546-1"><a href="rethinking-chapter-6.html#cb546-1" aria-hidden="true" tabindex="-1"></a>brms_c6_model_moisture_post_treatment <span class="ot">&lt;-</span> <span class="fu">update</span>(</span>
+<span id="cb546-2"><a href="rethinking-chapter-6.html#cb546-2" aria-hidden="true" tabindex="-1"></a>  brms_c6_model_fungus_post_treatment,</span>
+<span id="cb546-3"><a href="rethinking-chapter-6.html#cb546-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> data_moisture,</span>
+<span id="cb546-4"><a href="rethinking-chapter-6.html#cb546-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb546-5"><a href="rethinking-chapter-6.html#cb546-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_moisture_post_treatment&quot;</span></span>
+<span id="cb546-6"><a href="rethinking-chapter-6.html#cb546-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb546-7"><a href="rethinking-chapter-6.html#cb546-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb546-8"><a href="rethinking-chapter-6.html#cb546-8" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">summarise_model</span>(brms_c6_model_moisture_post_treatment)</span></code></pre></div>
+<pre><code>#&gt;     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#&gt;  Residual            4.54 2.13   2.10    2.16     1.00
+#&gt;         Term Value   SE Lower_2.5 Upper_97.5
+#&gt;  a_Intercept  1.53 0.00      1.52       1.54
+#&gt;  t_Intercept  0.05 0.00      0.05       0.06
+#&gt;  f_Intercept  0.13 0.00      0.12       0.14</code></pre>
+<div class="sourceCode" id="cb548"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb548-1"><a href="rethinking-chapter-6.html#cb548-1" aria-hidden="true" tabindex="-1"></a>brms_c6_model_moisture_only_treatment <span class="ot">&lt;-</span> <span class="fu">update</span>(</span>
+<span id="cb548-2"><a href="rethinking-chapter-6.html#cb548-2" aria-hidden="true" tabindex="-1"></a>  brms_c6_model_fungus_only_treatment,</span>
+<span id="cb548-3"><a href="rethinking-chapter-6.html#cb548-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> data_moisture,</span>
+<span id="cb548-4"><a href="rethinking-chapter-6.html#cb548-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb548-5"><a href="rethinking-chapter-6.html#cb548-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_moisture_only_treatment&quot;</span></span>
+<span id="cb548-6"><a href="rethinking-chapter-6.html#cb548-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb548-7"><a href="rethinking-chapter-6.html#cb548-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb548-8"><a href="rethinking-chapter-6.html#cb548-8" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">summarise_model</span>(brms_c6_model_moisture_only_treatment)</span></code></pre></div>
+<pre><code>#&gt;     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#&gt;  Residual            4.93 2.22   2.19    2.25     1.00
+#&gt;         Term Value   SE Lower_2.5 Upper_97.5
+#&gt;  a_Intercept  1.62 0.00      1.61       1.63
+#&gt;  t_Intercept  0.00 0.00     -0.01       0.01</code></pre>
+</div>
+<div id="collider-bias-1" class="section level3" number="7.5.3">
+<h3><span class="header-section-number">7.5.3</span> Collider Bias</h3>
+<div class="sourceCode" id="cb550"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb550-1"><a href="rethinking-chapter-6.html#cb550-1" aria-hidden="true" tabindex="-1"></a>data_married_factor <span class="ot">&lt;-</span> data_married_adults <span class="sc">%&gt;%</span> </span>
+<span id="cb550-2"><a href="rethinking-chapter-6.html#cb550-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">married_f =</span> <span class="fu">c</span>(<span class="st">&quot;single&quot;</span>, <span class="st">&quot;married&quot;</span>)[married <span class="sc">+</span> <span class="dv">1</span>] <span class="sc">%&gt;%</span> <span class="fu">factor</span>())</span>
+<span id="cb550-3"><a href="rethinking-chapter-6.html#cb550-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb550-4"><a href="rethinking-chapter-6.html#cb550-4" aria-hidden="true" tabindex="-1"></a>brms_c6_model_happy_married <span class="ot">&lt;-</span><span class="fu">brm</span>(</span>
+<span id="cb550-5"><a href="rethinking-chapter-6.html#cb550-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_married_factor, </span>
+<span id="cb550-6"><a href="rethinking-chapter-6.html#cb550-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb550-7"><a href="rethinking-chapter-6.html#cb550-7" aria-hidden="true" tabindex="-1"></a>  happiness <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> married_f <span class="sc">+</span> age_trans,</span>
+<span id="cb550-8"><a href="rethinking-chapter-6.html#cb550-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">class =</span> b, <span class="at">coef =</span> married_fmarried),</span>
+<span id="cb550-9"><a href="rethinking-chapter-6.html#cb550-9" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">class =</span> b, <span class="at">coef =</span> married_fsingle),</span>
+<span id="cb550-10"><a href="rethinking-chapter-6.html#cb550-10" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="at">class =</span> b, <span class="at">coef =</span> age_trans),</span>
+<span id="cb550-11"><a href="rethinking-chapter-6.html#cb550-11" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb550-12"><a href="rethinking-chapter-6.html#cb550-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>,</span>
+<span id="cb550-13"><a href="rethinking-chapter-6.html#cb550-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb550-14"><a href="rethinking-chapter-6.html#cb550-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb550-15"><a href="rethinking-chapter-6.html#cb550-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_happy_married&quot;</span>)</span>
+<span id="cb550-16"><a href="rethinking-chapter-6.html#cb550-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb550-17"><a href="rethinking-chapter-6.html#cb550-17" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">summarise_model</span>(brms_c6_model_happy_married)</span></code></pre></div>
+<pre><code>#&gt;     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#&gt;  Residual            0.96 0.98   0.94    1.02     1.00
+#&gt;              Term Value   SE Lower_2.5 Upper_97.5
+#&gt;  married_fmarried  1.34 0.08      1.18       1.50
+#&gt;   married_fsingle -0.21 0.06     -0.33      -0.09
+#&gt;         age_trans -0.81 0.11     -1.03      -0.61</code></pre>
+<div class="sourceCode" id="cb552"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb552-1"><a href="rethinking-chapter-6.html#cb552-1" aria-hidden="true" tabindex="-1"></a>brms_c6_model_happy <span class="ot">&lt;-</span><span class="fu">brm</span>(</span>
+<span id="cb552-2"><a href="rethinking-chapter-6.html#cb552-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_married_factor, </span>
+<span id="cb552-3"><a href="rethinking-chapter-6.html#cb552-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb552-4"><a href="rethinking-chapter-6.html#cb552-4" aria-hidden="true" tabindex="-1"></a>  happiness <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> Intercept <span class="sc">+</span> age_trans,</span>
+<span id="cb552-5"><a href="rethinking-chapter-6.html#cb552-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">class =</span> b, <span class="at">coef =</span> Intercept),</span>
+<span id="cb552-6"><a href="rethinking-chapter-6.html#cb552-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="at">class =</span> b, <span class="at">coef =</span> age_trans),</span>
+<span id="cb552-7"><a href="rethinking-chapter-6.html#cb552-7" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb552-8"><a href="rethinking-chapter-6.html#cb552-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>,</span>
+<span id="cb552-9"><a href="rethinking-chapter-6.html#cb552-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb552-10"><a href="rethinking-chapter-6.html#cb552-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb552-11"><a href="rethinking-chapter-6.html#cb552-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_happy&quot;</span>)</span>
+<span id="cb552-12"><a href="rethinking-chapter-6.html#cb552-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb552-13"><a href="rethinking-chapter-6.html#cb552-13" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">summarise_model</span>(brms_c6_model_happy)</span></code></pre></div>
+<pre><code>#&gt;     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#&gt;  Residual            1.47 1.21   1.16    1.27     1.00
+#&gt;       Term Value   SE Lower_2.5 Upper_97.5
+#&gt;  age_trans  0.00 0.07     -0.13       0.13</code></pre>
+<p><strong>The haunted DAG</strong></p>
+<div class="sourceCode" id="cb554"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb554-1"><a href="rethinking-chapter-6.html#cb554-1" aria-hidden="true" tabindex="-1"></a>brms_c6_model_education <span class="ot">&lt;-</span><span class="fu">brm</span>(</span>
+<span id="cb554-2"><a href="rethinking-chapter-6.html#cb554-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_education, </span>
+<span id="cb554-3"><a href="rethinking-chapter-6.html#cb554-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb554-4"><a href="rethinking-chapter-6.html#cb554-4" aria-hidden="true" tabindex="-1"></a>  children <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> Intercept <span class="sc">+</span> parents <span class="sc">+</span> grandparents,</span>
+<span id="cb554-5"><a href="rethinking-chapter-6.html#cb554-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">class =</span> b),</span>
+<span id="cb554-6"><a href="rethinking-chapter-6.html#cb554-6" aria-hidden="true" tabindex="-1"></a>                <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb554-7"><a href="rethinking-chapter-6.html#cb554-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>,</span>
+<span id="cb554-8"><a href="rethinking-chapter-6.html#cb554-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb554-9"><a href="rethinking-chapter-6.html#cb554-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb554-10"><a href="rethinking-chapter-6.html#cb554-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_education&quot;</span>)</span>
+<span id="cb554-11"><a href="rethinking-chapter-6.html#cb554-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb554-12"><a href="rethinking-chapter-6.html#cb554-12" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">summarise_model</span>(brms_c6_model_education)</span></code></pre></div>
+<pre><code>#&gt;     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#&gt;  Residual            2.04 1.43   1.30    1.58     1.00
+#&gt;          Term Value   SE Lower_2.5 Upper_97.5
+#&gt;     Intercept -0.12 0.10     -0.32       0.08
+#&gt;       parents  1.79 0.04      1.70       1.88
+#&gt;  grandparents -0.83 0.11     -1.04      -0.63</code></pre>
+<div class="sourceCode" id="cb556"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb556-1"><a href="rethinking-chapter-6.html#cb556-1" aria-hidden="true" tabindex="-1"></a>brms_c6_model_education_resolved <span class="ot">&lt;-</span> <span class="fu">update</span>(</span>
+<span id="cb556-2"><a href="rethinking-chapter-6.html#cb556-2" aria-hidden="true" tabindex="-1"></a>  brms_c6_model_education,</span>
+<span id="cb556-3"><a href="rethinking-chapter-6.html#cb556-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">newdata =</span> data_education, </span>
+<span id="cb556-4"><a href="rethinking-chapter-6.html#cb556-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> children <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> Intercept <span class="sc">+</span> parents <span class="sc">+</span> grandparents <span class="sc">+</span> unobserved,</span>
+<span id="cb556-5"><a href="rethinking-chapter-6.html#cb556-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb556-6"><a href="rethinking-chapter-6.html#cb556-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_education_resolved&quot;</span></span>
+<span id="cb556-7"><a href="rethinking-chapter-6.html#cb556-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb556-8"><a href="rethinking-chapter-6.html#cb556-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb556-9"><a href="rethinking-chapter-6.html#cb556-9" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">summarise_model</span>(brms_c6_model_education_resolved)</span></code></pre></div>
+<pre><code>#&gt;     Group Effect Variance   SD SD_2.5 SD_97.5 Var_prop
+#&gt;  Residual            1.07 1.04   0.94    1.15     1.00
+#&gt;          Term Value   SE Lower_2.5 Upper_97.5
+#&gt;     Intercept -0.12 0.07     -0.26       0.02
+#&gt;       parents  1.01 0.07      0.88       1.15
+#&gt;  grandparents -0.04 0.10     -0.24       0.15
+#&gt;    unobserved  2.00 0.15      1.70       2.27</code></pre>
+</div>
+<div id="summary" class="section level3" number="7.5.4">
+<h3><span class="header-section-number">7.5.4</span> Summary</h3>
+<div class="sourceCode" id="cb558"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb558-1"><a href="rethinking-chapter-6.html#cb558-1" aria-hidden="true" tabindex="-1"></a>data_waffle <span class="ot">&lt;-</span> data_waffle <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">south_f =</span> <span class="fu">factor</span>(South))</span>
+<span id="cb558-2"><a href="rethinking-chapter-6.html#cb558-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb558-3"><a href="rethinking-chapter-6.html#cb558-3" aria-hidden="true" tabindex="-1"></a>brms_c6_model_waffle_1 <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb558-4"><a href="rethinking-chapter-6.html#cb558-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_waffle, </span>
+<span id="cb558-5"><a href="rethinking-chapter-6.html#cb558-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb558-6"><a href="rethinking-chapter-6.html#cb558-6" aria-hidden="true" tabindex="-1"></a>  divorce_std <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> waffle_std,</span>
+<span id="cb558-7"><a href="rethinking-chapter-6.html#cb558-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.2</span>), <span class="at">class =</span> Intercept),</span>
+<span id="cb558-8"><a href="rethinking-chapter-6.html#cb558-8" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">class =</span> b),</span>
+<span id="cb558-9"><a href="rethinking-chapter-6.html#cb558-9" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb558-10"><a href="rethinking-chapter-6.html#cb558-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, </span>
+<span id="cb558-11"><a href="rethinking-chapter-6.html#cb558-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb558-12"><a href="rethinking-chapter-6.html#cb558-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb558-13"><a href="rethinking-chapter-6.html#cb558-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_waffle_1&quot;</span>)</span>
+<span id="cb558-14"><a href="rethinking-chapter-6.html#cb558-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb558-15"><a href="rethinking-chapter-6.html#cb558-15" aria-hidden="true" tabindex="-1"></a>brms_c6_model_waffle_2 <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb558-16"><a href="rethinking-chapter-6.html#cb558-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_waffle, </span>
+<span id="cb558-17"><a href="rethinking-chapter-6.html#cb558-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb558-18"><a href="rethinking-chapter-6.html#cb558-18" aria-hidden="true" tabindex="-1"></a>  divorce_std <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> waffle_std <span class="sc">+</span> south_f,</span>
+<span id="cb558-19"><a href="rethinking-chapter-6.html#cb558-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.2</span>), <span class="at">class =</span> Intercept),</span>
+<span id="cb558-20"><a href="rethinking-chapter-6.html#cb558-20" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">class =</span> b),</span>
+<span id="cb558-21"><a href="rethinking-chapter-6.html#cb558-21" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb558-22"><a href="rethinking-chapter-6.html#cb558-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, </span>
+<span id="cb558-23"><a href="rethinking-chapter-6.html#cb558-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb558-24"><a href="rethinking-chapter-6.html#cb558-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb558-25"><a href="rethinking-chapter-6.html#cb558-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_waffle_2&quot;</span>)</span>
+<span id="cb558-26"><a href="rethinking-chapter-6.html#cb558-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb558-27"><a href="rethinking-chapter-6.html#cb558-27" aria-hidden="true" tabindex="-1"></a>brms_c6_model_waffle_3 <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb558-28"><a href="rethinking-chapter-6.html#cb558-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_waffle, </span>
+<span id="cb558-29"><a href="rethinking-chapter-6.html#cb558-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb558-30"><a href="rethinking-chapter-6.html#cb558-30" aria-hidden="true" tabindex="-1"></a>  divorce_std <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> waffle_std <span class="sc">+</span> medianagemarriage_std <span class="sc">+</span> marriage_std,</span>
+<span id="cb558-31"><a href="rethinking-chapter-6.html#cb558-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.2</span>), <span class="at">class =</span> Intercept),</span>
+<span id="cb558-32"><a href="rethinking-chapter-6.html#cb558-32" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">class =</span> b),</span>
+<span id="cb558-33"><a href="rethinking-chapter-6.html#cb558-33" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb558-34"><a href="rethinking-chapter-6.html#cb558-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, </span>
+<span id="cb558-35"><a href="rethinking-chapter-6.html#cb558-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb558-36"><a href="rethinking-chapter-6.html#cb558-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb558-37"><a href="rethinking-chapter-6.html#cb558-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_waffle_3&quot;</span>)</span>
+<span id="cb558-38"><a href="rethinking-chapter-6.html#cb558-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb558-39"><a href="rethinking-chapter-6.html#cb558-39" aria-hidden="true" tabindex="-1"></a>brms_c6_model_waffle_4 <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb558-40"><a href="rethinking-chapter-6.html#cb558-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_waffle, </span>
+<span id="cb558-41"><a href="rethinking-chapter-6.html#cb558-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb558-42"><a href="rethinking-chapter-6.html#cb558-42" aria-hidden="true" tabindex="-1"></a>  divorce_std <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> waffle_std <span class="sc">+</span> medianagemarriage_std,</span>
+<span id="cb558-43"><a href="rethinking-chapter-6.html#cb558-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.2</span>), <span class="at">class =</span> Intercept),</span>
+<span id="cb558-44"><a href="rethinking-chapter-6.html#cb558-44" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">class =</span> b),</span>
+<span id="cb558-45"><a href="rethinking-chapter-6.html#cb558-45" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb558-46"><a href="rethinking-chapter-6.html#cb558-46" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, </span>
+<span id="cb558-47"><a href="rethinking-chapter-6.html#cb558-47" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb558-48"><a href="rethinking-chapter-6.html#cb558-48" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb558-49"><a href="rethinking-chapter-6.html#cb558-49" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_waffle_4&quot;</span>)</span>
+<span id="cb558-50"><a href="rethinking-chapter-6.html#cb558-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb558-51"><a href="rethinking-chapter-6.html#cb558-51" aria-hidden="true" tabindex="-1"></a>brms_c6_model_waffle_5 <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb558-52"><a href="rethinking-chapter-6.html#cb558-52" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_waffle, </span>
+<span id="cb558-53"><a href="rethinking-chapter-6.html#cb558-53" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb558-54"><a href="rethinking-chapter-6.html#cb558-54" aria-hidden="true" tabindex="-1"></a>  divorce_std <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> waffle_std <span class="sc">+</span> marriage_std,</span>
+<span id="cb558-55"><a href="rethinking-chapter-6.html#cb558-55" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(<span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.2</span>), <span class="at">class =</span> Intercept),</span>
+<span id="cb558-56"><a href="rethinking-chapter-6.html#cb558-56" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">class =</span> b),</span>
+<span id="cb558-57"><a href="rethinking-chapter-6.html#cb558-57" aria-hidden="true" tabindex="-1"></a>            <span class="fu">prior</span>(<span class="fu">exponential</span>(<span class="dv">1</span>), <span class="at">class =</span> sigma)),</span>
+<span id="cb558-58"><a href="rethinking-chapter-6.html#cb558-58" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">warmup =</span> <span class="dv">1000</span>, </span>
+<span id="cb558-59"><a href="rethinking-chapter-6.html#cb558-59" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">cores =</span> <span class="dv">4</span>,</span>
+<span id="cb558-60"><a href="rethinking-chapter-6.html#cb558-60" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb558-61"><a href="rethinking-chapter-6.html#cb558-61" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c6_model_waffle_5&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb559"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb559-1"><a href="rethinking-chapter-6.html#cb559-1" aria-hidden="true" tabindex="-1"></a>formula <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">glue</span>(<span class="st">&quot;d {mth(&#39;\U007E&#39;)} 1 + w&quot;</span>), </span>
+<span id="cb559-2"><a href="rethinking-chapter-6.html#cb559-2" aria-hidden="true" tabindex="-1"></a>             <span class="fu">glue</span>(<span class="st">&quot;d {mth(&#39;\U007E&#39;)} 1 + w + s&quot;</span>), </span>
+<span id="cb559-3"><a href="rethinking-chapter-6.html#cb559-3" aria-hidden="true" tabindex="-1"></a>             <span class="fu">glue</span>(<span class="st">&quot;d {mth(&#39;\U007E&#39;)} 1 + w + a + m&quot;</span>), </span>
+<span id="cb559-4"><a href="rethinking-chapter-6.html#cb559-4" aria-hidden="true" tabindex="-1"></a>             <span class="fu">glue</span>(<span class="st">&quot;d {mth(&#39;\U007E&#39;)} 1 + w + a&quot;</span>), </span>
+<span id="cb559-5"><a href="rethinking-chapter-6.html#cb559-5" aria-hidden="true" tabindex="-1"></a>             <span class="fu">glue</span>(<span class="st">&quot;d {mth(&#39;\U007E&#39;)} 1 + w + m&quot;</span>))</span>
+<span id="cb559-6"><a href="rethinking-chapter-6.html#cb559-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb559-7"><a href="rethinking-chapter-6.html#cb559-7" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">model =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,</span>
+<span id="cb559-8"><a href="rethinking-chapter-6.html#cb559-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">fit =</span> <span class="fu">str_c</span>(<span class="st">&quot;brms_c6_model_waffle_&quot;</span>, model)) <span class="sc">%&gt;%</span> </span>
+<span id="cb559-9"><a href="rethinking-chapter-6.html#cb559-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">y =</span> <span class="fu">str_c</span>(model, <span class="st">&quot;: &quot;</span>, formula),</span>
+<span id="cb559-10"><a href="rethinking-chapter-6.html#cb559-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">post =</span> purrr<span class="sc">::</span><span class="fu">map</span>(fit, <span class="sc">~</span><span class="fu">get</span>(.) <span class="sc">%&gt;%</span> </span>
+<span id="cb559-11"><a href="rethinking-chapter-6.html#cb559-11" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">as_draws_df</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb559-12"><a href="rethinking-chapter-6.html#cb559-12" aria-hidden="true" tabindex="-1"></a>                               dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="at">waffle_std =</span> b_waffle_std))) <span class="sc">%&gt;%</span> </span>
+<span id="cb559-13"><a href="rethinking-chapter-6.html#cb559-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(post) <span class="sc">%&gt;%</span> </span>
+<span id="cb559-14"><a href="rethinking-chapter-6.html#cb559-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> waffle_std, <span class="at">y =</span> y,</span>
+<span id="cb559-15"><a href="rethinking-chapter-6.html#cb559-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> fit <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;brms_c6_model_waffle_2&quot;</span>, <span class="st">&quot;brms_c6_model_waffle_3&quot;</span>))) <span class="sc">+</span></span>
+<span id="cb559-16"><a href="rethinking-chapter-6.html#cb559-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> clr_dark, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb559-17"><a href="rethinking-chapter-6.html#cb559-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_pointinterval</span>(<span class="fu">aes</span>(<span class="at">fill =</span> <span class="fu">after_scale</span>(<span class="fu">clr_lighten</span>(color))), <span class="at">shape =</span> <span class="dv">21</span>) <span class="sc">+</span></span>
+<span id="cb559-18"><a href="rethinking-chapter-6.html#cb559-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(clr0dd, clr2)) <span class="sc">+</span></span>
+<span id="cb559-19"><a href="rethinking-chapter-6.html#cb559-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="fu">str_c</span>(<span class="st">&quot;*&quot;</span>,<span class="fu">mth</span>(<span class="st">&quot;\U03B2&quot;</span>),<span class="st">&quot;&lt;sub&gt;w&lt;/sub&gt;*&quot;</span>),</span>
+<span id="cb559-20"><a href="rethinking-chapter-6.html#cb559-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb559-21"><a href="rethinking-chapter-6.html#cb559-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.4</span>, <span class="fl">0.6</span>)) <span class="sc">+</span></span>
+<span id="cb559-22"><a href="rethinking-chapter-6.html#cb559-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_markdown</span>(<span class="at">hjust =</span> <span class="dv">0</span>),</span>
+<span id="cb559-23"><a href="rethinking-chapter-6.html#cb559-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.x =</span> <span class="fu">element_markdown</span>(),</span>
+<span id="cb559-24"><a href="rethinking-chapter-6.html#cb559-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span></code></pre></div>
+<p><img src="rethinking_c6_files/figure-html/unnamed-chunk-68-1.svg" width="672" style="display: block; margin: auto;" /></p>
+</div>
 </div>
 <div id="pymc3-section-4" class="section level2" number="7.6">
 <h2><span class="header-section-number">7.6</span> pymc3 section</h2>
