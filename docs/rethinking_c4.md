@@ -102,7 +102,7 @@ $$
 
 ## A language for describing models
 
-*The first line defines the likelihood used in Bayes' theorem, the other lines describe the priors used. The tilde means that the relationships are **stochastic*.**
+*The first line defines the likelihood used in Bayes' theorem, the other lines describe the priors used. The tilde means that the relationships are **stochastic**.*
 
 re-describing the globe-toss model:
 
@@ -516,10 +516,10 @@ precis(posterior_sample) %>%
 
 
 
-|       mean|        sd|       5.5%|      94.5%|histogram   |
-|----------:|---------:|----------:|----------:|:-----------|
-| 154.607525| 0.4141125| 153.950912| 155.268034|▁▁▅▇▂▁▁     |
-|   7.733826| 0.2886119|   7.273942|   8.198123|▁▁▁▂▅▇▇▃▁▁▁ |
+|       mean|        sd|      5.5%|      94.5%|histogram   |
+|----------:|---------:|---------:|----------:|:-----------|
+| 154.604734| 0.4108867| 153.94063| 155.255209|▁▁▅▇▂▁▁     |
+|   7.731758| 0.2904574|   7.26298|   8.197043|▁▁▁▂▅▇▇▃▁▁▁ |
 
 ## Linear Prediction
 
@@ -1031,9 +1031,9 @@ D_i & \sim & Normal( \mu_i, \sigma) & \textrm{[likelihood]}\\
 \alpha & \sim & Normal(100, 10) & \textrm{[$\alpha$ prior]}\\
 w_i & \sim & Normal(0, 10) & \textrm{[w prior]}\\
 \sigma & \sim & Exponential(1) & \textrm{[$\sigma$ prior]}
-
 \end{array}
 $$
+
 
 
 ```r

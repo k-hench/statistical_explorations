@@ -108,7 +108,7 @@ $$
 
 ## A language for describing models
 
-*The first line defines the likelihood used in Bayes' theorem, the other lines describe the priors used. The tilde means that the relationships are **stochastic*.**
+*The first line defines the likelihood used in Bayes' theorem, the other lines describe the priors used. The tilde means that the relationships are **stochastic**.*
 
 re-describing the globe-toss model:
 
@@ -885,9 +885,9 @@ D_i & \sim & Normal( \mu_i, \sigma) & \textrm{[likelihood]}\\
 \alpha & \sim & Normal(100, 10) & \textrm{[$\alpha$ prior]}\\
 w_i & \sim & Normal(0, 10) & \textrm{[w prior]}\\
 \sigma & \sim & Exponential(1) & \textrm{[$\sigma$ prior]}
-
 \end{array}
 $$
+
 
 ```{r}
 model_cherry <- quap(

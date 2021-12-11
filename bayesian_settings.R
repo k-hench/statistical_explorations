@@ -103,10 +103,13 @@ plot_coeftab <- function(ct, prob = .95){
 as_tibble_rn <- function(x, nm = "param"){ as_tibble(x) %>% mutate(nm = row.names(x)) %>% set_names(nm = c(names(x), nm))}
 
 
-knit_precis <- function(prec){
-  prec %>% 
+knit_precis <- function(prec, param_name = "param"){
+  d <- prec %>% 
     as_tibble_rn() %>% 
     mutate(across(where(is.double), round, digits = 2)) %>%
-    dplyr::select(param, everything()) %>% 
+    dplyr::select(param, everything())
+  
+  d %>% 
+    set_names(nm = c(param_name, names(d)[2:length(names(d))])) %>% 
     knitr::kable()
 }

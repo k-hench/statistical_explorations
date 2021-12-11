@@ -358,6 +358,7 @@ model_fungus_no_treatment <- quap(
   data = data_fungus
 )
 
+
 precis(model_fungus_no_treatment) %>% 
   knit_precis()
 ```
@@ -1024,6 +1025,36 @@ impliedConditionalIndependencies(dag_waffles)
 #> A _||_ W | S
 #> D _||_ S | A, M, W
 #> M _||_ W | S
+```
+
+Exporting models and data for re-use
+
+
+```r
+library(rlang)
+chapter6_models <- env(
+  data_legs = data_legs,
+  model_legs_multicollinear = model_legs_multicollinear,
+  data_milk = data_milk,
+  model_milk_fat = model_milk_fat,
+  model_milk_lactose = model_milk_lactose,
+  model_milk_multicollinear = model_milk_multicollinear,
+  data_fungus = data_fungus,
+  model_fungus_no_treatment = model_fungus_no_treatment,
+  model_fungus_post_treatment = model_fungus_post_treatment,
+  model_fungus_only_treatment = model_fungus_only_treatment,
+  data_moisture = data_moisture,
+  model_moisture_post_treatment = model_moisture_post_treatment,
+  model_moisture_only_treatment = model_moisture_only_treatment,
+  data_married_adults = data_married_adults,
+  model_happy_married = model_happy_married,
+  model_happy = model_happy,
+  data_education = data_education,
+  model_education = model_education,
+  model_education_resolved = model_education_resolved
+)
+
+write_rds(chapter6_models, "envs/chapter6_models.rds")
 ```
 
 

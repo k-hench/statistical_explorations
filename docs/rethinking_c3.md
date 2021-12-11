@@ -93,7 +93,7 @@ sum(samples$proportion_water < .5) / length(samples$proportion_water)
 ```
 
 ```
-#> [1] 0.1705
+#> [1] 0.1713
 ```
 
 ```r
@@ -101,7 +101,7 @@ sum(samples$proportion_water > .5 & samples$proportion_water < .75) / length(sam
 ```
 
 ```
-#> [1] 0.6072
+#> [1] 0.6087
 ```
 
 ```r
@@ -265,7 +265,7 @@ rbinom( 10, size = 2, prob = .7)
 ```
 
 ```
-#>  [1] 2 1 1 2 0 1 1 2 0 2
+#>  [1] 2 2 2 2 2 1 1 1 1 2
 ```
 
 ```r

@@ -1789,6 +1789,50 @@ precis(model_milk_house, depth = 2, pars = "alpha") %>%
 
 <img src="rethinking_c5_files/figure-html/unnamed-chunk-62-1.svg" width="672" style="display: block; margin: auto;" />
 
+
+```r
+library(rlang)
+chapter5_models <- env(
+  data_waffle = data_waffle,
+  model_age = model_age,
+  model_marriage = model_marriage,
+  model_waffle = model_waffle,
+  model_multiple = model_multiple,
+  data_divorce_sim = data_divorce_sim,
+  model_multiple_sim = model_multiple_sim,
+  model_age_sim = model_age_sim,
+  model_marriage_sim = model_marriage_sim,
+  model_multiple_sim_codep = model_multiple_sim_codep,
+  model_age_sim_codep = model_age_sim_codep,
+  model_marriage_sim_codep = model_marriage_sim_codep,
+  pred_res_marriage = pred_res_marriage,
+  residuals_marriage = residuals_marriage,
+  pred_res_marriage_mu = pred_res_marriage_mu,
+  pred_res_age = pred_res_age,
+  residuals_age = residuals_age,
+  pred_res_age_mu = pred_res_age_mu,
+  data_spurious = data_spurious,
+  model_spurious = model_spurious,
+  model_counterfactual = model_counterfactual,
+  data_milk = data_milk,
+  model_milk_draft = model_milk_draft,
+  model_milk_cortex = model_milk_cortex,
+  model_milk_weight = model_milk_weight,
+  model_milk_multi = model_milk_multi,
+  data_milk_sim1 = data_milk_sim1,
+  model_milk_cortex_sim = model_milk_cortex_sim,
+  model_milk_weight_sim = model_milk_weight_sim,
+  model_milk_multi_sim = model_milk_multi_sim,
+  data_height = data_height,
+  model_hight = model_hight,
+  data_milk_clade = data_milk_clade,
+  model_milk_clade = model_milk_clade,
+  model_milk_house = model_milk_house
+)
+
+write_rds(chapter5_models, "envs/chapter5_models.rds")
+```
+
 ## Homework
 
 **E1**
