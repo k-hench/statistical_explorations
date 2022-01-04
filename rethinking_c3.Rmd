@@ -345,6 +345,16 @@ p_switches <- samples %>%
 p_run_length + p_switches
 ```
 
+```{r env_export}
+library(rlang)
+chapter3_models <- env(
+  grid_data = grid_data
+)
+
+write_rds(chapter3_models, "envs/chapter3_models.rds")
+```
+
+
 ---
 
 ## Homework
@@ -795,7 +805,7 @@ import seaborn as sns
 import matplotlib
 from matplotlib.colors import ListedColormap
 import matplotlib.font_manager
-matplotlib.font_manager._rebuild()
+#matplotlib.font_manager._rebuild()
 ```
 
 ```{python, include = FALSE, echo = FALSE}

@@ -10,7 +10,7 @@ library(ggtext)
 library(GGally)
 library(ggdag)
 
-clr0 <- "#E9E5D9" # "#A9A9A9"
+clr0 <- "#E9E9E9" # "#A9A9A9"
 clr0d <- clr_darken(clr0, .1)
 clr0dd <- clr_darken(clr0, .4)
 clr1 <- "#54436D" # "#083F82"

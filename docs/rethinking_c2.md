@@ -67,7 +67,7 @@ tibble(draws = 1:3,
 ```
 
 ```{=html}
-<template id="c56b1ca5-215e-45ce-8406-57010e5fa6e6"><style>
+<template id="e2d49bdf-632e-454c-99d3-c2256461e3fe"><style>
 .tabwid table{
   border-spacing:0px !important;
   border-collapse:collapse;
@@ -101,15 +101,15 @@ tibble(draws = 1:3,
 .tabwid table tr {
 background-color: transparent;
 }
-</style><div class="tabwid"><style>.cl-3d13ec86{}.cl-3d0f002c{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-3d0f1378{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-3d0f3f92{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-3d0f3fb0{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-3d0f3fba{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-3d13ec86'>
+</style><div class="tabwid"><style>.cl-49677b2e{}.cl-49626c06{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-49627ffc{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-4962ac3e{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-4962ac5c{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-4962ac66{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-49677b2e'>
 ```
 
 ```{=html}
-<thead><tr style="overflow-wrap:break-word;"><td class="cl-3d0f3fba"><p class="cl-3d0f1378"><span class="cl-3d0f002c">draws</span></p></td><td class="cl-3d0f3fba"><p class="cl-3d0f1378"><span class="cl-3d0f002c">marbles</span></p></td><td class="cl-3d0f3fba"><p class="cl-3d0f1378"><span class="cl-3d0f002c">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-3d0f3f92"><p class="cl-3d0f1378"><span class="cl-3d0f002c">1</span></p></td><td class="cl-3d0f3f92"><p class="cl-3d0f1378"><span class="cl-3d0f002c">4</span></p></td><td class="cl-3d0f3f92"><p class="cl-3d0f1378"><span class="cl-3d0f002c">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-3d0f3f92"><p class="cl-3d0f1378"><span class="cl-3d0f002c">2</span></p></td><td class="cl-3d0f3f92"><p class="cl-3d0f1378"><span class="cl-3d0f002c">4</span></p></td><td class="cl-3d0f3f92"><p class="cl-3d0f1378"><span class="cl-3d0f002c">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-3d0f3fb0"><p class="cl-3d0f1378"><span class="cl-3d0f002c">3</span></p></td><td class="cl-3d0f3fb0"><p class="cl-3d0f1378"><span class="cl-3d0f002c">4</span></p></td><td class="cl-3d0f3fb0"><p class="cl-3d0f1378"><span class="cl-3d0f002c">64</span></p></td></tr></tbody></table></div></template>
-<div class="flextable-shadow-host" id="2f6b04b4-de91-42f4-a5de-65d13bc9387c"></div>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-4962ac66"><p class="cl-49627ffc"><span class="cl-49626c06">draws</span></p></td><td class="cl-4962ac66"><p class="cl-49627ffc"><span class="cl-49626c06">marbles</span></p></td><td class="cl-4962ac66"><p class="cl-49627ffc"><span class="cl-49626c06">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-4962ac3e"><p class="cl-49627ffc"><span class="cl-49626c06">1</span></p></td><td class="cl-4962ac3e"><p class="cl-49627ffc"><span class="cl-49626c06">4</span></p></td><td class="cl-4962ac3e"><p class="cl-49627ffc"><span class="cl-49626c06">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-4962ac3e"><p class="cl-49627ffc"><span class="cl-49626c06">2</span></p></td><td class="cl-4962ac3e"><p class="cl-49627ffc"><span class="cl-49626c06">4</span></p></td><td class="cl-4962ac3e"><p class="cl-49627ffc"><span class="cl-49626c06">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-4962ac5c"><p class="cl-49627ffc"><span class="cl-49626c06">3</span></p></td><td class="cl-4962ac5c"><p class="cl-49627ffc"><span class="cl-49626c06">4</span></p></td><td class="cl-4962ac5c"><p class="cl-49627ffc"><span class="cl-49626c06">64</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="6e0fe0ce-1c57-42ba-98d1-764f1bb06f9a"></div>
 <script>
-var dest = document.getElementById("2f6b04b4-de91-42f4-a5de-65d13bc9387c");
-var template = document.getElementById("c56b1ca5-215e-45ce-8406-57010e5fa6e6");
+var dest = document.getElementById("6e0fe0ce-1c57-42ba-98d1-764f1bb06f9a");
+var template = document.getElementById("e2d49bdf-632e-454c-99d3-c2256461e3fe");
 var caption = template.content.querySelector("caption");
 if(caption) {
   caption.style.cssText = "display:block;text-align:center;";
@@ -300,10 +300,10 @@ tibble(conjectures = list(rep(0,4),
 
 |conjecture                                                                                                                                                                                                                                                                                                              | ways to produce <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span>|    p| ways data/prior counts|new count         | plausibility|
 |:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------:|----:|----------------------:|:-----------------|------------:|
-|[ <span style='color:#E9E5D9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E5D9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E5D9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E5D9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> ]         |                                                                                            0| 0.00|                      0|0 $\times$ 0 = 0  |         0.00|
-|[ <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E5D9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E5D9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E5D9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> ]       |                                                                                            1| 0.25|                      3|3 $\times$ 1 = 3  |         0.15|
-|[ <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E5D9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E5D9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> ]     |                                                                                            2| 0.50|                      8|8 $\times$ 2 = 16 |         0.40|
-|[ <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E5D9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> ]   |                                                                                            3| 0.75|                      9|9 $\times$ 3 = 27 |         0.45|
+|[ <span style='color:#E9E9E9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E9E9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E9E9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E9E9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> ]         |                                                                                            0| 0.00|                      0|0 $\times$ 0 = 0  |         0.00|
+|[ <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E9E9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E9E9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E9E9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> ]       |                                                                                            1| 0.25|                      3|3 $\times$ 1 = 3  |         0.15|
+|[ <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E9E9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E9E9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> ]     |                                                                                            2| 0.50|                      8|8 $\times$ 2 = 16 |         0.40|
+|[ <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#E9E9E9;filter:drop-shadow(0px 0px 1px black)'>⬤</span> ]   |                                                                                            3| 0.75|                      9|9 $\times$ 3 = 27 |         0.45|
 |[ <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> <span style='color:#85769EFF;filter:drop-shadow(0px 0px 1px black)'>⬤</span> ] |                                                                                            4| 1.00|                      0|0 $\times$ 4 = 0  |         0.00|
 
 ## Building a Model
@@ -479,7 +479,7 @@ Note how the y scale depends on the number of grid points: the peak reaches ~0.7
 ```r
 library(rethinking)
 map <- purrr::map
-conpare_qa <- function(w_in, l_in){
+compare_qa <- function(w_in, l_in){
   globe_qa <- quap(
     alist(
       W ~ dbinom( W + L, p ), # binomial likelihood
@@ -508,9 +508,9 @@ conpare_qa <- function(w_in, l_in){
 
 
 ```r
-conpare_qa(w_in = 6, l_in = 3) +
-conpare_qa(w_in = 12, l_in = 6) +
-conpare_qa(w_in = 24, l_in = 12)
+compare_qa(w_in = 6, l_in = 3) +
+compare_qa(w_in = 12, l_in = 6) +
+compare_qa(w_in = 24, l_in = 12)
 ```
 
 ```
@@ -518,17 +518,17 @@ conpare_qa(w_in = 24, l_in = 12)
 #> 
 #> |      mean|        sd|      5.5%|     94.5%|qa         |
 #> |---------:|---------:|---------:|---------:|:----------|
-#> | 0.6666667| 0.1571338| 0.4155366| 0.9177968|W: 6, L: 3 |
+#> | 0.6666672| 0.1571337| 0.4155373| 0.9177971|W: 6, L: 3 |
 #> 
 #> 
 #> |      mean|        sd|      5.5%|     94.5%|qa          |
 #> |---------:|---------:|---------:|---------:|:-----------|
-#> | 0.6666662| 0.1111104| 0.4890903| 0.8442422|W: 12, L: 6 |
+#> | 0.6666662| 0.1111104| 0.4890902| 0.8442421|W: 12, L: 6 |
 #> 
 #> 
 #> |      mean|        sd|      5.5%|     94.5%|qa           |
 #> |---------:|---------:|---------:|---------:|:------------|
-#> | 0.6666665| 0.0785669| 0.5411014| 0.7922316|W: 24, L: 12 |
+#> | 0.6666669| 0.0785669| 0.5411019| 0.7922319|W: 24, L: 12 |
 ```
 
 <img src="rethinking_c2_files/figure-html/unnamed-chunk-17-1.svg" width="672" style="display: block; margin: auto;" />
@@ -585,6 +585,17 @@ p_p + p_p36
 ```
 
 <img src="rethinking_c2_files/figure-html/unnamed-chunk-18-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+library(rlang)
+chapter2_models <- env(
+  compare_qa = compare_qa
+)
+
+write_rds(chapter2_models, "envs/chapter2_models.rds")
+```
+
 
 ---
 
@@ -926,7 +937,7 @@ import seaborn as sns
 import matplotlib
 from matplotlib.colors import ListedColormap
 import matplotlib.font_manager
-matplotlib.font_manager._rebuild()
+#matplotlib.font_manager.rebuild()
 ```
 
 

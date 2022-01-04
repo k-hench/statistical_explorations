@@ -715,6 +715,7 @@ $$
 :::
 :::
 
+
 ```{r}
 plot_model_intervals <- function(mod, data,
                                  weight_seq = list(weight_s = seq(from = min(data_model$weight_s),
@@ -751,7 +752,10 @@ plot_model_intervals <- function(mod, data,
     geom_line(data = model_hight_mu_interval,
               aes(y = mean))
 }
+```
 
+
+```{r}
 data_model <-  data %>% 
   mutate(weight_s = (weight - mean(weight))/sd(weight),
          weight_s2 = weight_s ^ 2,
@@ -961,6 +965,26 @@ model_cherry_stats %>%
   theme(panel.grid.minor.x = element_blank(),
         panel.grid.major.x = element_blank())
 ```
+
+
+```{r env_export}
+library(rlang)
+chapter4_models <- env(
+  data_adults = data_adults,
+  model_heights_quap_weak_prior = model_heights_quap_weak_prior,
+  model_hight = model_hight,
+  data_model = data_model,
+  model_hight_s1 = model_hight_s1,
+  model_hight_s2 = model_hight_s2,
+  model_hight_s3 = model_hight_s3,
+  data_cherry = data_cherry,
+  b_spline_cherry = b_spline_cherry,
+  model_cherry = model_cherry
+)
+
+write_rds(chapter4_models, "envs/chapter4_models.rds")
+```
+
 
 ---
 

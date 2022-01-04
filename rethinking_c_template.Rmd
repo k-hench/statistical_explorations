@@ -27,6 +27,16 @@ source("knitr_matrix.R")
 
 by [Richard McElreath](https://xcelab.net/rm/statistical-rethinking/), building on the Summaries by [Solomon Kurz](https://bookdown.org/content/4857/) and [Jake Thompson](https://sr2-solutions.wjakethompson.com/linear-models.html).
 
+
+```{r env_export}
+library(rlang)
+chapterX_models <- env(
+)
+
+write_rds(chapterX_models, "envs/chapterX_models.rds")
+```
+
+
 ## Homework
 
 **E1**

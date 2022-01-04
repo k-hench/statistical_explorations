@@ -371,7 +371,7 @@ Note how the y scale depends on the number of grid points: the peak reaches ~0.7
 ```{r, message = FALSE}
 library(rethinking)
 map <- purrr::map
-conpare_qa <- function(w_in, l_in){
+compare_qa <- function(w_in, l_in){
   globe_qa <- quap(
     alist(
       W ~ dbinom( W + L, p ), # binomial likelihood
@@ -399,9 +399,9 @@ conpare_qa <- function(w_in, l_in){
 ```
 
 ```{r, warning = FALSE}
-conpare_qa(w_in = 6, l_in = 3) +
-conpare_qa(w_in = 12, l_in = 6) +
-conpare_qa(w_in = 24, l_in = 12)
+compare_qa(w_in = 6, l_in = 3) +
+compare_qa(w_in = 12, l_in = 6) +
+compare_qa(w_in = 24, l_in = 12)
 ```
 
 ## Marcov Chain Monte Carlo (MCMC)
@@ -453,6 +453,16 @@ p_p36 <- tibble(x = p_36) %>%
 
 p_p + p_p36
 ```
+
+```{r env_export}
+library(rlang)
+chapter2_models <- env(
+  compare_qa = compare_qa
+)
+
+write_rds(chapter2_models, "envs/chapter2_models.rds")
+```
+
 
 ---
 
@@ -687,7 +697,7 @@ import seaborn as sns
 import matplotlib
 from matplotlib.colors import ListedColormap
 import matplotlib.font_manager
-matplotlib.font_manager._rebuild()
+#matplotlib.font_manager.rebuild()
 ```
 
 ```{python, include = FALSE, echo = FALSE}

@@ -516,10 +516,10 @@ precis(posterior_sample) %>%
 
 
 
-|       mean|        sd|      5.5%|      94.5%|histogram   |
-|----------:|---------:|---------:|----------:|:-----------|
-| 154.604734| 0.4108867| 153.94063| 155.255209|▁▁▅▇▂▁▁     |
-|   7.731758| 0.2904574|   7.26298|   8.197043|▁▁▁▂▅▇▇▃▁▁▁ |
+|       mean|        sd|       5.5%|      94.5%|histogram   |
+|----------:|---------:|----------:|----------:|:-----------|
+| 154.615040| 0.4135991| 153.960948| 155.281810|▁▁▅▇▂▁▁     |
+|   7.726235| 0.2902976|   7.252531|   8.184402|▁▁▁▂▅▇▇▃▁▁▁ |
 
 ## Linear Prediction
 
@@ -837,6 +837,7 @@ $$
 :::
 
 
+
 ```r
 plot_model_intervals <- function(mod, data,
                                  weight_seq = list(weight_s = seq(from = min(data_model$weight_s),
@@ -873,7 +874,11 @@ plot_model_intervals <- function(mod, data,
     geom_line(data = model_hight_mu_interval,
               aes(y = mean))
 }
+```
 
+
+
+```r
 data_model <-  data %>% 
   mutate(weight_s = (weight - mean(weight))/sd(weight),
          weight_s2 = weight_s ^ 2,
@@ -933,7 +938,7 @@ plot_model_intervals(model_hight_s3, data_model,
                                        weight_s3 = weight_s ^ 3))
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-27-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-28-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -950,7 +955,7 @@ plot_model_intervals(model_hight_s3, data_model,
   labs(y = "height [cm]")
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-28-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-29-1.svg" width="672" style="display: block; margin: auto;" />
 
 ## Splines
 
@@ -980,7 +985,7 @@ cherry_blossoms %>%
   labs(y = "Day of first blossom")
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-30-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-31-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1020,7 +1025,7 @@ ggplot() +
         panel.grid.major.x = element_blank())
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-32-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-33-1.svg" width="672" style="display: block; margin: auto;" />
 
 B-spline model:
 
@@ -1106,7 +1111,7 @@ ggplot() +
         panel.grid.major.x = element_blank())
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-35-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-36-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -1138,7 +1143,28 @@ model_cherry_stats %>%
         panel.grid.major.x = element_blank())
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-36-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-37-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+library(rlang)
+chapter4_models <- env(
+  data_adults = data_adults,
+  model_heights_quap_weak_prior = model_heights_quap_weak_prior,
+  model_hight = model_hight,
+  data_model = data_model,
+  model_hight_s1 = model_hight_s1,
+  model_hight_s2 = model_hight_s2,
+  model_hight_s3 = model_hight_s3,
+  data_cherry = data_cherry,
+  b_spline_cherry = b_spline_cherry,
+  model_cherry = model_cherry
+)
+
+write_rds(chapter4_models, "envs/chapter4_models.rds")
+```
+
 
 ---
 
@@ -1217,7 +1243,7 @@ sample_data %>%
   labs(y = "density")
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-37-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-38-1.svg" width="672" style="display: block; margin: auto;" />
 
 **M2**
 
@@ -1396,7 +1422,7 @@ p_2 <- model_hight_sd %>%
 p_1 + p_2
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-41-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-42-1.svg" width="672" style="display: block; margin: auto;" />
 
 Hmm 🤔`: I can't see a difference - maybe that is the point?
 
@@ -1506,7 +1532,7 @@ p3 <- spline_check(n_knots = 3, inner = TRUE)
 p1 | p2 | p3
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-42-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-43-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -1524,7 +1550,7 @@ p3 <- spline_check(n_knots = 10, inner = TRUE)
 p1 | p2 | p3
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-43-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-44-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -1542,7 +1568,7 @@ p3 <- spline_check(n_knots = 30, inner = TRUE)
 p1 | p2 | p3
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-44-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-45-1.svg" width="672" style="display: block; margin: auto;" />
 
 They control the division of data and the initial scale for the weighting
 
@@ -1594,7 +1620,7 @@ ggplot(data_children,
   geom_point(shape = 21, size = 1.5, color = clr1, fill = fll1)
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-46-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-47-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1657,7 +1683,7 @@ ggplot(data_children, aes(x  = weight, y = height)) +
                 color = clr2, n = 2)
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-48-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-49-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
 model_hight_smp_mean_children %>% 
@@ -1711,7 +1737,7 @@ model_hight_sd_children %>%
               aes(y = mean))
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-49-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-50-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 c)
@@ -1784,7 +1810,7 @@ ggplot(data_log, aes(x  = weight_log, y = height)) +
                 color = clr2, n = 2)
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-51-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-52-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -1824,7 +1850,7 @@ model_hight_sd_log %>%
               aes(y = mean), linetype = 3)
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-52-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-53-1.svg" width="672" style="display: block; margin: auto;" />
 
 **H4**
 
@@ -1854,7 +1880,7 @@ ggplot(cubic_priors, aes(x = weight, y = height, group = n)) +
     theme(plot.title = element_markdown())
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-53-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-54-1.svg" width="672" style="display: block; margin: auto;" />
 
 **H5**
 
@@ -1874,7 +1900,7 @@ cherry_blossoms_tib %>%
   geom_point(size = 1.2, color = fll2)
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-54-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-55-1.svg" width="672" style="display: block; margin: auto;" />
 
 $$
 \begin{array}{cccr} 
@@ -1937,7 +1963,7 @@ model_temp_sd %>%
               aes(y = mean))
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-55-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-56-1.svg" width="672" style="display: block; margin: auto;" />
 
 **H6**
 
@@ -1988,7 +2014,7 @@ p1 + p2 &
         panel.grid.major.x = element_blank())
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-56-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-57-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 **H7**
@@ -2076,7 +2102,7 @@ model_cherry_stats %>%
         panel.grid.major.x = element_blank())
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-57-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-58-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ## {brms} section
@@ -2138,7 +2164,7 @@ p_dens + p_chains
 brms_summary_plot(brms_c4_adult_heights)
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-58-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-59-1.svg" width="672" style="display: block; margin: auto;" />
 
 **sampling from the posterior**
 
@@ -2218,7 +2244,7 @@ brms_c4_heights_x <- brm(data = data_adults,
 brms_summary_plot(brms_c4_heights_x, n_chains = 12)
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-60-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-61-1.svg" width="672" style="display: block; margin: auto;" />
 
 *Logs and exps* (`m4.3b`)
 
@@ -2292,7 +2318,7 @@ ggpairs(brms_posterior_samples,
         upper = list(continuous = wrap(ggally_cor, size = 5, color = "black", family = "Josefin sans")))
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-62-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-63-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -2337,7 +2363,7 @@ data_adults %>%
               slope     = fixef(brms_c4_heights_x)[2])
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-63-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-64-1.svg" width="672" style="display: block; margin: auto;" />
 
 ```r
 brms_model_hight_mu_interval %>% 
@@ -2349,7 +2375,7 @@ brms_model_hight_mu_interval %>%
   geom_line(aes(y = mean))
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-63-2.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-64-2.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2368,7 +2394,7 @@ brms_c4_curve_x <- brm(data = data_model,
 brms_summary_plot(brms_c4_curve_x, n_chains = 4)
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-64-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-65-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2399,7 +2425,7 @@ ggplot(data = data_model,
   geom_point(aes(y = height), color = rgb(0,0,0,.5), size = .6)
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-65-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-66-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2469,7 +2495,7 @@ ggplot(data = data_cherry,
         panel.grid.major.x = element_blank())
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-67-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-68-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2533,7 +2559,7 @@ fitted(brms_c4_cherry_smooth,
         panel.grid.major.x = element_blank())
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-70-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-71-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2567,7 +2593,7 @@ fitted(brms_c4_cherry_smooth2,
         panel.grid.major.x = element_blank())
 ```
 
-<img src="rethinking_c4_files/figure-html/unnamed-chunk-71-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c4_files/figure-html/unnamed-chunk-72-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 Add-on about matrix-columns ([4.7 Second bonus](https://bookdown.org/content/4857/geocentric-models.html#second-bonus-group-predictors-with-matrix-columns))

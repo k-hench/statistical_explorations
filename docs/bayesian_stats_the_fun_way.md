@@ -279,7 +279,7 @@ The important parts here are the
 
 -   [*posterior probability* ]{style="color:#54436D"}$P(H|D)$: how strongly we belief in our hypothesis given the data
 -   [*likelyhood* ]{style="color:#B35136"}$P(D|H)$: the probability of data if the hypothesis were true
--   [*prior probability* ]{style="color:#E9E5D9"}$P(H)$: how likely our hypothesis is in the first place
+-   [*prior probability* ]{style="color:#E9E9E9"}$P(H)$: how likely our hypothesis is in the first place
 
 <img src="baeyes_theorem.svg" style="display: block; margin: auto;" />
 
@@ -518,7 +518,7 @@ p_b_superior
 ```
 
 ```
-#> [1] 0.95857
+#> [1] 0.95938
 ```
 
 ```r

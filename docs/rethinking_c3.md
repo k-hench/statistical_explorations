@@ -93,7 +93,7 @@ sum(samples$proportion_water < .5) / length(samples$proportion_water)
 ```
 
 ```
-#> [1] 0.1713
+#> [1] 0.175
 ```
 
 ```r
@@ -101,7 +101,7 @@ sum(samples$proportion_water > .5 & samples$proportion_water < .75) / length(sam
 ```
 
 ```
-#> [1] 0.6087
+#> [1] 0.5997
 ```
 
 ```r
@@ -265,7 +265,7 @@ rbinom( 10, size = 2, prob = .7)
 ```
 
 ```
-#>  [1] 2 2 2 2 2 1 1 1 1 2
+#>  [1] 2 1 2 1 1 2 1 1 1 2
 ```
 
 ```r
@@ -383,7 +383,7 @@ sum( samples$w == 6 ) / length( samples$w )
 ```
 
 ```
-#> [1] 0.20082
+#> [1] 0.20117
 ```
 
 
@@ -409,6 +409,17 @@ p_run_length + p_switches
 ```
 
 <img src="rethinking_c3_files/figure-html/unnamed-chunk-14-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+library(rlang)
+chapter3_models <- env(
+  grid_data = grid_data
+)
+
+write_rds(chapter3_models, "envs/chapter3_models.rds")
+```
+
 
 ---
 
@@ -1011,7 +1022,7 @@ import seaborn as sns
 import matplotlib
 from matplotlib.colors import ListedColormap
 import matplotlib.font_manager
-matplotlib.font_manager._rebuild()
+#matplotlib.font_manager._rebuild()
 ```
 
 
@@ -1259,7 +1270,7 @@ plt.hist(dummy_w, bins = np.arange(0, 11) - bar_width / 2, width = bar_width, co
 ```
 #> (array([2.0000e+00, 4.2000e+01, 3.9200e+02, 2.1170e+03, 7.4230e+03,
 #>        1.7153e+04, 2.6752e+04, 2.6557e+04, 1.5640e+04, 3.9220e+03]), array([-0.35,  0.65,  1.65,  2.65,  3.65,  4.65,  5.65,  6.65,  7.65,
-#>         8.65,  9.65]), <a list of 10 Patch objects>)
+#>         8.65,  9.65]), <BarContainer object of 10 artists>)
 ```
 
 ```python
@@ -1267,7 +1278,7 @@ plt.xlim(0, 9.5)
 ```
 
 ```
-#> (0, 9.5)
+#> (0.0, 9.5)
 ```
 
 ```python
