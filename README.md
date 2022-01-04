@@ -6,7 +6,9 @@
 
 A [small notebook](https://k-hench.github.io/statistical_explorations/) were I protocol my journeys into the realms of golems, small and large worlds 🧙‍♂️.
 
-!["golem saying: well it's 42 of course..."](img/golem.svg)
+<center>
+ <img src="img/golem.svg" alt="golem saying: well it's 42 of course...", style="width:90%; max-width:500px">
+</center>
 
 ---
 
