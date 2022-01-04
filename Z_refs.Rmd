@@ -13,11 +13,43 @@ knitr::opts_chunk$set(echo = TRUE,
 options(knitr.kable.NA = '')
 
 source("bayesian_settings.R")
+library(rethinking)
+library(tidybayes)
+library(mixedup)
+library(bayesplot)
+library(reticulate)
 ```
+
+### R settings
 
 ```{r}
 sessionInfo()
 ```
+
+<center>
+<img src='img/Rlogo.svg' width='139' />
+</center>
+
+### Python settings
+
+```{python}
+import arviz as az
+import matplotlib.pyplot as plt
+import numpy as np
+import pymc3 as pm
+import scipy.stats as stats
+import seaborn as sns
+import matplotlib
+from matplotlib.colors import ListedColormap
+import matplotlib.font_manager
+import session_info
+
+session_info.show(html = False)
+```
+
+<center>
+<img src='img/python_logo.svg' align='center' width='139' />
+</center>
 
 ## References
 

@@ -1015,7 +1015,7 @@ PSIS(chapter5_models$model_multiple)
 
 ```
 #>       PSIS      lppd  penalty  std_err
-#> 1 129.2347 -64.61735 5.750456 14.85706
+#> 1 129.9451 -64.97254 6.176689 15.34672
 ```
 
 With the *Student T* distribution as a the likelihood, $k$ is reduced as there is more mass in the tails of the distribution (thus, Idaho is less *surprising*)
@@ -1026,8 +1026,8 @@ PSIS(model_multiple_sudent)
 ```
 
 ```
-#>       PSIS      lppd  penalty  std_err
-#> 1 133.7108 -66.85541 6.933533 11.95276
+#>       PSIS      lppd  penalty std_err
+#> 1 134.2209 -67.11045 7.209632 11.9681
 ```
 
 
@@ -1055,7 +1055,7 @@ precis(model_multiple_sudent) %>%
 
 |param  |  mean|   sd|  5.5%| 94.5%|
 |:------|-----:|----:|-----:|-----:|
-|alpha  |  0.01| 0.10| -0.14|  0.17|
+|alpha  |  0.02| 0.10| -0.14|  0.17|
 |beta_A | -0.70| 0.13| -0.91| -0.49|
 |beta_M |  0.00| 0.21| -0.33|  0.34|
 |sigma  |  0.55| 0.08|  0.42|  0.68|

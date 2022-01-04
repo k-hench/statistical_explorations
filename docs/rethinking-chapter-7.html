@@ -24,7 +24,7 @@
 <meta name="author" content="Kosmas Hench" />
 
 
-<meta name="date" content="2022-01-04" />
+<meta name="date" content="2022-01-05" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -887,7 +887,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="12" data-path="references-and-session-info.html"><a href="references-and-session-info.html"><i class="fa fa-check"></i><b>12</b> References and Session Info</a>
 <ul>
-<li class="chapter" data-level="12.1" data-path="references-and-session-info.html"><a href="references-and-session-info.html#session-info"><i class="fa fa-check"></i><b>12.1</b> Session Info</a></li>
+<li class="chapter" data-level="12.1" data-path="references-and-session-info.html"><a href="references-and-session-info.html#session-info"><i class="fa fa-check"></i><b>12.1</b> Session Info</a>
+<ul>
+<li class="chapter" data-level="12.1.1" data-path="references-and-session-info.html"><a href="references-and-session-info.html#r-settings"><i class="fa fa-check"></i><b>12.1.1</b> R settings</a></li>
+<li class="chapter" data-level="12.1.2" data-path="references-and-session-info.html"><a href="references-and-session-info.html#python-settings"><i class="fa fa-check"></i><b>12.1.2</b> Python settings</a></li>
+</ul></li>
 <li class="chapter" data-level="12.2" data-path="references-and-session-info.html"><a href="references-and-session-info.html#references"><i class="fa fa-check"></i><b>12.2</b> References</a></li>
 </ul></li>
 </ul>
@@ -1756,11 +1760,11 @@ w_{i} = \frac{\textrm{exp}(-0.5\Delta_{i})}{\Sigma_{j}\textrm{exp}(-0.5\Delta_{j
 <span id="cb617-11"><a href="rethinking-chapter-7.html#cb617-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <div class="sourceCode" id="cb618"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb618-1"><a href="rethinking-chapter-7.html#cb618-1" aria-hidden="true" tabindex="-1"></a><span class="fu">PSIS</span>(chapter5_models<span class="sc">$</span>model_multiple)</span></code></pre></div>
 <pre><code>#&gt;       PSIS      lppd  penalty  std_err
-#&gt; 1 129.2347 -64.61735 5.750456 14.85706</code></pre>
+#&gt; 1 129.9451 -64.97254 6.176689 15.34672</code></pre>
 <p>With the <em>Student T</em> distribution as a the likelihood, <span class="math inline">\(k\)</span> is reduced as there is more mass in the tails of the distribution (thus, Idaho is less <em>surprising</em>)</p>
 <div class="sourceCode" id="cb620"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb620-1"><a href="rethinking-chapter-7.html#cb620-1" aria-hidden="true" tabindex="-1"></a><span class="fu">PSIS</span>(model_multiple_sudent)</span></code></pre></div>
-<pre><code>#&gt;       PSIS      lppd  penalty  std_err
-#&gt; 1 133.7108 -66.85541 6.933533 11.95276</code></pre>
+<pre><code>#&gt;       PSIS      lppd  penalty std_err
+#&gt; 1 134.2209 -67.11045 7.209632 11.9681</code></pre>
 <div class="sourceCode" id="cb622"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb622-1"><a href="rethinking-chapter-7.html#cb622-1" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(chapter5_models<span class="sc">$</span>model_multiple) <span class="sc">%&gt;%</span> </span>
 <span id="cb622-2"><a href="rethinking-chapter-7.html#cb622-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">knit_precis</span>()</span></code></pre></div>
 <table>
@@ -1819,7 +1823,7 @@ w_{i} = \frac{\textrm{exp}(-0.5\Delta_{i})}{\Sigma_{j}\textrm{exp}(-0.5\Delta_{j
 <tbody>
 <tr class="odd">
 <td align="left">alpha</td>
-<td align="right">0.01</td>
+<td align="right">0.02</td>
 <td align="right">0.10</td>
 <td align="right">-0.14</td>
 <td align="right">0.17</td>

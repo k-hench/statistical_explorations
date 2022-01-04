@@ -2,7 +2,7 @@
 title: "Statistical Exploration"
 subtitle: "a small notebook to keep track"
 author: "Kosmas Hench"
-date: "2022-01-04"
+date: "2022-01-05"
 documentclass: book
 bibliography: [book.bib]
 biblio-style: apalike
@@ -20,6 +20,7 @@ editor_options:
 
 
 
+So far, the journey includes **Statistical Rethinking** [@mcelreath2020] and **Bayesian Statistics the Fun Way** [@kurt2019].
 
 ---
 

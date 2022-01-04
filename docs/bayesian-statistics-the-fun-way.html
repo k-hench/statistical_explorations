@@ -24,7 +24,7 @@
 <meta name="author" content="Kosmas Hench" />
 
 
-<meta name="date" content="2022-01-04" />
+<meta name="date" content="2022-01-05" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -887,7 +887,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="12" data-path="references-and-session-info.html"><a href="references-and-session-info.html"><i class="fa fa-check"></i><b>12</b> References and Session Info</a>
 <ul>
-<li class="chapter" data-level="12.1" data-path="references-and-session-info.html"><a href="references-and-session-info.html#session-info"><i class="fa fa-check"></i><b>12.1</b> Session Info</a></li>
+<li class="chapter" data-level="12.1" data-path="references-and-session-info.html"><a href="references-and-session-info.html#session-info"><i class="fa fa-check"></i><b>12.1</b> Session Info</a>
+<ul>
+<li class="chapter" data-level="12.1.1" data-path="references-and-session-info.html"><a href="references-and-session-info.html#r-settings"><i class="fa fa-check"></i><b>12.1.1</b> R settings</a></li>
+<li class="chapter" data-level="12.1.2" data-path="references-and-session-info.html"><a href="references-and-session-info.html#python-settings"><i class="fa fa-check"></i><b>12.1.2</b> Python settings</a></li>
+</ul></li>
 <li class="chapter" data-level="12.2" data-path="references-and-session-info.html"><a href="references-and-session-info.html#references"><i class="fa fa-check"></i><b>12.2</b> References</a></li>
 </ul></li>
 </ul>
@@ -1262,7 +1266,7 @@ N(\mu, \sigma) = \frac{1}{\sqrt{2\pi    \sigma^2}} \times e ^{- \frac{(x - \mu) 
 <span id="cb852-5"><a href="bayesian-statistics-the-fun-way.html#cb852-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb852-6"><a href="bayesian-statistics-the-fun-way.html#cb852-6" aria-hidden="true" tabindex="-1"></a>p_b_superior <span class="ot">&lt;-</span> <span class="fu">sum</span>(mc_simulation<span class="sc">$</span>samples_b <span class="sc">&gt;</span> mc_simulation<span class="sc">$</span>samples_a)<span class="sc">/</span>n_trials</span>
 <span id="cb852-7"><a href="bayesian-statistics-the-fun-way.html#cb852-7" aria-hidden="true" tabindex="-1"></a>p_b_superior</span></code></pre></div>
-<pre><code>#&gt; [1] 0.95938</code></pre>
+<pre><code>#&gt; [1] 0.95979</code></pre>
 <div class="sourceCode" id="cb854"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb854-1"><a href="bayesian-statistics-the-fun-way.html#cb854-1" aria-hidden="true" tabindex="-1"></a>p_hist <span class="ot">&lt;-</span> mc_simulation <span class="sc">%&gt;%</span> </span>
 <span id="cb854-2"><a href="bayesian-statistics-the-fun-way.html#cb854-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> samples_ratio)) <span class="sc">+</span></span>
 <span id="cb854-3"><a href="bayesian-statistics-the-fun-way.html#cb854-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">color =</span> clr2, <span class="at">fill =</span> fll2, <span class="at">size =</span> .<span class="dv">2</span>, <span class="at">bins =</span> <span class="dv">20</span>,<span class="at">boundary =</span> <span class="dv">1</span>) <span class="sc">+</span></span>

@@ -59,6 +59,7 @@ $(document).ready(function () {
 readr::write_lines(htmlhead, file = "header.html")
 ```
 
+So far, the journey includes **Statistical Rethinking** [@mcelreath2020] and **Bayesian Statistics the Fun Way** [@kurt2019].
 
 ---
 
