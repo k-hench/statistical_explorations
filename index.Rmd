@@ -1,6 +1,6 @@
 ---
-title: "Statistical Exploration"
-subtitle: "a small notebook to keep track"
+title: "Statistical Explorations"
+subtitle: "A small notebook to keep track"
 author: "Kosmas Hench"
 date: "`r Sys.Date()`"
 documentclass: book
