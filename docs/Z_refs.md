@@ -134,9 +134,9 @@ session_info.show(html = False)
 #> notebook            6.0.3
 #> -----
 #> Python 3.8.10 (default, Nov 26 2021, 20:14:08) [GCC 9.3.0]
-#> Linux-5.11.0-43-generic-x86_64-with-glibc2.29
+#> Linux-5.11.0-46-generic-x86_64-with-glibc2.29
 #> -----
-#> Session information updated at 2022-01-05 00:41
+#> Session information updated at 2022-01-12 17:36
 ```
 
 <center>

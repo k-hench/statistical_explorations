@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>10 Rethinking: Chapter 9 | Statistical Explorations</title>
+  <meta name="description" content="statistical explorations by kh" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="10 Rethinking: Chapter 9 | Statistical Explorations" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="statistical explorations by kh" />
+  <meta name="github-repo" content="k-hench/statistical_explorations" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="10 Rethinking: Chapter 9 | Statistical Explorations" />
+  
+  <meta name="twitter:description" content="statistical explorations by kh" />
+  
+
+<meta name="author" content="Kosmas Hench" />
+
+
+<meta name="date" content="2022-01-12" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="rethinking-chapter-8.html"/>
+<link rel="next" href="bayesian-statistics-the-fun-way.html"/>
+<script src="libs/header-attrs-2.9.6/header-attrs.js"></script>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="libs/tabwid-1.0.0/tabwid.css" rel="stylesheet" />
+
+<script>
+/* ========================================================================
+ * Bootstrap: transition.js v3.3.7
+ * http://getbootstrap.com/javascript/#transitions
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
+  // ============================================================
+
+  function transitionEnd() {
+    var el = document.createElement('bootstrap')
+
+    var transEndEventNames = {
+      WebkitTransition : 'webkitTransitionEnd',
+      MozTransition    : 'transitionend',
+      OTransition      : 'oTransitionEnd otransitionend',
+      transition       : 'transitionend'
+    }
+
+    for (var name in transEndEventNames) {
+      if (el.style[name] !== undefined) {
+        return { end: transEndEventNames[name] }
+      }
+    }
+
+    return false // explicit for ie8 (  ._.)
+  }
+
+  // http://blog.alexmaccaw.com/css-transitions
+  $.fn.emulateTransitionEnd = function (duration) {
+    var called = false
+    var $el = this
+    $(this).one('bsTransitionEnd', function () { called = true })
+    var callback = function () { if (!called) $($el).trigger($.support.transition.end) }
+    setTimeout(callback, duration)
+    return this
+  }
+
+  $(function () {
+    $.support.transition = transitionEnd()
+
+    if (!$.support.transition) return
+
+    $.event.special.bsTransitionEnd = {
+      bindType: $.support.transition.end,
+      delegateType: $.support.transition.end,
+      handle: function (e) {
+        if ($(e.target).is(this)) return e.handleObj.handler.apply(this, arguments)
+      }
+    }
+  })
+
+}(jQuery);
+</script>
+<script>
+/* ========================================================================
+ * Bootstrap: collapse.js v3.3.7
+ * http://getbootstrap.com/javascript/#collapse
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+/* jshint latedef: false */
+
++function ($) {
+  'use strict';
+
+  // COLLAPSE PUBLIC CLASS DEFINITION
+  // ================================
+
+  var Collapse = function (element, options) {
+    this.$element      = $(element)
+    this.options       = $.extend({}, Collapse.DEFAULTS, options)
+    this.$trigger      = $('[data-toggle="collapse"][href="#' + element.id + '"],' +
+                           '[data-toggle="collapse"][data-target="#' + element.id + '"]')
+    this.transitioning = null
+
+    if (this.options.parent) {
+      this.$parent = this.getParent()
+    } else {
+      this.addAriaAndCollapsedClass(this.$element, this.$trigger)
+    }
+
+    if (this.options.toggle) this.toggle()
+  }
+
+  Collapse.VERSION  = '3.3.7'
+
+  Collapse.TRANSITION_DURATION = 350
+
+  Collapse.DEFAULTS = {
+    toggle: true
+  }
+
+  Collapse.prototype.dimension = function () {
+    var hasWidth = this.$element.hasClass('width')
+    return hasWidth ? 'width' : 'height'
+  }
+
+  Collapse.prototype.show = function () {
+    if (this.transitioning || this.$element.hasClass('in')) return
+
+    var activesData
+    var actives = this.$parent && this.$parent.children('.panel').children('.in, .collapsing')
+
+    if (actives && actives.length) {
+      activesData = actives.data('bs.collapse')
+      if (activesData && activesData.transitioning) return
+    }
+
+    var startEvent = $.Event('show.bs.collapse')
+    this.$element.trigger(startEvent)
+    if (startEvent.isDefaultPrevented()) return
+
+    if (actives && actives.length) {
+      Plugin.call(actives, 'hide')
+      activesData || actives.data('bs.collapse', null)
+    }
+
+    var dimension = this.dimension()
+
+    this.$element
+      .removeClass('collapse')
+      .addClass('collapsing')[dimension](0)
+      .attr('aria-expanded', true)
+
+    this.$trigger
+      .removeClass('collapsed')
+      .attr('aria-expanded', true)
+
+    this.transitioning = 1
+
+    var complete = function () {
+      this.$element
+        .removeClass('collapsing')
+        .addClass('collapse in')[dimension]('')
+      this.transitioning = 0
+      this.$element
+        .trigger('shown.bs.collapse')
+    }
+
+    if (!$.support.transition) return complete.call(this)
+
+    var scrollSize = $.camelCase(['scroll', dimension].join('-'))
+
+    this.$element
+      .one('bsTransitionEnd', $.proxy(complete, this))
+      .emulateTransitionEnd(Collapse.TRANSITION_DURATION)[dimension](this.$element[0][scrollSize])
+  }
+
+  Collapse.prototype.hide = function () {
+    if (this.transitioning || !this.$element.hasClass('in')) return
+
+    var startEvent = $.Event('hide.bs.collapse')
+    this.$element.trigger(startEvent)
+    if (startEvent.isDefaultPrevented()) return
+
+    var dimension = this.dimension()
+
+    this.$element[dimension](this.$element[dimension]())[0].offsetHeight
+
+    this.$element
+      .addClass('collapsing')
+      .removeClass('collapse in')
+      .attr('aria-expanded', false)
+
+    this.$trigger
+      .addClass('collapsed')
+      .attr('aria-expanded', false)
+
+    this.transitioning = 1
+
+    var complete = function () {
+      this.transitioning = 0
+      this.$element
+        .removeClass('collapsing')
+        .addClass('collapse')
+        .trigger('hidden.bs.collapse')
+    }
+
+    if (!$.support.transition) return complete.call(this)
+
+    this.$element
+      [dimension](0)
+      .one('bsTransitionEnd', $.proxy(complete, this))
+      .emulateTransitionEnd(Collapse.TRANSITION_DURATION)
+  }
+
+  Collapse.prototype.toggle = function () {
+    this[this.$element.hasClass('in') ? 'hide' : 'show']()
+  }
+
+  Collapse.prototype.getParent = function () {
+    return $(this.options.parent)
+      .find('[data-toggle="collapse"][data-parent="' + this.options.parent + '"]')
+      .each($.proxy(function (i, element) {
+        var $element = $(element)
+        this.addAriaAndCollapsedClass(getTargetFromTrigger($element), $element)
+      }, this))
+      .end()
+  }
+
+  Collapse.prototype.addAriaAndCollapsedClass = function ($element, $trigger) {
+    var isOpen = $element.hasClass('in')
+
+    $element.attr('aria-expanded', isOpen)
+    $trigger
+      .toggleClass('collapsed', !isOpen)
+      .attr('aria-expanded', isOpen)
+  }
+
+  function getTargetFromTrigger($trigger) {
+    var href
+    var target = $trigger.attr('data-target')
+      || (href = $trigger.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '') // strip for ie7
+
+    return $(target)
+  }
+
+
+  // COLLAPSE PLUGIN DEFINITION
+  // ==========================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this   = $(this)
+      var data    = $this.data('bs.collapse')
+      var options = $.extend({}, Collapse.DEFAULTS, $this.data(), typeof option == 'object' && option)
+
+      if (!data && options.toggle && /show|hide/.test(option)) options.toggle = false
+      if (!data) $this.data('bs.collapse', (data = new Collapse(this, options)))
+      if (typeof option == 'string') data[option]()
+    })
+  }
+
+  var old = $.fn.collapse
+
+  $.fn.collapse             = Plugin
+  $.fn.collapse.Constructor = Collapse
+
+
+  // COLLAPSE NO CONFLICT
+  // ====================
+
+  $.fn.collapse.noConflict = function () {
+    $.fn.collapse = old
+    return this
+  }
+
+
+  // COLLAPSE DATA-API
+  // =================
+
+  $(document).on('click.bs.collapse.data-api', '[data-toggle="collapse"]', function (e) {
+    var $this   = $(this)
+
+    if (!$this.attr('data-target')) e.preventDefault()
+
+    var $target = getTargetFromTrigger($this)
+    var data    = $target.data('bs.collapse')
+    var option  = data ? 'toggle' : $this.data()
+
+    Plugin.call($target, option)
+  })
+
+}(jQuery);
+</script>
+<script>
+window.initializeCodeFolding = function(show) {
+
+  // handlers for show-all and hide all
+  $("#rmd-show-all-code").click(function() {
+    $('div.r-code-collapse').each(function() {
+      $(this).collapse('show');
+    });
+  });
+  $("#rmd-hide-all-code").click(function() {
+    $('div.r-code-collapse').each(function() {
+      $(this).collapse('hide');
+    });
+  });
+  
+  // index for unique code element ids
+  var currentIndex = 1;
+
+  // select all R code blocks
+  var rCodeBlocks = $('pre.sourceCode, pre.r, pre.python, pre.bash, pre.sql, pre.cpp, pre.stan');
+  rCodeBlocks.each(function() {
+
+    // create a collapsable div to wrap the code in
+    var div = $('<div class="collapse r-code-collapse"></div>');
+    if (show)
+      div.addClass('in');
+    var id = 'rcode-643E0F36' + currentIndex++;
+    div.attr('id', id);
+    $(this).before(div);
+    $(this).detach().appendTo(div);
+
+    // add a show code button right above
+    // var showCodeText = $('<span>' + (show ? 'Hide' : 'Code') + '</span>');
+    var showCodeText = $('<img style="width:45px;" src="img/both.svg">');
+    var showCodeButton = $('<button type="button" class="btn btn-default btn-xs code-folding-btn pull-right"></button>');
+    showCodeButton.append(showCodeText);
+    showCodeButton
+        .attr('data-toggle', 'collapse')
+        .attr('data-target', '#' + id)
+        .attr('aria-expanded', show)
+        .attr('aria-controls', id);
+
+    var buttonRow = $('<div class="row"></div>');
+    var buttonCol = $('<div class="col-md-12"></div>');
+
+    var buttonColK = $('<div class="check"><input type="checkbox" id="cc_' + id + '" class="btn btn-default btn-xs code-folding-btn pull-right ch1" /><label class="checktrue" for="cc_' + id + '" ></label></div>');
+
+    buttonColK
+        .attr('data-toggle', 'collapse')
+        .attr('data-target', '#' + id)
+        .attr('aria-expanded', show)
+        .attr('aria-controls', id);
+
+    //buttonCol.append(showCodeButton);
+    buttonRow.append(buttonCol);
+    buttonCol.append(buttonColK);
+
+    div.before(buttonRow);
+
+    // update state of button on show/hide
+    div.on('hidden.bs.collapse', function () {
+      showCodeText.text();
+    });
+    div.on('show.bs.collapse', function () {
+      showCodeText.text();
+    });
+  });
+
+}
+</script>
+<script>
+/* ========================================================================
+ * Bootstrap: dropdown.js v3.3.7
+ * http://getbootstrap.com/javascript/#dropdowns
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // DROPDOWN CLASS DEFINITION
+  // =========================
+
+  var backdrop = '.dropdown-backdrop'
+  var toggle   = '[data-toggle="dropdown"]'
+  var Dropdown = function (element) {
+    $(element).on('click.bs.dropdown', this.toggle)
+  }
+
+  Dropdown.VERSION = '3.3.7'
+
+  function getParent($this) {
+    var selector = $this.attr('data-target')
+
+    if (!selector) {
+      selector = $this.attr('href')
+      selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
+    }
+
+    var $parent = selector && $(selector)
+
+    return $parent && $parent.length ? $parent : $this.parent()
+  }
+
+  function clearMenus(e) {
+    if (e && e.which === 3) return
+    $(backdrop).remove()
+    $(toggle).each(function () {
+      var $this         = $(this)
+      var $parent       = getParent($this)
+      var relatedTarget = { relatedTarget: this }
+
+      if (!$parent.hasClass('open')) return
+
+      if (e && e.type == 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) return
+
+      $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
+
+      if (e.isDefaultPrevented()) return
+
+      $this.attr('aria-expanded', 'false')
+      $parent.removeClass('open').trigger($.Event('hidden.bs.dropdown', relatedTarget))
+    })
+  }
+
+  Dropdown.prototype.toggle = function (e) {
+    var $this = $(this)
+
+    if ($this.is('.disabled, :disabled')) return
+
+    var $parent  = getParent($this)
+    var isActive = $parent.hasClass('open')
+
+    clearMenus()
+
+    if (!isActive) {
+      if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
+        // if mobile we use a backdrop because click events don't delegate
+        $(document.createElement('div'))
+          .addClass('dropdown-backdrop')
+          .insertAfter($(this))
+          .on('click', clearMenus)
+      }
+
+      var relatedTarget = { relatedTarget: this }
+      $parent.trigger(e = $.Event('show.bs.dropdown', relatedTarget))
+
+      if (e.isDefaultPrevented()) return
+
+      $this
+        .trigger('focus')
+        .attr('aria-expanded', 'true')
+
+      $parent
+        .toggleClass('open')
+        .trigger($.Event('shown.bs.dropdown', relatedTarget))
+    }
+
+    return false
+  }
+
+  Dropdown.prototype.keydown = function (e) {
+    if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
+
+    var $this = $(this)
+
+    e.preventDefault()
+    e.stopPropagation()
+
+    if ($this.is('.disabled, :disabled')) return
+
+    var $parent  = getParent($this)
+    var isActive = $parent.hasClass('open')
+
+    if (!isActive && e.which != 27 || isActive && e.which == 27) {
+      if (e.which == 27) $parent.find(toggle).trigger('focus')
+      return $this.trigger('click')
+    }
+
+    var desc = ' li:not(.disabled):visible a'
+    var $items = $parent.find('.dropdown-menu' + desc)
+
+    if (!$items.length) return
+
+    var index = $items.index(e.target)
+
+    if (e.which == 38 && index > 0)                 index--         // up
+    if (e.which == 40 && index < $items.length - 1) index++         // down
+    if (!~index)                                    index = 0
+
+    $items.eq(index).trigger('focus')
+  }
+
+
+  // DROPDOWN PLUGIN DEFINITION
+  // ==========================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this = $(this)
+      var data  = $this.data('bs.dropdown')
+
+      if (!data) $this.data('bs.dropdown', (data = new Dropdown(this)))
+      if (typeof option == 'string') data[option].call($this)
+    })
+  }
+
+  var old = $.fn.dropdown
+
+  $.fn.dropdown             = Plugin
+  $.fn.dropdown.Constructor = Dropdown
+
+
+  // DROPDOWN NO CONFLICT
+  // ====================
+
+  $.fn.dropdown.noConflict = function () {
+    $.fn.dropdown = old
+    return this
+  }
+
+
+  // APPLY TO STANDARD DROPDOWN ELEMENTS
+  // ===================================
+
+  $(document)
+    .on('click.bs.dropdown.data-api', clearMenus)
+    .on('click.bs.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
+    .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
+    .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
+    .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
+
+}(jQuery);
+</script>
+<script>
+$(document).ready(function() {
+
+  // Section anchors
+  $('.section h1, .section h2, .section h3, .section h4, .section h5').each(function() {
+    anchor = '#' + $(this).parent().attr('id');
+    $(this).addClass("hasAnchor").prepend('<a href="' + anchor + '" class="anchor"></a>');
+  });
+});
+</script>
+<link rel="shortcut icon" href="img/favicon.ico" />
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "hide");
+});
+</script>
+
+<script>document.write('<div class="btn-group pull-right" style="position: absolute; top: 35px; right: 2%; z-index: 10"><button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"aria-expanded="true" data-_extension-text-contrast=""><span>global code</span><span class="caret"></span></button><ul class="dropdown-menu" style="min-width: 50px;"><li><a id="rmd-show-all-code" href="#">Show All</a></li><li><a id="rmd-hide-all-code" href="#">Hide All</a></li></ul></div>')</script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="https://github.com/k-hench/statistical_explorations">github repository</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Intro</a></li>
+<li class="chapter" data-level="2" data-path="rethinking-chapter-1.html"><a href="rethinking-chapter-1.html"><i class="fa fa-check"></i><b>2</b> Rethinking: Chapter 1</a></li>
+<li class="chapter" data-level="3" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html"><i class="fa fa-check"></i><b>3</b> Rethinking: Chapter 2</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#counting-possibilities"><i class="fa fa-check"></i><b>3.1</b> Counting possibilities</a></li>
+<li class="chapter" data-level="3.2" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#building-a-model"><i class="fa fa-check"></i><b>3.2</b> Building a Model</a></li>
+<li class="chapter" data-level="3.3" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#making-the-model-go-bayes-theorem"><i class="fa fa-check"></i><b>3.3</b> Making the model go / Bayes’ Theorem</a></li>
+<li class="chapter" data-level="3.4" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#motors-grid-approximation"><i class="fa fa-check"></i><b>3.4</b> Motors: Grid Approximation</a></li>
+<li class="chapter" data-level="3.5" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#quadratic-approximation"><i class="fa fa-check"></i><b>3.5</b> Quadratic Approximation</a></li>
+<li class="chapter" data-level="3.6" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#marcov-chain-monte-carlo-mcmc"><i class="fa fa-check"></i><b>3.6</b> Marcov Chain Monte Carlo (MCMC)</a></li>
+<li class="chapter" data-level="3.7" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#homework"><i class="fa fa-check"></i><b>3.7</b> Homework</a></li>
+<li class="chapter" data-level="3.8" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#brms-section"><i class="fa fa-check"></i><b>3.8</b> {brms} section</a></li>
+<li class="chapter" data-level="3.9" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#pymc3-section"><i class="fa fa-check"></i><b>3.9</b> pymc3 section</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html"><i class="fa fa-check"></i><b>4</b> Rethinking: Chapter 3</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#sampling-from-a-grid-approximate-posterior"><i class="fa fa-check"></i><b>4.1</b> Sampling from a grid approximate posterior</a></li>
+<li class="chapter" data-level="4.2" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#sampling-to-summarize"><i class="fa fa-check"></i><b>4.2</b> Sampling to Summarize</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#intervals-of-devined-boundaries"><i class="fa fa-check"></i><b>4.2.1</b> Intervals of devined boundaries</a></li>
+<li class="chapter" data-level="4.2.2" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#intervals-of-defined-mass"><i class="fa fa-check"></i><b>4.2.2</b> Intervals of defined mass</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#point-estimates"><i class="fa fa-check"></i><b>4.3</b> Point estimates</a></li>
+<li class="chapter" data-level="4.4" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#sample-to-simulate-prediction"><i class="fa fa-check"></i><b>4.4</b> sample to simulate prediction</a></li>
+<li class="chapter" data-level="4.5" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#homework-1"><i class="fa fa-check"></i><b>4.5</b> Homework</a></li>
+<li class="chapter" data-level="4.6" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#brms-section-1"><i class="fa fa-check"></i><b>4.6</b> {brms} section</a></li>
+<li class="chapter" data-level="4.7" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#pymc3-section-1"><i class="fa fa-check"></i><b>4.7</b> pymc3 section</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html"><i class="fa fa-check"></i><b>5</b> Rethinking: Chapter 4</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#why-normal-distributions-are-normal"><i class="fa fa-check"></i><b>5.1</b> Why normal distributions are normal</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#normal-by-addition"><i class="fa fa-check"></i><b>5.1.1</b> Normal by addition</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#normal-by-multiplication-and-by-log-multiplication"><i class="fa fa-check"></i><b>5.2</b> Normal by multiplication and by log-multiplication</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#using-the-gaussian-distribution"><i class="fa fa-check"></i><b>5.2.1</b> using the Gaussian distribution</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#a-language-for-describing-models"><i class="fa fa-check"></i><b>5.3</b> A language for describing models</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#gaussian-model-of-height"><i class="fa fa-check"></i><b>5.3.1</b> Gaussian model of height</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#linear-prediction"><i class="fa fa-check"></i><b>5.4</b> Linear Prediction</a>
+<ul>
+<li class="chapter" data-level="5.4.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#finding-the-posterior-distribution"><i class="fa fa-check"></i><b>5.4.1</b> Finding the posterior Distribution</a></li>
+</ul></li>
+<li class="chapter" data-level="5.5" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#curves-from-lines"><i class="fa fa-check"></i><b>5.5</b> Curves from lines</a></li>
+<li class="chapter" data-level="5.6" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#splines"><i class="fa fa-check"></i><b>5.6</b> Splines</a></li>
+<li class="chapter" data-level="5.7" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#homework-2"><i class="fa fa-check"></i><b>5.7</b> Homework</a></li>
+<li class="chapter" data-level="5.8" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#brms-section-2"><i class="fa fa-check"></i><b>5.8</b> {brms} section</a>
+<ul>
+<li class="chapter" data-level="5.8.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#linear-model-of-adult-height"><i class="fa fa-check"></i><b>5.8.1</b> linear model of adult height</a></li>
+</ul></li>
+<li class="chapter" data-level="5.9" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#pymc3-section-2"><i class="fa fa-check"></i><b>5.9</b> pymc3 section</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html"><i class="fa fa-check"></i><b>6</b> Rethinking: Chapter 5</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#directed-acyclic-graphs"><i class="fa fa-check"></i><b>6.1</b> Directed Acyclic Graphs</a></li>
+<li class="chapter" data-level="6.2" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multiple-regression-notion"><i class="fa fa-check"></i><b>6.2</b> Multiple Regression notion</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#visualizations-for-multivariate-regressions"><i class="fa fa-check"></i><b>6.2.1</b> Visualizations for multivariate regressions</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#masked-relationship"><i class="fa fa-check"></i><b>6.3</b> Masked relationship</a>
+<ul>
+<li class="chapter" data-level="6.3.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#bi-variate-models"><i class="fa fa-check"></i><b>6.3.1</b> Bi-variate models</a></li>
+<li class="chapter" data-level="6.3.2" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#simulate-a-masking-relationship"><i class="fa fa-check"></i><b>6.3.2</b> Simulate a masking relationship</a></li>
+</ul></li>
+<li class="chapter" data-level="6.4" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#categorical-variables"><i class="fa fa-check"></i><b>6.4</b> Categorical Variables</a>
+<ul>
+<li class="chapter" data-level="6.4.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#indicator-vs.-index-variable-binary-categories"><i class="fa fa-check"></i><b>6.4.1</b> Indicator vs. Index variable (binary categories)</a></li>
+<li class="chapter" data-level="6.4.2" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multiple-categories"><i class="fa fa-check"></i><b>6.4.2</b> Multiple categories</a></li>
+</ul></li>
+<li class="chapter" data-level="6.5" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#homework-3"><i class="fa fa-check"></i><b>6.5</b> Homework</a></li>
+<li class="chapter" data-level="6.6" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#brms-section-3"><i class="fa fa-check"></i><b>6.6</b> {brms} section</a>
+<ul>
+<li class="chapter" data-level="6.6.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#age-at-marriage-model"><i class="fa fa-check"></i><b>6.6.1</b> Age at marriage Model</a></li>
+<li class="chapter" data-level="6.6.2" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#marriage-rate-model"><i class="fa fa-check"></i><b>6.6.2</b> Marriage rate Model</a></li>
+<li class="chapter" data-level="6.6.3" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multiple-regression"><i class="fa fa-check"></i><b>6.6.3</b> Multiple regression</a></li>
+<li class="chapter" data-level="6.6.4" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multivariate-posteriors"><i class="fa fa-check"></i><b>6.6.4</b> Multivariate Posteriors</a></li>
+<li class="chapter" data-level="6.6.5" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#counterfactual-plots-1"><i class="fa fa-check"></i><b>6.6.5</b> Counterfactual plots</a></li>
+<li class="chapter" data-level="6.6.6" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#masked-relationships"><i class="fa fa-check"></i><b>6.6.6</b> Masked Relationships</a></li>
+<li class="chapter" data-level="6.6.7" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#categorical-variables-1"><i class="fa fa-check"></i><b>6.6.7</b> Categorical Variables</a></li>
+<li class="chapter" data-level="6.6.8" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#alternative-ways-to-model-multiple-categories"><i class="fa fa-check"></i><b>6.6.8</b> Alternative ways to model multiple categories</a></li>
+<li class="chapter" data-level="6.6.9" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multilevel-anova"><i class="fa fa-check"></i><b>6.6.9</b> Multilevel ANOVA</a></li>
+</ul></li>
+<li class="chapter" data-level="6.7" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#pymc3-section-3"><i class="fa fa-check"></i><b>6.7</b> pymc3 section</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html"><i class="fa fa-check"></i><b>7</b> Rethinking: Chapter 6</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#multicolliniarity"><i class="fa fa-check"></i><b>7.1</b> Multicolliniarity</a></li>
+<li class="chapter" data-level="7.2" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#post-treatment-bias"><i class="fa fa-check"></i><b>7.2</b> Post-treatment bias</a></li>
+<li class="chapter" data-level="7.3" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#collider-bias"><i class="fa fa-check"></i><b>7.3</b> Collider Bias</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#the-haunted-dag"><i class="fa fa-check"></i><b>7.3.1</b> The haunted DAG</a></li>
+<li class="chapter" data-level="7.3.2" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#shutting-the-backdoor"><i class="fa fa-check"></i><b>7.3.2</b> Shutting the Backdoor</a></li>
+<li class="chapter" data-level="7.3.3" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#two-roads"><i class="fa fa-check"></i><b>7.3.3</b> Two Roads</a></li>
+<li class="chapter" data-level="7.3.4" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#backdoor-waffles"><i class="fa fa-check"></i><b>7.3.4</b> Backdoor Waffles</a></li>
+</ul></li>
+<li class="chapter" data-level="7.4" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#homework-4"><i class="fa fa-check"></i><b>7.4</b> Homework</a></li>
+<li class="chapter" data-level="7.5" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#brms-section-4"><i class="fa fa-check"></i><b>7.5</b> {brms} section</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#multicolliniarity-1"><i class="fa fa-check"></i><b>7.5.1</b> Multicolliniarity</a></li>
+<li class="chapter" data-level="7.5.2" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#post-treatment-bias-1"><i class="fa fa-check"></i><b>7.5.2</b> Post-treatment bias</a></li>
+<li class="chapter" data-level="7.5.3" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#collider-bias-1"><i class="fa fa-check"></i><b>7.5.3</b> Collider Bias</a></li>
+<li class="chapter" data-level="7.5.4" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#summary"><i class="fa fa-check"></i><b>7.5.4</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="7.6" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#pymc3-section-4"><i class="fa fa-check"></i><b>7.6</b> pymc3 section</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html"><i class="fa fa-check"></i><b>8</b> Rethinking: Chapter 7</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#the-problem-with-parameters"><i class="fa fa-check"></i><b>8.1</b> The Problem with Parameters</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#the-burial-of-r2"><i class="fa fa-check"></i><b>8.1.1</b> The burial of R<sup>2</sup></a></li>
+<li class="chapter" data-level="8.1.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#higher-order-polynomials"><i class="fa fa-check"></i><b>8.1.2</b> Higher order polynomials</a></li>
+<li class="chapter" data-level="8.1.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#underfitting"><i class="fa fa-check"></i><b>8.1.3</b> Underfitting</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#entropy-and-accuracy"><i class="fa fa-check"></i><b>8.2</b> Entropy and Accuracy</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#entropy"><i class="fa fa-check"></i><b>8.2.1</b> Entropy</a></li>
+<li class="chapter" data-level="8.2.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#accuracy"><i class="fa fa-check"></i><b>8.2.2</b> Accuracy</a></li>
+<li class="chapter" data-level="8.2.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#estimating-divergence"><i class="fa fa-check"></i><b>8.2.3</b> Estimating Divergence</a></li>
+<li class="chapter" data-level="8.2.4" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#scoring-the-right-data"><i class="fa fa-check"></i><b>8.2.4</b> Scoring the right data</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#golem-taming-regularization"><i class="fa fa-check"></i><b>8.3</b> Golem taming: regularization</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#cross-validataion"><i class="fa fa-check"></i><b>8.3.1</b> Cross-validataion</a></li>
+<li class="chapter" data-level="8.3.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#information-criteria"><i class="fa fa-check"></i><b>8.3.2</b> Information Criteria</a></li>
+<li class="chapter" data-level="8.3.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#comparing-cv-psis-and-waic"><i class="fa fa-check"></i><b>8.3.3</b> Comparing CV, PSIS and WAIC</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#model-comparison"><i class="fa fa-check"></i><b>8.4</b> Model comparison</a>
+<ul>
+<li class="chapter" data-level="8.4.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#model-mis-selection"><i class="fa fa-check"></i><b>8.4.1</b> Model mis-selection</a></li>
+<li class="chapter" data-level="8.4.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#outliers-and-other-illusions"><i class="fa fa-check"></i><b>8.4.2</b> Outliers and other illusions</a></li>
+</ul></li>
+<li class="chapter" data-level="8.5" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#homework-5"><i class="fa fa-check"></i><b>8.5</b> Homework</a></li>
+<li class="chapter" data-level="8.6" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#brms-section-5"><i class="fa fa-check"></i><b>8.6</b> {brms} section</a>
+<ul>
+<li class="chapter" data-level="8.6.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#the-problem-with-parameters-1"><i class="fa fa-check"></i><b>8.6.1</b> The problem with parameters</a></li>
+<li class="chapter" data-level="8.6.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#entropy-and-accuracy-1"><i class="fa fa-check"></i><b>8.6.2</b> Entropy and accuracy</a></li>
+<li class="chapter" data-level="8.6.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#information-criteria-1"><i class="fa fa-check"></i><b>8.6.3</b> Information criteria</a></li>
+<li class="chapter" data-level="8.6.4" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#model-comparison-1"><i class="fa fa-check"></i><b>8.6.4</b> Model comparison</a></li>
+<li class="chapter" data-level="8.6.5" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#outliers-and-other-illusions-1"><i class="fa fa-check"></i><b>8.6.5</b> Outliers and other illusions</a></li>
+<li class="chapter" data-level="8.6.6" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#brms-r2"><i class="fa fa-check"></i><b>8.6.6</b> {brms} <span class="math inline">\(r^2\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="8.7" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#pymc3-section-5"><i class="fa fa-check"></i><b>8.7</b> pymc3 section</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html"><i class="fa fa-check"></i><b>9</b> Rethinking: Chapter 8</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#building-an-interaction"><i class="fa fa-check"></i><b>9.1</b> Building an Interaction</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#adding-an-index-variable-is-not-enough"><i class="fa fa-check"></i><b>9.1.1</b> Adding an index variable is not enough</a></li>
+<li class="chapter" data-level="9.1.2" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#adding-an-interaction-does-work"><i class="fa fa-check"></i><b>9.1.2</b> Adding an interaction does work</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#symetry-of-interactions"><i class="fa fa-check"></i><b>9.2</b> Symetry of Interactions</a></li>
+<li class="chapter" data-level="9.3" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#continuous-interaction"><i class="fa fa-check"></i><b>9.3</b> Continuous Interaction</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#model-without-interaction"><i class="fa fa-check"></i><b>9.3.1</b> Model without Interaction</a></li>
+<li class="chapter" data-level="9.3.2" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#model-with-interaction"><i class="fa fa-check"></i><b>9.3.2</b> Model with Interaction</a></li>
+<li class="chapter" data-level="9.3.3" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-the-posterior-predictions"><i class="fa fa-check"></i><b>9.3.3</b> Plotting the Posterior Predictions</a></li>
+<li class="chapter" data-level="9.3.4" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-the-prior-predictions"><i class="fa fa-check"></i><b>9.3.4</b> Plotting the Prior Predictions</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#homework-6"><i class="fa fa-check"></i><b>9.4</b> Homework</a></li>
+<li class="chapter" data-level="9.5" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#brms-section-6"><i class="fa fa-check"></i><b>9.5</b> {brms} section</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#building-an-interaction-1"><i class="fa fa-check"></i><b>9.5.1</b> Building an Interaction</a></li>
+<li class="chapter" data-level="9.5.2" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-the-interaction"><i class="fa fa-check"></i><b>9.5.2</b> Plotting the Interaction</a></li>
+<li class="chapter" data-level="9.5.3" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#symetry-of-interactions-1"><i class="fa fa-check"></i><b>9.5.3</b> Symetry of Interactions</a></li>
+<li class="chapter" data-level="9.5.4" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#continuous-interactions"><i class="fa fa-check"></i><b>9.5.4</b> Continuous Interactions</a></li>
+<li class="chapter" data-level="9.5.5" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-the-posterior-predictions-1"><i class="fa fa-check"></i><b>9.5.5</b> Plotting the Posterior Predictions</a></li>
+<li class="chapter" data-level="9.5.6" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-prior-predictions"><i class="fa fa-check"></i><b>9.5.6</b> Plotting Prior Predictions</a></li>
+<li class="chapter" data-level="9.5.7" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#brms-conditional_effects"><i class="fa fa-check"></i><b>9.5.7</b> {brms} <code>conditional_effects()</code></a></li>
+</ul></li>
+<li class="chapter" data-level="9.6" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#pymc3-section-6"><i class="fa fa-check"></i><b>9.6</b> pymc3 section</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html"><i class="fa fa-check"></i><b>10</b> Rethinking: Chapter 9</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#the-island-kingdom"><i class="fa fa-check"></i><b>10.1</b> The island Kingdom</a></li>
+<li class="chapter" data-level="10.2" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#metropolis-algotithms"><i class="fa fa-check"></i><b>10.2</b> Metropolis algotithms</a></li>
+<li class="chapter" data-level="10.3" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#hamiltonian-monte-carlo"><i class="fa fa-check"></i><b>10.3</b> Hamiltonian Monte Carlo</a></li>
+<li class="chapter" data-level="10.4" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#easy-hmc-rethinkingulam"><i class="fa fa-check"></i><b>10.4</b> Easy HMC: <code>rethinking::ulam()</code></a>
+<ul>
+<li class="chapter" data-level="10.4.1" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#checking-the-chain"><i class="fa fa-check"></i><b>10.4.1</b> Checking the Chain</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#care-and-feeding-of-your-markov-chain"><i class="fa fa-check"></i><b>10.5</b> Care and feeding of your Markov Chain</a></li>
+<li class="chapter" data-level="10.6" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#homework-7"><i class="fa fa-check"></i><b>10.6</b> Homework</a></li>
+<li class="chapter" data-level="10.7" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#brms-section-7"><i class="fa fa-check"></i><b>10.7</b> {brms} section</a></li>
+<li class="chapter" data-level="10.8" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#pymc3-section-7"><i class="fa fa-check"></i><b>10.8</b> pymc3 section</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html"><i class="fa fa-check"></i><b>11</b> Bayesian Statistics the Fun Way</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#conditioning-probabilities"><i class="fa fa-check"></i><b>11.1</b> Conditioning Probabilities</a></li>
+<li class="chapter" data-level="11.2" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#combining-probailities-based-on-logic"><i class="fa fa-check"></i><b>11.2</b> Combining Probailities based on logic</a></li>
+<li class="chapter" data-level="11.3" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-binomial-distribution"><i class="fa fa-check"></i><b>11.3</b> The binomial distribution</a></li>
+<li class="chapter" data-level="11.4" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-beta-distribution"><i class="fa fa-check"></i><b>11.4</b> The beta distribution</a></li>
+<li class="chapter" data-level="11.5" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#bayes-theorem"><i class="fa fa-check"></i><b>11.5</b> Bayes’ Theorem</a></li>
+<li class="chapter" data-level="11.6" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-i"><i class="fa fa-check"></i><b>11.6</b> Parameter Estimation (I)</a></li>
+<li class="chapter" data-level="11.7" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-normal-distribution"><i class="fa fa-check"></i><b>11.7</b> The normal distribution</a></li>
+<li class="chapter" data-level="11.8" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#cummulative-density-and-quantile-function"><i class="fa fa-check"></i><b>11.8</b> Cummulative Density and Quantile Function</a></li>
+<li class="chapter" data-level="11.9" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-with-prior-probabilities"><i class="fa fa-check"></i><b>11.9</b> Parameter estimation with prior probabilities</a></li>
+<li class="chapter" data-level="11.10" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#monte-carlosimulation"><i class="fa fa-check"></i><b>11.10</b> Monte CarloSimulation</a></li>
+<li class="chapter" data-level="11.11" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#posterior-odds"><i class="fa fa-check"></i><b>11.11</b> Posterior Odds</a></li>
+<li class="chapter" data-level="11.12" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-ii"><i class="fa fa-check"></i><b>11.12</b> Parameter Estimation (II)</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html"><i class="fa fa-check"></i><b>12</b> Mixed Models with R</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#standard-regregression-model"><i class="fa fa-check"></i><b>12.1</b> Standard regregression model</a></li>
+<li class="chapter" data-level="12.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#mixed-nodel"><i class="fa fa-check"></i><b>12.2</b> mixed nodel</a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#student-specific-effect-initial-depiction"><i class="fa fa-check"></i><b>12.2.1</b> student specific effect (initial depiction)</a></li>
+<li class="chapter" data-level="12.2.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#as-multi-level-model"><i class="fa fa-check"></i><b>12.2.2</b> as multi-level model</a></li>
+<li class="chapter" data-level="12.2.3" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#mixed-model"><i class="fa fa-check"></i><b>12.2.3</b> Mixed Model</a></li>
+<li class="chapter" data-level="12.2.4" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#estimation-of-random-effects"><i class="fa fa-check"></i><b>12.2.4</b> Estimation of random effects</a></li>
+<li class="chapter" data-level="12.2.5" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#prediction"><i class="fa fa-check"></i><b>12.2.5</b> Prediction</a></li>
+<li class="chapter" data-level="12.2.6" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#cluster-level-covariates"><i class="fa fa-check"></i><b>12.2.6</b> Cluster Level Covariates</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#add-random-slope"><i class="fa fa-check"></i><b>12.3</b> Add random slope</a></li>
+<li class="chapter" data-level="12.4" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#cross-classified-models"><i class="fa fa-check"></i><b>12.4</b> Cross Classified models</a></li>
+<li class="chapter" data-level="12.5" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#hierachical-structure"><i class="fa fa-check"></i><b>12.5</b> Hierachical structure</a>
+<ul>
+<li class="chapter" data-level="12.5.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#crossed-vs.-nested"><i class="fa fa-check"></i><b>12.5.1</b> Crossed vs. nested</a></li>
+</ul></li>
+<li class="chapter" data-level="12.6" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#residual-structure"><i class="fa fa-check"></i><b>12.6</b> Residual Structure</a>
+<ul>
+<li class="chapter" data-level="12.6.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#heterogeneous-variance"><i class="fa fa-check"></i><b>12.6.1</b> Heterogeneous variance</a></li>
+<li class="chapter" data-level="12.6.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#autocorrelation"><i class="fa fa-check"></i><b>12.6.2</b> Autocorrelation</a></li>
+</ul></li>
+<li class="chapter" data-level="12.7" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#generalized-linear-mixed-models"><i class="fa fa-check"></i><b>12.7</b> Generalized Linear Mixed Models</a></li>
+<li class="chapter" data-level="12.8" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#issues-considderations"><i class="fa fa-check"></i><b>12.8</b> Issues/ Considderations</a>
+<ul>
+<li class="chapter" data-level="12.8.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#model-comparison-2"><i class="fa fa-check"></i><b>12.8.1</b> Model comparison</a></li>
+</ul></li>
+<li class="chapter" data-level="12.9" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#formula-summary"><i class="fa fa-check"></i><b>12.9</b> Formula summary</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="references-and-session-info.html"><a href="references-and-session-info.html"><i class="fa fa-check"></i><b>13</b> References and Session Info</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="references-and-session-info.html"><a href="references-and-session-info.html#session-info"><i class="fa fa-check"></i><b>13.1</b> Session Info</a>
+<ul>
+<li class="chapter" data-level="13.1.1" data-path="references-and-session-info.html"><a href="references-and-session-info.html#r-settings"><i class="fa fa-check"></i><b>13.1.1</b> R settings</a></li>
+<li class="chapter" data-level="13.1.2" data-path="references-and-session-info.html"><a href="references-and-session-info.html#python-settings"><i class="fa fa-check"></i><b>13.1.2</b> Python settings</a></li>
+</ul></li>
+<li class="chapter" data-level="13.2" data-path="references-and-session-info.html"><a href="references-and-session-info.html#references"><i class="fa fa-check"></i><b>13.2</b> References</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Statistical Explorations</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="rethinking-chapter-9" class="section level1" number="10">
+<h1><span class="header-section-number">10</span> Rethinking: Chapter 9</h1>
+<p><strong>Markov Chain Monte Carlo</strong></p>
+<p>by <a href="https://xcelab.net/rm/statistical-rethinking/">Richard McElreath</a>, building on the Summaries by <a href="https://bookdown.org/content/4857/">Solomon Kurz</a> and <a href="https://sr2-solutions.wjakethompson.com/linear-models.html">Jake Thompson</a>.</p>
+<div id="the-island-kingdom" class="section level2" number="10.1">
+<h2><span class="header-section-number">10.1</span> The island Kingdom</h2>
+<div class="sourceCode" id="cb849"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb849-1"><a href="rethinking-chapter-9.html#cb849-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb849-2"><a href="rethinking-chapter-9.html#cb849-2" aria-hidden="true" tabindex="-1"></a>n_weeks <span class="ot">&lt;-</span> <span class="fl">1e5</span></span>
+<span id="cb849-3"><a href="rethinking-chapter-9.html#cb849-3" aria-hidden="true" tabindex="-1"></a>positions <span class="ot">&lt;-</span>  <span class="fu">rep</span>(<span class="dv">0</span>, n_weeks)</span>
+<span id="cb849-4"><a href="rethinking-chapter-9.html#cb849-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb849-5"><a href="rethinking-chapter-9.html#cb849-5" aria-hidden="true" tabindex="-1"></a>current <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb849-6"><a href="rethinking-chapter-9.html#cb849-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>( i <span class="cf">in</span> <span class="fu">seq_along</span>(positions)){</span>
+<span id="cb849-7"><a href="rethinking-chapter-9.html#cb849-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># record the current position</span></span>
+<span id="cb849-8"><a href="rethinking-chapter-9.html#cb849-8" aria-hidden="true" tabindex="-1"></a>  positions[i] <span class="ot">&lt;-</span> current</span>
+<span id="cb849-9"><a href="rethinking-chapter-9.html#cb849-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb849-10"><a href="rethinking-chapter-9.html#cb849-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># flip the coin to get the proposal</span></span>
+<span id="cb849-11"><a href="rethinking-chapter-9.html#cb849-11" aria-hidden="true" tabindex="-1"></a>  proposal <span class="ot">&lt;-</span> current <span class="sc">+</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="at">size =</span> <span class="dv">1</span>)</span>
+<span id="cb849-12"><a href="rethinking-chapter-9.html#cb849-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># connecting the edges to make the archipelago circular</span></span>
+<span id="cb849-13"><a href="rethinking-chapter-9.html#cb849-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(proposal <span class="sc">==</span> <span class="dv">0</span>){proposal <span class="ot">&lt;-</span> <span class="dv">10</span>}</span>
+<span id="cb849-14"><a href="rethinking-chapter-9.html#cb849-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(proposal <span class="sc">==</span> <span class="dv">11</span>){proposal <span class="ot">&lt;-</span> <span class="dv">1</span>}</span>
+<span id="cb849-15"><a href="rethinking-chapter-9.html#cb849-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># decide whether to move</span></span>
+<span id="cb849-16"><a href="rethinking-chapter-9.html#cb849-16" aria-hidden="true" tabindex="-1"></a>  prob_move <span class="ot">&lt;-</span> proposal<span class="sc">/</span>current</span>
+<span id="cb849-17"><a href="rethinking-chapter-9.html#cb849-17" aria-hidden="true" tabindex="-1"></a>  current <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">runif</span>(<span class="dv">1</span>) <span class="sc">&lt;</span> prob_move, proposal, current)</span>
+<span id="cb849-18"><a href="rethinking-chapter-9.html#cb849-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb849-19"><a href="rethinking-chapter-9.html#cb849-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb849-20"><a href="rethinking-chapter-9.html#cb849-20" aria-hidden="true" tabindex="-1"></a>data_markov <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb849-21"><a href="rethinking-chapter-9.html#cb849-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">week =</span> <span class="fu">seq_along</span>(positions),</span>
+<span id="cb849-22"><a href="rethinking-chapter-9.html#cb849-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">position =</span> positions)</span>
+<span id="cb849-23"><a href="rethinking-chapter-9.html#cb849-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb849-24"><a href="rethinking-chapter-9.html#cb849-24" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> data_markov <span class="sc">%&gt;%</span> </span>
+<span id="cb849-25"><a href="rethinking-chapter-9.html#cb849-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(week <span class="sc">&lt;</span> <span class="dv">101</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb849-26"><a href="rethinking-chapter-9.html#cb849-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> week, <span class="at">y =</span> position)) <span class="sc">+</span></span>
+<span id="cb849-27"><a href="rethinking-chapter-9.html#cb849-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">shape =</span> <span class="dv">21</span>, <span class="at">color =</span> clr0dd, <span class="at">fill =</span> fll0)</span>
+<span id="cb849-28"><a href="rethinking-chapter-9.html#cb849-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb849-29"><a href="rethinking-chapter-9.html#cb849-29" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> data_markov <span class="sc">%&gt;%</span> </span>
+<span id="cb849-30"><a href="rethinking-chapter-9.html#cb849-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> position)) <span class="sc">+</span></span>
+<span id="cb849-31"><a href="rethinking-chapter-9.html#cb849-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">breaks =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">color =</span> clr0dd, <span class="at">fill =</span> fll0) <span class="sc">+</span></span>
+<span id="cb849-32"><a href="rethinking-chapter-9.html#cb849-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> .<span class="dv">5</span> <span class="sc">+</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">9</span>, <span class="at">labels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb849-33"><a href="rethinking-chapter-9.html#cb849-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb849-34"><a href="rethinking-chapter-9.html#cb849-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb849-35"><a href="rethinking-chapter-9.html#cb849-35" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">+</span> p2</span></code></pre></div>
+<p><img src="rethinking_c9_files/figure-html/unnamed-chunk-1-1.svg" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="metropolis-algotithms" class="section level2" number="10.2">
+<h2><span class="header-section-number">10.2</span> Metropolis algotithms</h2>
+<blockquote>
+<p>bivariate distribution “with a strong negative correlation of -0.9”</p>
+</blockquote>
+<p><span class="math display">\[\begin{align*}
+\begin{bmatrix} \text a_1 \\ \text a_2 \end{bmatrix} &amp; \sim \operatorname{MVNormal} \left (\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \mathbf \Sigma \right) \\
+\mathbf \Sigma &amp; = \mathbf{SRS} \\
+\mathbf S &amp; = \begin{bmatrix} 0.22 &amp; 0 \\ 0 &amp; 0.22 \end{bmatrix} \\
+\mathbf R &amp; = \begin{bmatrix} 1 &amp; -.9 \\ -.9 &amp; 1 \end{bmatrix},
+\end{align*}\]</span></p>
+<div class="sourceCode" id="cb850"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb850-1"><a href="rethinking-chapter-9.html#cb850-1" aria-hidden="true" tabindex="-1"></a><span class="co"># mean vector</span></span>
+<span id="cb850-2"><a href="rethinking-chapter-9.html#cb850-2" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb850-3"><a href="rethinking-chapter-9.html#cb850-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb850-4"><a href="rethinking-chapter-9.html#cb850-4" aria-hidden="true" tabindex="-1"></a><span class="co"># variance/covariance matrix</span></span>
+<span id="cb850-5"><a href="rethinking-chapter-9.html#cb850-5" aria-hidden="true" tabindex="-1"></a>sd_a1 <span class="ot">&lt;-</span> <span class="fl">0.22</span></span>
+<span id="cb850-6"><a href="rethinking-chapter-9.html#cb850-6" aria-hidden="true" tabindex="-1"></a>sd_a2 <span class="ot">&lt;-</span> <span class="fl">0.22</span></span>
+<span id="cb850-7"><a href="rethinking-chapter-9.html#cb850-7" aria-hidden="true" tabindex="-1"></a>rho   <span class="ot">&lt;-</span> <span class="sc">-</span>.<span class="dv">9</span></span>
+<span id="cb850-8"><a href="rethinking-chapter-9.html#cb850-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb850-9"><a href="rethinking-chapter-9.html#cb850-9" aria-hidden="true" tabindex="-1"></a>Sigma <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="at">data =</span> <span class="fu">c</span>(sd_a1<span class="sc">^</span><span class="dv">2</span>,</span>
+<span id="cb850-10"><a href="rethinking-chapter-9.html#cb850-10" aria-hidden="true" tabindex="-1"></a>                         rho <span class="sc">*</span> sd_a1 <span class="sc">*</span> sd_a2,</span>
+<span id="cb850-11"><a href="rethinking-chapter-9.html#cb850-11" aria-hidden="true" tabindex="-1"></a>                         rho <span class="sc">*</span> sd_a1 <span class="sc">*</span> sd_a2,</span>
+<span id="cb850-12"><a href="rethinking-chapter-9.html#cb850-12" aria-hidden="true" tabindex="-1"></a>                         sd_a2<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb850-13"><a href="rethinking-chapter-9.html#cb850-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">nrow =</span> <span class="dv">2</span>)</span>
+<span id="cb850-14"><a href="rethinking-chapter-9.html#cb850-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb850-15"><a href="rethinking-chapter-9.html#cb850-15" aria-hidden="true" tabindex="-1"></a><span class="co"># sample from the distribution with the `mvtnorm::rmvnorm()` function</span></span>
+<span id="cb850-16"><a href="rethinking-chapter-9.html#cb850-16" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">9</span>)</span>
+<span id="cb850-17"><a href="rethinking-chapter-9.html#cb850-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb850-18"><a href="rethinking-chapter-9.html#cb850-18" aria-hidden="true" tabindex="-1"></a>my_samples <span class="ot">&lt;-</span> mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="at">n =</span> <span class="fl">1e3</span>, <span class="at">mean =</span> mu, <span class="at">sigma =</span> Sigma)</span></code></pre></div>
+<div class="sourceCode" id="cb851"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb851-1"><a href="rethinking-chapter-9.html#cb851-1" aria-hidden="true" tabindex="-1"></a><span class="co"># just for demo - not actually used</span></span>
+<span id="cb851-2"><a href="rethinking-chapter-9.html#cb851-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">a =</span> my_samples) <span class="sc">%&gt;%</span> </span>
+<span id="cb851-3"><a href="rethinking-chapter-9.html#cb851-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb851-4"><a href="rethinking-chapter-9.html#cb851-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="fu">str_c</span>(<span class="st">&quot;a&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb851-5"><a href="rethinking-chapter-9.html#cb851-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rho =</span> <span class="fu">cor</span>(a1, a2))</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 1 x 1
+#&gt;      rho
+#&gt;    &lt;dbl&gt;
+#&gt; 1 -0.911</code></pre>
+<div class="sourceCode" id="cb853"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb853-1"><a href="rethinking-chapter-9.html#cb853-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define the function</span></span>
+<span id="cb853-2"><a href="rethinking-chapter-9.html#cb853-2" aria-hidden="true" tabindex="-1"></a>x_y_grid <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">x_start =</span> <span class="sc">-</span><span class="fl">1.6</span>,</span>
+<span id="cb853-3"><a href="rethinking-chapter-9.html#cb853-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">x_stop =</span> <span class="fl">1.6</span>,</span>
+<span id="cb853-4"><a href="rethinking-chapter-9.html#cb853-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">x_length =</span> <span class="dv">101</span>,</span>
+<span id="cb853-5"><a href="rethinking-chapter-9.html#cb853-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">y_start =</span> <span class="sc">-</span><span class="fl">1.6</span>,</span>
+<span id="cb853-6"><a href="rethinking-chapter-9.html#cb853-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">y_stop =</span> <span class="fl">1.6</span>,</span>
+<span id="cb853-7"><a href="rethinking-chapter-9.html#cb853-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">y_length =</span> <span class="dv">101</span>) {</span>
+<span id="cb853-8"><a href="rethinking-chapter-9.html#cb853-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb853-9"><a href="rethinking-chapter-9.html#cb853-9" aria-hidden="true" tabindex="-1"></a>  x_domain <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> x_start, <span class="at">to =</span> x_stop, <span class="at">length.out =</span> x_length)</span>
+<span id="cb853-10"><a href="rethinking-chapter-9.html#cb853-10" aria-hidden="true" tabindex="-1"></a>  y_domain <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> y_start, <span class="at">to =</span> y_stop, <span class="at">length.out =</span> y_length)</span>
+<span id="cb853-11"><a href="rethinking-chapter-9.html#cb853-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb853-12"><a href="rethinking-chapter-9.html#cb853-12" aria-hidden="true" tabindex="-1"></a>  x_y_grid_tibble <span class="ot">&lt;-</span> tidyr<span class="sc">::</span><span class="fu">expand_grid</span>(<span class="at">a1 =</span> x_domain, <span class="at">a2 =</span> y_domain)</span>
+<span id="cb853-13"><a href="rethinking-chapter-9.html#cb853-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb853-14"><a href="rethinking-chapter-9.html#cb853-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(x_y_grid_tibble)</span>
+<span id="cb853-15"><a href="rethinking-chapter-9.html#cb853-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb853-16"><a href="rethinking-chapter-9.html#cb853-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb853-17"><a href="rethinking-chapter-9.html#cb853-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb853-18"><a href="rethinking-chapter-9.html#cb853-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb853-19"><a href="rethinking-chapter-9.html#cb853-19" aria-hidden="true" tabindex="-1"></a><span class="co"># simulate</span></span>
+<span id="cb853-20"><a href="rethinking-chapter-9.html#cb853-20" aria-hidden="true" tabindex="-1"></a>contour_plot_dat <span class="ot">&lt;-</span> <span class="fu">x_y_grid</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb853-21"><a href="rethinking-chapter-9.html#cb853-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">d =</span> mvtnorm<span class="sc">::</span><span class="fu">dmvnorm</span>(<span class="fu">as.matrix</span>(.),</span>
+<span id="cb853-22"><a href="rethinking-chapter-9.html#cb853-22" aria-hidden="true" tabindex="-1"></a>                              <span class="at">mean =</span> mu, <span class="at">sigma =</span> Sigma))</span></code></pre></div>
+<div class="sourceCode" id="cb854"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb854-1"><a href="rethinking-chapter-9.html#cb854-1" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> contour_plot_dat <span class="sc">%&gt;%</span> </span>
+<span id="cb854-2"><a href="rethinking-chapter-9.html#cb854-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb854-3"><a href="rethinking-chapter-9.html#cb854-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_contour</span>(<span class="fu">aes</span>(<span class="at">x =</span> a1, <span class="at">y =</span> a2, <span class="at">z =</span> d), </span>
+<span id="cb854-4"><a href="rethinking-chapter-9.html#cb854-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">size =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">8</span>, <span class="at">color =</span> clr_dark,</span>
+<span id="cb854-5"><a href="rethinking-chapter-9.html#cb854-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">breaks =</span> <span class="dv">9</span><span class="sc">^</span>(<span class="sc">-</span>(<span class="dv">10</span> <span class="sc">*</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">25</span>))) <span class="sc">+</span></span>
+<span id="cb854-6"><a href="rethinking-chapter-9.html#cb854-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb854-7"><a href="rethinking-chapter-9.html#cb854-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>))  <span class="sc">+</span></span>
+<span id="cb854-8"><a href="rethinking-chapter-9.html#cb854-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">19</span>)) <span class="sc">+</span></span>
+<span id="cb854-9"><a href="rethinking-chapter-9.html#cb854-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">FALSE</span><span class="st">`</span> <span class="ot">=</span> clr0, <span class="st">`</span><span class="at">TRUE</span><span class="st">`</span> <span class="ot">=</span> clr2)) <span class="sc">+</span></span>
+<span id="cb854-10"><a href="rethinking-chapter-9.html#cb854-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.border =</span> <span class="fu">element_rect</span>(<span class="at">color =</span> clr_dark, <span class="at">fill =</span> <span class="st">&quot;transparent&quot;</span>))</span>
+<span id="cb854-11"><a href="rethinking-chapter-9.html#cb854-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb854-12"><a href="rethinking-chapter-9.html#cb854-12" aria-hidden="true" tabindex="-1"></a>metropolis <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">num_proposals =</span> <span class="dv">50</span>,</span>
+<span id="cb854-13"><a href="rethinking-chapter-9.html#cb854-13" aria-hidden="true" tabindex="-1"></a>                       <span class="at">step_size =</span> <span class="fl">0.1</span>,</span>
+<span id="cb854-14"><a href="rethinking-chapter-9.html#cb854-14" aria-hidden="true" tabindex="-1"></a>                       <span class="at">starting_point =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb854-15"><a href="rethinking-chapter-9.html#cb854-15" aria-hidden="true" tabindex="-1"></a>                       <span class="at">seed =</span> <span class="dv">42</span>) {</span>
+<span id="cb854-16"><a href="rethinking-chapter-9.html#cb854-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb854-17"><a href="rethinking-chapter-9.html#cb854-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Initialize vectors where we will keep track of relevant</span></span>
+<span id="cb854-18"><a href="rethinking-chapter-9.html#cb854-18" aria-hidden="true" tabindex="-1"></a>  candidate_x_history <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="cn">Inf</span>, num_proposals)</span>
+<span id="cb854-19"><a href="rethinking-chapter-9.html#cb854-19" aria-hidden="true" tabindex="-1"></a>  candidate_y_history <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="cn">Inf</span>, num_proposals)</span>
+<span id="cb854-20"><a href="rethinking-chapter-9.html#cb854-20" aria-hidden="true" tabindex="-1"></a>  did_move_history <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">FALSE</span>, num_proposals)</span>
+<span id="cb854-21"><a href="rethinking-chapter-9.html#cb854-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb854-22"><a href="rethinking-chapter-9.html#cb854-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Prepare to begin the algorithm...</span></span>
+<span id="cb854-23"><a href="rethinking-chapter-9.html#cb854-23" aria-hidden="true" tabindex="-1"></a>  current_point <span class="ot">&lt;-</span> starting_point</span>
+<span id="cb854-24"><a href="rethinking-chapter-9.html#cb854-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb854-25"><a href="rethinking-chapter-9.html#cb854-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>num_proposals) {</span>
+<span id="cb854-26"><a href="rethinking-chapter-9.html#cb854-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb854-27"><a href="rethinking-chapter-9.html#cb854-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># &quot;Proposals are generated by adding random Gaussian noise</span></span>
+<span id="cb854-28"><a href="rethinking-chapter-9.html#cb854-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># to each parameter&quot;</span></span>
+<span id="cb854-29"><a href="rethinking-chapter-9.html#cb854-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb854-30"><a href="rethinking-chapter-9.html#cb854-30" aria-hidden="true" tabindex="-1"></a>    noise <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">n =</span> <span class="dv">2</span>, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> step_size)</span>
+<span id="cb854-31"><a href="rethinking-chapter-9.html#cb854-31" aria-hidden="true" tabindex="-1"></a>    candidate_point <span class="ot">&lt;-</span> current_point <span class="sc">+</span> noise</span>
+<span id="cb854-32"><a href="rethinking-chapter-9.html#cb854-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb854-33"><a href="rethinking-chapter-9.html#cb854-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># store coordinates of the proposal point</span></span>
+<span id="cb854-34"><a href="rethinking-chapter-9.html#cb854-34" aria-hidden="true" tabindex="-1"></a>    candidate_x_history[i] <span class="ot">&lt;-</span> candidate_point[<span class="dv">1</span>]</span>
+<span id="cb854-35"><a href="rethinking-chapter-9.html#cb854-35" aria-hidden="true" tabindex="-1"></a>    candidate_y_history[i] <span class="ot">&lt;-</span> candidate_point[<span class="dv">2</span>]</span>
+<span id="cb854-36"><a href="rethinking-chapter-9.html#cb854-36" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb854-37"><a href="rethinking-chapter-9.html#cb854-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># evaluate the density of our posterior at the proposal point</span></span>
+<span id="cb854-38"><a href="rethinking-chapter-9.html#cb854-38" aria-hidden="true" tabindex="-1"></a>    candidate_prob <span class="ot">&lt;-</span> mvtnorm<span class="sc">::</span><span class="fu">dmvnorm</span>(candidate_point, <span class="at">mean =</span> mu, <span class="at">sigma =</span> Sigma)</span>
+<span id="cb854-39"><a href="rethinking-chapter-9.html#cb854-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb854-40"><a href="rethinking-chapter-9.html#cb854-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># evaluate the density of our posterior at the current point</span></span>
+<span id="cb854-41"><a href="rethinking-chapter-9.html#cb854-41" aria-hidden="true" tabindex="-1"></a>    current_prob <span class="ot">&lt;-</span> mvtnorm<span class="sc">::</span><span class="fu">dmvnorm</span>(current_point, <span class="at">mean =</span> mu, <span class="at">sigma =</span> Sigma)</span>
+<span id="cb854-42"><a href="rethinking-chapter-9.html#cb854-42" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb854-43"><a href="rethinking-chapter-9.html#cb854-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Decide whether or not we should move to the candidate point</span></span>
+<span id="cb854-44"><a href="rethinking-chapter-9.html#cb854-44" aria-hidden="true" tabindex="-1"></a>    acceptance_ratio <span class="ot">&lt;-</span> candidate_prob <span class="sc">/</span> current_prob</span>
+<span id="cb854-45"><a href="rethinking-chapter-9.html#cb854-45" aria-hidden="true" tabindex="-1"></a>    should_move <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">runif</span>(<span class="at">n =</span> <span class="dv">1</span>) <span class="sc">&lt;</span> acceptance_ratio, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>)</span>
+<span id="cb854-46"><a href="rethinking-chapter-9.html#cb854-46" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb854-47"><a href="rethinking-chapter-9.html#cb854-47" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Keep track of the decision</span></span>
+<span id="cb854-48"><a href="rethinking-chapter-9.html#cb854-48" aria-hidden="true" tabindex="-1"></a>    did_move_history[i] <span class="ot">&lt;-</span> should_move</span>
+<span id="cb854-49"><a href="rethinking-chapter-9.html#cb854-49" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb854-50"><a href="rethinking-chapter-9.html#cb854-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Move if necessary</span></span>
+<span id="cb854-51"><a href="rethinking-chapter-9.html#cb854-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(should_move) {</span>
+<span id="cb854-52"><a href="rethinking-chapter-9.html#cb854-52" aria-hidden="true" tabindex="-1"></a>      current_point <span class="ot">&lt;-</span> candidate_point</span>
+<span id="cb854-53"><a href="rethinking-chapter-9.html#cb854-53" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb854-54"><a href="rethinking-chapter-9.html#cb854-54" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb854-55"><a href="rethinking-chapter-9.html#cb854-55" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb854-56"><a href="rethinking-chapter-9.html#cb854-56" aria-hidden="true" tabindex="-1"></a>  <span class="co"># once the loop is complete, store the relevant results in a tibble</span></span>
+<span id="cb854-57"><a href="rethinking-chapter-9.html#cb854-57" aria-hidden="true" tabindex="-1"></a>  results <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
+<span id="cb854-58"><a href="rethinking-chapter-9.html#cb854-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">candidate_x =</span> candidate_x_history,</span>
+<span id="cb854-59"><a href="rethinking-chapter-9.html#cb854-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">candidate_y =</span> candidate_y_history,</span>
+<span id="cb854-60"><a href="rethinking-chapter-9.html#cb854-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">accept =</span> did_move_history</span>
+<span id="cb854-61"><a href="rethinking-chapter-9.html#cb854-61" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb854-62"><a href="rethinking-chapter-9.html#cb854-62" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb854-63"><a href="rethinking-chapter-9.html#cb854-63" aria-hidden="true" tabindex="-1"></a>  <span class="co"># compute the &quot;acceptance rate&quot; by dividing the total number of &quot;moves&quot;</span></span>
+<span id="cb854-64"><a href="rethinking-chapter-9.html#cb854-64" aria-hidden="true" tabindex="-1"></a>  <span class="co"># by the total number of proposals</span></span>
+<span id="cb854-65"><a href="rethinking-chapter-9.html#cb854-65" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb854-66"><a href="rethinking-chapter-9.html#cb854-66" aria-hidden="true" tabindex="-1"></a>  number_of_moves <span class="ot">&lt;-</span> results <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">pull</span>(accept) <span class="sc">%&gt;%</span> <span class="fu">sum</span>(.)</span>
+<span id="cb854-67"><a href="rethinking-chapter-9.html#cb854-67" aria-hidden="true" tabindex="-1"></a>  acceptance_rate <span class="ot">&lt;-</span> number_of_moves<span class="sc">/</span>num_proposals</span>
+<span id="cb854-68"><a href="rethinking-chapter-9.html#cb854-68" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb854-69"><a href="rethinking-chapter-9.html#cb854-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">results =</span> results, <span class="at">acceptance_rate =</span> acceptance_rate))</span>
+<span id="cb854-70"><a href="rethinking-chapter-9.html#cb854-70" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb854-71"><a href="rethinking-chapter-9.html#cb854-71" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb854-72"><a href="rethinking-chapter-9.html#cb854-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb854-73"><a href="rethinking-chapter-9.html#cb854-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb854-74"><a href="rethinking-chapter-9.html#cb854-74" aria-hidden="true" tabindex="-1"></a>round_1 <span class="ot">&lt;-</span> <span class="fu">metropolis</span>(<span class="at">num_proposals =</span> <span class="dv">50</span>,</span>
+<span id="cb854-75"><a href="rethinking-chapter-9.html#cb854-75" aria-hidden="true" tabindex="-1"></a>                      <span class="at">step_size =</span> <span class="fl">0.1</span>,</span>
+<span id="cb854-76"><a href="rethinking-chapter-9.html#cb854-76" aria-hidden="true" tabindex="-1"></a>                      <span class="at">starting_point =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb854-77"><a href="rethinking-chapter-9.html#cb854-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb854-78"><a href="rethinking-chapter-9.html#cb854-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb854-79"><a href="rethinking-chapter-9.html#cb854-79" aria-hidden="true" tabindex="-1"></a>round_2 <span class="ot">&lt;-</span> <span class="fu">metropolis</span>(<span class="at">num_proposals =</span> <span class="dv">50</span>,</span>
+<span id="cb854-80"><a href="rethinking-chapter-9.html#cb854-80" aria-hidden="true" tabindex="-1"></a>                      <span class="at">step_size =</span> <span class="fl">0.25</span>,</span>
+<span id="cb854-81"><a href="rethinking-chapter-9.html#cb854-81" aria-hidden="true" tabindex="-1"></a>                      <span class="at">starting_point =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb854-82"><a href="rethinking-chapter-9.html#cb854-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb854-83"><a href="rethinking-chapter-9.html#cb854-83" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> p0 <span class="sc">+</span> </span>
+<span id="cb854-84"><a href="rethinking-chapter-9.html#cb854-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> round_1<span class="sc">$</span>results,</span>
+<span id="cb854-85"><a href="rethinking-chapter-9.html#cb854-85" aria-hidden="true" tabindex="-1"></a>             <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> candidate_x, <span class="at">y =</span> candidate_y, </span>
+<span id="cb854-86"><a href="rethinking-chapter-9.html#cb854-86" aria-hidden="true" tabindex="-1"></a>                           <span class="at">color =</span> accept, <span class="at">fill =</span> <span class="fu">after_scale</span>(<span class="fu">clr_alpha</span>(color,.<span class="dv">2</span>))), <span class="at">shape =</span> <span class="dv">21</span>) <span class="sc">+</span></span>
+<span id="cb854-87"><a href="rethinking-chapter-9.html#cb854-87" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="fu">str_c</span>(<span class="st">&quot;step size 0.1,</span><span class="sc">\n</span><span class="st">accept rate &quot;</span>,</span>
+<span id="cb854-88"><a href="rethinking-chapter-9.html#cb854-88" aria-hidden="true" tabindex="-1"></a>                        round_1<span class="sc">$</span>acceptance_rate), <span class="at">x =</span> <span class="st">&quot;a1&quot;</span>)</span>
+<span id="cb854-89"><a href="rethinking-chapter-9.html#cb854-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb854-90"><a href="rethinking-chapter-9.html#cb854-90" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> p0 <span class="sc">+</span> </span>
+<span id="cb854-91"><a href="rethinking-chapter-9.html#cb854-91" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> round_2<span class="sc">$</span>results,</span>
+<span id="cb854-92"><a href="rethinking-chapter-9.html#cb854-92" aria-hidden="true" tabindex="-1"></a>             <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> candidate_x, <span class="at">y =</span> candidate_y, </span>
+<span id="cb854-93"><a href="rethinking-chapter-9.html#cb854-93" aria-hidden="true" tabindex="-1"></a>                           <span class="at">color =</span> accept, <span class="at">fill =</span> <span class="fu">after_scale</span>(<span class="fu">clr_alpha</span>(color,.<span class="dv">2</span>))), <span class="at">shape =</span> <span class="dv">21</span>) <span class="sc">+</span></span>
+<span id="cb854-94"><a href="rethinking-chapter-9.html#cb854-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="cn">NULL</span>, <span class="at">breaks =</span> <span class="cn">NULL</span>, <span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb854-95"><a href="rethinking-chapter-9.html#cb854-95" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="fu">str_c</span>(<span class="st">&quot;step size 0.25,</span><span class="sc">\n</span><span class="st">accept rate &quot;</span>,</span>
+<span id="cb854-96"><a href="rethinking-chapter-9.html#cb854-96" aria-hidden="true" tabindex="-1"></a>                        round_2<span class="sc">$</span>acceptance_rate), <span class="at">x =</span> <span class="st">&quot;a1&quot;</span>)</span>
+<span id="cb854-97"><a href="rethinking-chapter-9.html#cb854-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb854-98"><a href="rethinking-chapter-9.html#cb854-98" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">+</span> p2 <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">&quot;collect&quot;</span>)</span></code></pre></div>
+<p><img src="rethinking_c9_files/figure-html/unnamed-chunk-5-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb855"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb855-1"><a href="rethinking-chapter-9.html#cb855-1" aria-hidden="true" tabindex="-1"></a>concentration_sim <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">dimensions =</span> <span class="dv">1</span>, <span class="at">t =</span> <span class="fl">1e3</span>, <span class="at">seed =</span> <span class="dv">42</span>) {</span>
+<span id="cb855-2"><a href="rethinking-chapter-9.html#cb855-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb855-3"><a href="rethinking-chapter-9.html#cb855-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb855-4"><a href="rethinking-chapter-9.html#cb855-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb855-5"><a href="rethinking-chapter-9.html#cb855-5" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> rethinking<span class="sc">::</span><span class="fu">rmvnorm</span>(t, <span class="fu">rep</span>(<span class="dv">0</span>, dimensions), <span class="fu">diag</span>(dimensions))</span>
+<span id="cb855-6"><a href="rethinking-chapter-9.html#cb855-6" aria-hidden="true" tabindex="-1"></a>  rad_dist <span class="ot">&lt;-</span> <span class="cf">function</span>(y) <span class="fu">sqrt</span>(<span class="fu">sum</span>(y<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb855-7"><a href="rethinking-chapter-9.html#cb855-7" aria-hidden="true" tabindex="-1"></a>  rd <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span>t, <span class="cf">function</span>(i) <span class="fu">rad_dist</span>( y[i, ])) </span>
+<span id="cb855-8"><a href="rethinking-chapter-9.html#cb855-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb855-9"><a href="rethinking-chapter-9.html#cb855-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb855-10"><a href="rethinking-chapter-9.html#cb855-10" aria-hidden="true" tabindex="-1"></a>data_concentration <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">dimensions =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>, <span class="dv">1000</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb855-11"><a href="rethinking-chapter-9.html#cb855-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">con =</span> <span class="fu">map</span>(dimensions, concentration_sim)) <span class="sc">%&gt;%</span> </span>
+<span id="cb855-12"><a href="rethinking-chapter-9.html#cb855-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(con) <span class="sc">%&gt;%</span> </span>
+<span id="cb855-13"><a href="rethinking-chapter-9.html#cb855-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at"># dimensions</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">factor</span>(dimensions)) </span>
+<span id="cb855-14"><a href="rethinking-chapter-9.html#cb855-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb855-15"><a href="rethinking-chapter-9.html#cb855-15" aria-hidden="true" tabindex="-1"></a>data_concentration  <span class="sc">%&gt;%</span> </span>
+<span id="cb855-16"><a href="rethinking-chapter-9.html#cb855-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> con, <span class="at">fill =</span> <span class="st">`</span><span class="at"># dimensions</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb855-17"><a href="rethinking-chapter-9.html#cb855-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">size =</span> .<span class="dv">4</span>, <span class="at">adjust =</span> .<span class="dv">6</span>,</span>
+<span id="cb855-18"><a href="rethinking-chapter-9.html#cb855-18" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">color =</span> <span class="fu">after_scale</span>(<span class="fu">clr_alpha</span>(fill, <span class="dv">1</span>)))) <span class="sc">+</span></span>
+<span id="cb855-19"><a href="rethinking-chapter-9.html#cb855-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> scales<span class="sc">::</span><span class="fu">colour_ramp</span>(<span class="at">colors =</span> <span class="fu">c</span>(clr0d, clr2) <span class="sc">%&gt;%</span> <span class="fu">clr_alpha</span>())((<span class="dv">0</span><span class="sc">:</span><span class="dv">3</span>)<span class="sc">/</span><span class="dv">3</span>)) <span class="sc">+</span></span>
+<span id="cb855-20"><a href="rethinking-chapter-9.html#cb855-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Radial distance from mode&quot;</span>) <span class="sc">+</span></span>
+<span id="cb855-21"><a href="rethinking-chapter-9.html#cb855-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
+<p><img src="rethinking_c9_files/figure-html/unnamed-chunk-6-1.svg" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="hamiltonian-monte-carlo" class="section level2" number="10.3">
+<h2><span class="header-section-number">10.3</span> Hamiltonian Monte Carlo</h2>
+<div class="sourceCode" id="cb856"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb856-1"><a href="rethinking-chapter-9.html#cb856-1" aria-hidden="true" tabindex="-1"></a>U <span class="ot">&lt;-</span> <span class="cf">function</span>( q, <span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>, <span class="at">k =</span> <span class="dv">0</span>, <span class="at">d =</span> <span class="dv">1</span>){</span>
+<span id="cb856-2"><a href="rethinking-chapter-9.html#cb856-2" aria-hidden="true" tabindex="-1"></a>  muy <span class="ot">&lt;-</span> q[<span class="dv">1</span>]</span>
+<span id="cb856-3"><a href="rethinking-chapter-9.html#cb856-3" aria-hidden="true" tabindex="-1"></a>  mux <span class="ot">&lt;-</span> q[<span class="dv">2</span>]</span>
+<span id="cb856-4"><a href="rethinking-chapter-9.html#cb856-4" aria-hidden="true" tabindex="-1"></a>  U <span class="ot">&lt;-</span> <span class="fu">sum</span>( <span class="fu">dnorm</span>(y , muy, <span class="dv">1</span>, <span class="at">log =</span> <span class="cn">TRUE</span>)) <span class="sc">+</span> <span class="fu">sum</span>( <span class="fu">dnorm</span>(x , mux, <span class="dv">1</span>, <span class="at">log =</span> <span class="cn">TRUE</span>)) <span class="sc">+</span></span>
+<span id="cb856-5"><a href="rethinking-chapter-9.html#cb856-5" aria-hidden="true" tabindex="-1"></a>   <span class="fu">dnorm</span>(muy, a, b, <span class="at">log =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> <span class="fu">dnorm</span>(mux, k, d, <span class="at">log =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb856-6"><a href="rethinking-chapter-9.html#cb856-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="sc">-</span>U)</span>
+<span id="cb856-7"><a href="rethinking-chapter-9.html#cb856-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb856-8"><a href="rethinking-chapter-9.html#cb856-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb856-9"><a href="rethinking-chapter-9.html#cb856-9" aria-hidden="true" tabindex="-1"></a>U_gradient <span class="ot">&lt;-</span> <span class="cf">function</span>(</span>
+<span id="cb856-10"><a href="rethinking-chapter-9.html#cb856-10" aria-hidden="true" tabindex="-1"></a>  q , <span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>, <span class="at">k =</span> <span class="dv">0</span>, <span class="at">d =</span> <span class="dv">1</span>){</span>
+<span id="cb856-11"><a href="rethinking-chapter-9.html#cb856-11" aria-hidden="true" tabindex="-1"></a>  muy <span class="ot">&lt;-</span> q[<span class="dv">1</span>]</span>
+<span id="cb856-12"><a href="rethinking-chapter-9.html#cb856-12" aria-hidden="true" tabindex="-1"></a>  mux <span class="ot">&lt;-</span> q[<span class="dv">2</span>]</span>
+<span id="cb856-13"><a href="rethinking-chapter-9.html#cb856-13" aria-hidden="true" tabindex="-1"></a>  G1 <span class="ot">&lt;-</span> <span class="fu">sum</span>( y <span class="sc">-</span> muy ) <span class="sc">+</span> (a <span class="sc">-</span> muy) <span class="sc">/</span> b <span class="sc">^</span> <span class="dv">2</span> <span class="co"># dU/dmuy</span></span>
+<span id="cb856-14"><a href="rethinking-chapter-9.html#cb856-14" aria-hidden="true" tabindex="-1"></a>  G2 <span class="ot">&lt;-</span> <span class="fu">sum</span>( x <span class="sc">-</span> mux ) <span class="sc">+</span> (a <span class="sc">-</span> mux) <span class="sc">/</span> b <span class="sc">^</span> <span class="dv">2</span> <span class="co"># dU/dmux</span></span>
+<span id="cb856-15"><a href="rethinking-chapter-9.html#cb856-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">c</span>(<span class="sc">-</span>G1, <span class="sc">-</span>G2))                      <span class="co"># negative because energy is neg-log-prob</span></span>
+<span id="cb856-16"><a href="rethinking-chapter-9.html#cb856-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb856-17"><a href="rethinking-chapter-9.html#cb856-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb856-18"><a href="rethinking-chapter-9.html#cb856-18" aria-hidden="true" tabindex="-1"></a>U1d <span class="ot">&lt;-</span> <span class="cf">function</span>( q, <span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>, <span class="at">k =</span> <span class="dv">0</span>, <span class="at">d =</span> <span class="dv">1</span>){</span>
+<span id="cb856-19"><a href="rethinking-chapter-9.html#cb856-19" aria-hidden="true" tabindex="-1"></a>  muy <span class="ot">&lt;-</span> q[<span class="dv">1</span>]</span>
+<span id="cb856-20"><a href="rethinking-chapter-9.html#cb856-20" aria-hidden="true" tabindex="-1"></a>  U <span class="ot">&lt;-</span> <span class="fu">sum</span>( <span class="fu">dnorm</span>(y , muy, <span class="dv">1</span>, <span class="at">log =</span> <span class="cn">TRUE</span>)) <span class="sc">+</span></span>
+<span id="cb856-21"><a href="rethinking-chapter-9.html#cb856-21" aria-hidden="true" tabindex="-1"></a>   <span class="fu">dnorm</span>(muy, a, b, <span class="at">log =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb856-22"><a href="rethinking-chapter-9.html#cb856-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="sc">-</span>U)</span>
+<span id="cb856-23"><a href="rethinking-chapter-9.html#cb856-23" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb856-24"><a href="rethinking-chapter-9.html#cb856-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb856-25"><a href="rethinking-chapter-9.html#cb856-25" aria-hidden="true" tabindex="-1"></a>U1d_gradient <span class="ot">&lt;-</span> <span class="cf">function</span>(</span>
+<span id="cb856-26"><a href="rethinking-chapter-9.html#cb856-26" aria-hidden="true" tabindex="-1"></a>  q , <span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>, <span class="at">k =</span> <span class="dv">0</span>, <span class="at">d =</span> <span class="dv">1</span>){</span>
+<span id="cb856-27"><a href="rethinking-chapter-9.html#cb856-27" aria-hidden="true" tabindex="-1"></a>  muy <span class="ot">&lt;-</span> q[<span class="dv">1</span>]</span>
+<span id="cb856-28"><a href="rethinking-chapter-9.html#cb856-28" aria-hidden="true" tabindex="-1"></a>  G1 <span class="ot">&lt;-</span> <span class="fu">sum</span>( y <span class="sc">-</span> muy ) <span class="sc">+</span> (a <span class="sc">-</span> muy) <span class="sc">/</span> b <span class="sc">^</span> <span class="dv">2</span> <span class="co"># dU/dmuy</span></span>
+<span id="cb856-29"><a href="rethinking-chapter-9.html#cb856-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="sc">-</span>G1)                      <span class="co"># negative because energy is neg-log-prob</span></span>
+<span id="cb856-30"><a href="rethinking-chapter-9.html#cb856-30" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb857"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb857-1"><a href="rethinking-chapter-9.html#cb857-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(shape)</span>
+<span id="cb857-2"><a href="rethinking-chapter-9.html#cb857-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rethinking)</span>
+<span id="cb857-3"><a href="rethinking-chapter-9.html#cb857-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggforce)</span>
+<span id="cb857-4"><a href="rethinking-chapter-9.html#cb857-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggnewscale)</span>
+<span id="cb857-5"><a href="rethinking-chapter-9.html#cb857-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb857-6"><a href="rethinking-chapter-9.html#cb857-6" aria-hidden="true" tabindex="-1"></a>import_trajs <span class="ot">&lt;-</span> <span class="cf">function</span>(Q, idx,<span class="at">names =</span> <span class="fu">c</span>(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>)){</span>
+<span id="cb857-7"><a href="rethinking-chapter-9.html#cb857-7" aria-hidden="true" tabindex="-1"></a>  traj <span class="ot">&lt;-</span> Q<span class="sc">$</span>traj <span class="sc">%&gt;%</span> </span>
+<span id="cb857-8"><a href="rethinking-chapter-9.html#cb857-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb857-9"><a href="rethinking-chapter-9.html#cb857-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_names</span>(<span class="at">nm =</span> names) <span class="sc">%&gt;%</span> </span>
+<span id="cb857-10"><a href="rethinking-chapter-9.html#cb857-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">leapfrog_step =</span> <span class="fu">row_number</span>())</span>
+<span id="cb857-11"><a href="rethinking-chapter-9.html#cb857-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb857-12"><a href="rethinking-chapter-9.html#cb857-12" aria-hidden="true" tabindex="-1"></a>  ptraj <span class="ot">&lt;-</span> Q<span class="sc">$</span>ptraj <span class="sc">%&gt;%</span> </span>
+<span id="cb857-13"><a href="rethinking-chapter-9.html#cb857-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb857-14"><a href="rethinking-chapter-9.html#cb857-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_names</span>(<span class="at">nm =</span> <span class="fu">str_c</span>(names, <span class="st">&quot;_p&quot;</span>))</span>
+<span id="cb857-15"><a href="rethinking-chapter-9.html#cb857-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb857-16"><a href="rethinking-chapter-9.html#cb857-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">sample =</span> idx, <span class="at">traj =</span> <span class="fu">list</span>(<span class="fu">bind_cols</span>(traj, ptraj)))</span>
+<span id="cb857-17"><a href="rethinking-chapter-9.html#cb857-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb857-18"><a href="rethinking-chapter-9.html#cb857-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb857-19"><a href="rethinking-chapter-9.html#cb857-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb857-20"><a href="rethinking-chapter-9.html#cb857-20" aria-hidden="true" tabindex="-1"></a>contour_plot_dat_gaus <span class="ot">&lt;-</span> <span class="fu">x_y_grid</span>(<span class="at">x_start =</span> <span class="sc">-</span>.<span class="dv">35</span>,<span class="at">x_stop =</span> .<span class="dv">35</span>,</span>
+<span id="cb857-21"><a href="rethinking-chapter-9.html#cb857-21" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">y_start =</span> <span class="sc">-</span>.<span class="dv">35</span>, <span class="at">y_stop =</span> .<span class="dv">35</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb857-22"><a href="rethinking-chapter-9.html#cb857-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">d =</span> mvtnorm<span class="sc">::</span><span class="fu">dmvnorm</span>(<span class="fu">as.matrix</span>(.),</span>
+<span id="cb857-23"><a href="rethinking-chapter-9.html#cb857-23" aria-hidden="true" tabindex="-1"></a>                              <span class="at">mean =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>),</span>
+<span id="cb857-24"><a href="rethinking-chapter-9.html#cb857-24" aria-hidden="true" tabindex="-1"></a>                              <span class="at">sigma =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>),<span class="at">nrow =</span> <span class="dv">2</span>)))</span>
+<span id="cb857-25"><a href="rethinking-chapter-9.html#cb857-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb857-26"><a href="rethinking-chapter-9.html#cb857-26" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">50</span>)</span>
+<span id="cb857-27"><a href="rethinking-chapter-9.html#cb857-27" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">scale</span>(y))</span></code></pre></div>
+<div class="sourceCode" id="cb858"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb858-1"><a href="rethinking-chapter-9.html#cb858-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb858-2"><a href="rethinking-chapter-9.html#cb858-2" aria-hidden="true" tabindex="-1"></a>  S <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb858-3"><a href="rethinking-chapter-9.html#cb858-3" aria-hidden="true" tabindex="-1"></a>  Q <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb858-4"><a href="rethinking-chapter-9.html#cb858-4" aria-hidden="true" tabindex="-1"></a>  Q<span class="sc">$</span>q <span class="ot">&lt;-</span> .<span class="dv">15</span></span>
+<span id="cb858-5"><a href="rethinking-chapter-9.html#cb858-5" aria-hidden="true" tabindex="-1"></a>  pr <span class="ot">&lt;-</span> .<span class="dv">3</span></span>
+<span id="cb858-6"><a href="rethinking-chapter-9.html#cb858-6" aria-hidden="true" tabindex="-1"></a>  step <span class="ot">&lt;-</span> .<span class="dv">03</span></span>
+<span id="cb858-7"><a href="rethinking-chapter-9.html#cb858-7" aria-hidden="true" tabindex="-1"></a>  n_samples <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb858-8"><a href="rethinking-chapter-9.html#cb858-8" aria-hidden="true" tabindex="-1"></a>  L <span class="ot">&lt;-</span> <span class="dv">11</span></span>
+<span id="cb858-9"><a href="rethinking-chapter-9.html#cb858-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb858-10"><a href="rethinking-chapter-9.html#cb858-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_samples){</span>
+<span id="cb858-11"><a href="rethinking-chapter-9.html#cb858-11" aria-hidden="true" tabindex="-1"></a>    Q <span class="ot">&lt;-</span> <span class="fu">HMC2</span>(<span class="at">U =</span> U1d, <span class="at">grad_U =</span> U1d_gradient, <span class="at">epsilon =</span> step, <span class="at">L =</span> L, <span class="at">current_q =</span> Q<span class="sc">$</span>q)</span>
+<span id="cb858-12"><a href="rethinking-chapter-9.html#cb858-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>L){</span>
+<span id="cb858-13"><a href="rethinking-chapter-9.html#cb858-13" aria-hidden="true" tabindex="-1"></a>      K0 <span class="ot">&lt;-</span> <span class="fu">sum</span>(Q<span class="sc">$</span>ptraj[j,] <span class="sc">^</span> <span class="dv">2</span>)<span class="sc">/</span><span class="dv">2</span> <span class="co"># kinetic energy</span></span>
+<span id="cb858-14"><a href="rethinking-chapter-9.html#cb858-14" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb858-15"><a href="rethinking-chapter-9.html#cb858-15" aria-hidden="true" tabindex="-1"></a>    S[[i]] <span class="ot">&lt;-</span> Q</span>
+<span id="cb858-16"><a href="rethinking-chapter-9.html#cb858-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb858-17"><a href="rethinking-chapter-9.html#cb858-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb858-18"><a href="rethinking-chapter-9.html#cb858-18" aria-hidden="true" tabindex="-1"></a>sample_tib <span class="ot">&lt;-</span> <span class="fu">map2_dfr</span>(S, <span class="fu">seq_along</span>(S), import_trajs, <span class="at">names =</span> <span class="fu">c</span>(<span class="st">&quot;y&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb858-19"><a href="rethinking-chapter-9.html#cb858-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest</span>(traj) <span class="sc">%&gt;%</span> </span>
+<span id="cb858-20"><a href="rethinking-chapter-9.html#cb858-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">k =</span> (y_p <span class="sc">^</span> <span class="dv">2</span> ) <span class="sc">/</span><span class="dv">2</span> ,</span>
+<span id="cb858-21"><a href="rethinking-chapter-9.html#cb858-21" aria-hidden="true" tabindex="-1"></a>           <span class="at">t =</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fu">cumsum</span>(leapfrog_step <span class="sc">!=</span> <span class="dv">1</span>))</span>
+<span id="cb858-22"><a href="rethinking-chapter-9.html#cb858-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb858-23"><a href="rethinking-chapter-9.html#cb858-23" aria-hidden="true" tabindex="-1"></a>sample_tib <span class="sc">%&gt;%</span> </span>
+<span id="cb858-24"><a href="rethinking-chapter-9.html#cb858-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(t, y)) <span class="sc">+</span></span>
+<span id="cb858-25"><a href="rethinking-chapter-9.html#cb858-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>,<span class="dv">1</span>), <span class="at">each =</span> <span class="dv">5</span>) <span class="sc">*</span> <span class="fu">rep</span>(<span class="fu">c</span>(.<span class="dv">5</span>,.<span class="dv">48</span>,.<span class="dv">41</span>, .<span class="dv">33</span>, .<span class="dv">2</span>),<span class="dv">2</span>),</span>
+<span id="cb858-26"><a href="rethinking-chapter-9.html#cb858-26" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> clr0) <span class="sc">+</span></span>
+<span id="cb858-27"><a href="rethinking-chapter-9.html#cb858-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_link2</span>(<span class="fu">aes</span>(<span class="at">group =</span> sample, <span class="at">size =</span> k),</span>
+<span id="cb858-28"><a href="rethinking-chapter-9.html#cb858-28" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> clr_dag) <span class="sc">+</span></span>
+<span id="cb858-29"><a href="rethinking-chapter-9.html#cb858-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_size_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(.<span class="dv">15</span>,<span class="fl">3.5</span>), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>)<span class="sc">+</span></span>
+<span id="cb858-30"><a href="rethinking-chapter-9.html#cb858-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">new_scale</span>(<span class="at">new_aes =</span> <span class="st">&quot;size&quot;</span>)<span class="sc">+</span></span>
+<span id="cb858-31"><a href="rethinking-chapter-9.html#cb858-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> . <span class="sc">%&gt;%</span> <span class="fu">filter</span>(leapfrog_step <span class="sc">==</span> (L <span class="sc">+</span> <span class="dv">1</span>)),</span>
+<span id="cb858-32"><a href="rethinking-chapter-9.html#cb858-32" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">2.5</span>,</span>
+<span id="cb858-33"><a href="rethinking-chapter-9.html#cb858-33" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> clr2,</span>
+<span id="cb858-34"><a href="rethinking-chapter-9.html#cb858-34" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill =</span> <span class="fu">clr_lighten</span>(clr2),</span>
+<span id="cb858-35"><a href="rethinking-chapter-9.html#cb858-35" aria-hidden="true" tabindex="-1"></a>             <span class="at">shape =</span> <span class="dv">21</span>) <span class="sc">+</span></span>
+<span id="cb858-36"><a href="rethinking-chapter-9.html#cb858-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> sample_tib <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">row_number</span>() <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(sample_tib))),</span>
+<span id="cb858-37"><a href="rethinking-chapter-9.html#cb858-37" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> clr2,</span>
+<span id="cb858-38"><a href="rethinking-chapter-9.html#cb858-38" aria-hidden="true" tabindex="-1"></a>             <span class="at">shape =</span> <span class="dv">1</span>,</span>
+<span id="cb858-39"><a href="rethinking-chapter-9.html#cb858-39" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">4.5</span>) <span class="sc">+</span></span>
+<span id="cb858-40"><a href="rethinking-chapter-9.html#cb858-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">55</span>,.<span class="dv">55</span>),<span class="at">breaks =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">46</span>,.<span class="dv">46</span>),</span>
+<span id="cb858-41"><a href="rethinking-chapter-9.html#cb858-41" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;South&quot;</span>, <span class="st">&quot;North&quot;</span>))  <span class="sc">+</span></span>
+<span id="cb858-42"><a href="rethinking-chapter-9.html#cb858-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_size_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">TRUE</span><span class="st">`</span> <span class="ot">=</span> <span class="fl">2.5</span>, <span class="st">`</span><span class="at">FALSE</span><span class="st">`</span> <span class="ot">=</span> .<span class="dv">5</span>)) <span class="sc">+</span></span>
+<span id="cb858-43"><a href="rethinking-chapter-9.html#cb858-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">TRUE</span><span class="st">`</span> <span class="ot">=</span> clr2, <span class="st">`</span><span class="at">FALSE</span><span class="st">`</span> <span class="ot">=</span> clr0dd)) <span class="sc">+</span></span>
+<span id="cb858-44"><a href="rethinking-chapter-9.html#cb858-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">5</span>, .<span class="dv">5</span>), </span>
+<span id="cb858-45"><a href="rethinking-chapter-9.html#cb858-45" aria-hidden="true" tabindex="-1"></a>                  <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">3</span> <span class="sc">+</span> n_samples<span class="sc">*</span>L), <span class="at">expand =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb858-46"><a href="rethinking-chapter-9.html#cb858-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;time&quot;</span>, <span class="at">y =</span> <span class="st">&quot;position&quot;</span>)<span class="sc">+</span></span>
+<span id="cb858-47"><a href="rethinking-chapter-9.html#cb858-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.border =</span> <span class="fu">element_rect</span>(<span class="at">color =</span> clr_dark, <span class="at">fill =</span> <span class="st">&quot;transparent&quot;</span>),</span>
+<span id="cb858-48"><a href="rethinking-chapter-9.html#cb858-48" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb858-49"><a href="rethinking-chapter-9.html#cb858-49" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.minor.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb858-50"><a href="rethinking-chapter-9.html#cb858-50" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> .<span class="dv">5</span>))</span></code></pre></div>
+<p><img src="rethinking_c9_files/figure-html/unnamed-chunk-9-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb859"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb859-1"><a href="rethinking-chapter-9.html#cb859-1" aria-hidden="true" tabindex="-1"></a>monty_plot <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">L =</span> <span class="dv">11</span>,</span>
+<span id="cb859-2"><a href="rethinking-chapter-9.html#cb859-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">n_samples =</span> <span class="dv">4</span>,</span>
+<span id="cb859-3"><a href="rethinking-chapter-9.html#cb859-3" aria-hidden="true" tabindex="-1"></a>                       contour_plot_dat,</span>
+<span id="cb859-4"><a href="rethinking-chapter-9.html#cb859-4" aria-hidden="true" tabindex="-1"></a>                       contour_breaks,</span>
+<span id="cb859-5"><a href="rethinking-chapter-9.html#cb859-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">seed =</span> <span class="dv">42</span>,</span>
+<span id="cb859-6"><a href="rethinking-chapter-9.html#cb859-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">start_point =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>,.<span class="dv">2</span>)){</span>
+<span id="cb859-7"><a href="rethinking-chapter-9.html#cb859-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb859-8"><a href="rethinking-chapter-9.html#cb859-8" aria-hidden="true" tabindex="-1"></a>  S <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb859-9"><a href="rethinking-chapter-9.html#cb859-9" aria-hidden="true" tabindex="-1"></a>  Q <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb859-10"><a href="rethinking-chapter-9.html#cb859-10" aria-hidden="true" tabindex="-1"></a>  Q<span class="sc">$</span>q <span class="ot">&lt;-</span> start_point</span>
+<span id="cb859-11"><a href="rethinking-chapter-9.html#cb859-11" aria-hidden="true" tabindex="-1"></a>  pr <span class="ot">&lt;-</span> .<span class="dv">3</span></span>
+<span id="cb859-12"><a href="rethinking-chapter-9.html#cb859-12" aria-hidden="true" tabindex="-1"></a>  step <span class="ot">&lt;-</span> .<span class="dv">03</span></span>
+<span id="cb859-13"><a href="rethinking-chapter-9.html#cb859-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb859-14"><a href="rethinking-chapter-9.html#cb859-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_samples){</span>
+<span id="cb859-15"><a href="rethinking-chapter-9.html#cb859-15" aria-hidden="true" tabindex="-1"></a>    Q <span class="ot">&lt;-</span> <span class="fu">HMC2</span>(<span class="at">U =</span> U, <span class="at">grad_U =</span> U_gradient, <span class="at">epsilon =</span> step, <span class="at">L =</span> L, <span class="at">current_q =</span> Q<span class="sc">$</span>q)</span>
+<span id="cb859-16"><a href="rethinking-chapter-9.html#cb859-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>L){</span>
+<span id="cb859-17"><a href="rethinking-chapter-9.html#cb859-17" aria-hidden="true" tabindex="-1"></a>      K0 <span class="ot">&lt;-</span> <span class="fu">sum</span>(Q<span class="sc">$</span>ptraj[j,] <span class="sc">^</span> <span class="dv">2</span>)<span class="sc">/</span><span class="dv">2</span> <span class="co"># kinetic energy</span></span>
+<span id="cb859-18"><a href="rethinking-chapter-9.html#cb859-18" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb859-19"><a href="rethinking-chapter-9.html#cb859-19" aria-hidden="true" tabindex="-1"></a>    S[[i]] <span class="ot">&lt;-</span> Q</span>
+<span id="cb859-20"><a href="rethinking-chapter-9.html#cb859-20" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb859-21"><a href="rethinking-chapter-9.html#cb859-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb859-22"><a href="rethinking-chapter-9.html#cb859-22" aria-hidden="true" tabindex="-1"></a>  sample_tib <span class="ot">&lt;-</span> <span class="fu">map2_dfr</span>(S, <span class="fu">seq_along</span>(S), import_trajs) <span class="sc">%&gt;%</span> </span>
+<span id="cb859-23"><a href="rethinking-chapter-9.html#cb859-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest</span>(traj) <span class="sc">%&gt;%</span> </span>
+<span id="cb859-24"><a href="rethinking-chapter-9.html#cb859-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">k =</span> (x_p <span class="sc">^</span> <span class="dv">2</span> <span class="sc">+</span> y_p <span class="sc">^</span> <span class="dv">2</span> ) <span class="sc">/</span><span class="dv">2</span> )</span>
+<span id="cb859-25"><a href="rethinking-chapter-9.html#cb859-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb859-26"><a href="rethinking-chapter-9.html#cb859-26" aria-hidden="true" tabindex="-1"></a>  sample_tib <span class="sc">%&gt;%</span> </span>
+<span id="cb859-27"><a href="rethinking-chapter-9.html#cb859-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(x, y)) <span class="sc">+</span></span>
+<span id="cb859-28"><a href="rethinking-chapter-9.html#cb859-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_contour</span>(<span class="at">data =</span> contour_plot_dat,</span>
+<span id="cb859-29"><a href="rethinking-chapter-9.html#cb859-29" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">aes</span>(<span class="at">x =</span> a1, <span class="at">y =</span> a2, <span class="at">z =</span> d), </span>
+<span id="cb859-30"><a href="rethinking-chapter-9.html#cb859-30" aria-hidden="true" tabindex="-1"></a>                 <span class="at">size =</span> .<span class="dv">2</span>,</span>
+<span id="cb859-31"><a href="rethinking-chapter-9.html#cb859-31" aria-hidden="true" tabindex="-1"></a>                 <span class="at">breaks =</span> contour_breaks,</span>
+<span id="cb859-32"><a href="rethinking-chapter-9.html#cb859-32" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> clr_dark) <span class="sc">+</span></span>
+<span id="cb859-33"><a href="rethinking-chapter-9.html#cb859-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb859-34"><a href="rethinking-chapter-9.html#cb859-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>))  <span class="sc">+</span></span>
+<span id="cb859-35"><a href="rethinking-chapter-9.html#cb859-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_link2</span>(<span class="fu">aes</span>(<span class="at">group =</span> sample, <span class="at">size =</span> k),</span>
+<span id="cb859-36"><a href="rethinking-chapter-9.html#cb859-36" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> clr_dag) <span class="sc">+</span></span>
+<span id="cb859-37"><a href="rethinking-chapter-9.html#cb859-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_size_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(.<span class="dv">15</span>,<span class="fl">3.5</span>), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>)<span class="sc">+</span></span>
+<span id="cb859-38"><a href="rethinking-chapter-9.html#cb859-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">new_scale</span>(<span class="at">new_aes =</span> <span class="st">&quot;size&quot;</span>)<span class="sc">+</span></span>
+<span id="cb859-39"><a href="rethinking-chapter-9.html#cb859-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data =</span> . <span class="sc">%&gt;%</span> <span class="fu">filter</span>(leapfrog_step <span class="sc">&gt;</span> <span class="dv">1</span>),</span>
+<span id="cb859-40"><a href="rethinking-chapter-9.html#cb859-40" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">size =</span> leapfrog_step <span class="sc">==</span> (L <span class="sc">+</span> <span class="dv">1</span>),</span>
+<span id="cb859-41"><a href="rethinking-chapter-9.html#cb859-41" aria-hidden="true" tabindex="-1"></a>                   <span class="at">color =</span> leapfrog_step <span class="sc">==</span> (L <span class="sc">+</span> <span class="dv">1</span>),</span>
+<span id="cb859-42"><a href="rethinking-chapter-9.html#cb859-42" aria-hidden="true" tabindex="-1"></a>                   <span class="at">fill =</span> <span class="fu">after_scale</span>(<span class="fu">clr_lighten</span>(color,.<span class="dv">3</span>))),</span>
+<span id="cb859-43"><a href="rethinking-chapter-9.html#cb859-43" aria-hidden="true" tabindex="-1"></a>               <span class="at">shape =</span> <span class="dv">21</span>) <span class="sc">+</span></span>
+<span id="cb859-44"><a href="rethinking-chapter-9.html#cb859-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data =</span> sample_tib <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">row_number</span>() <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(sample_tib))),</span>
+<span id="cb859-45"><a href="rethinking-chapter-9.html#cb859-45" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> clr2,</span>
+<span id="cb859-46"><a href="rethinking-chapter-9.html#cb859-46" aria-hidden="true" tabindex="-1"></a>               <span class="at">shape =</span> <span class="dv">1</span>,</span>
+<span id="cb859-47"><a href="rethinking-chapter-9.html#cb859-47" aria-hidden="true" tabindex="-1"></a>               <span class="at">size =</span> <span class="fl">4.5</span>) <span class="sc">+</span></span>
+<span id="cb859-48"><a href="rethinking-chapter-9.html#cb859-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_size_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">TRUE</span><span class="st">`</span> <span class="ot">=</span> <span class="fl">2.5</span>, <span class="st">`</span><span class="at">FALSE</span><span class="st">`</span> <span class="ot">=</span> .<span class="dv">5</span>)) <span class="sc">+</span></span>
+<span id="cb859-49"><a href="rethinking-chapter-9.html#cb859-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">TRUE</span><span class="st">`</span> <span class="ot">=</span> clr2, <span class="st">`</span><span class="at">FALSE</span><span class="st">`</span> <span class="ot">=</span> clr0dd)) <span class="sc">+</span></span>
+<span id="cb859-50"><a href="rethinking-chapter-9.html#cb859-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">panel.border =</span> <span class="fu">element_rect</span>(<span class="at">color =</span> clr_dark, <span class="at">fill =</span> <span class="st">&quot;transparent&quot;</span>))</span>
+<span id="cb859-51"><a href="rethinking-chapter-9.html#cb859-51" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb860"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb860-1"><a href="rethinking-chapter-9.html#cb860-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">50</span>)</span>
+<span id="cb860-2"><a href="rethinking-chapter-9.html#cb860-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">scale</span>(x))</span>
+<span id="cb860-3"><a href="rethinking-chapter-9.html#cb860-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb860-4"><a href="rethinking-chapter-9.html#cb860-4" aria-hidden="true" tabindex="-1"></a><span class="fu">monty_plot</span>(<span class="at">contour_plot_dat =</span> contour_plot_dat_gaus,</span>
+<span id="cb860-5"><a href="rethinking-chapter-9.html#cb860-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">contour_breaks =</span> .<span class="dv">001</span><span class="sc">*</span> <span class="fu">seq</span>(<span class="dv">146</span>,<span class="dv">160</span>, <span class="at">by =</span> <span class="fl">2.5</span>),</span>
+<span id="cb860-6"><a href="rethinking-chapter-9.html#cb860-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">seed =</span> <span class="dv">23</span>) <span class="sc">+</span></span>
+<span id="cb860-7"><a href="rethinking-chapter-9.html#cb860-7" aria-hidden="true" tabindex="-1"></a><span class="fu">monty_plot</span>(<span class="at">L =</span> <span class="dv">28</span>,</span>
+<span id="cb860-8"><a href="rethinking-chapter-9.html#cb860-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">contour_plot_dat =</span> contour_plot_dat_gaus,</span>
+<span id="cb860-9"><a href="rethinking-chapter-9.html#cb860-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">contour_breaks =</span> .<span class="dv">001</span><span class="sc">*</span> <span class="fu">seq</span>(<span class="dv">146</span>,<span class="dv">160</span>, <span class="at">by =</span> <span class="fl">2.5</span>),</span>
+<span id="cb860-10"><a href="rethinking-chapter-9.html#cb860-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">seed =</span> <span class="dv">23</span>) <span class="sc">+</span></span>
+<span id="cb860-11"><a href="rethinking-chapter-9.html#cb860-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb860-12"><a href="rethinking-chapter-9.html#cb860-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb860-13"><a href="rethinking-chapter-9.html#cb860-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">&quot;collect&quot;</span>) <span class="sc">&amp;</span></span>
+<span id="cb860-14"><a href="rethinking-chapter-9.html#cb860-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
+<p><img src="rethinking_c9_files/figure-html/unnamed-chunk-11-1.svg" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="easy-hmc-rethinkingulam" class="section level2" number="10.4">
+<h2><span class="header-section-number">10.4</span> Easy HMC: <code>rethinking::ulam()</code></h2>
+<p>Revisiting the ruggedness model:</p>
+<p><span class="math display">\[
+\begin{array}{rclr}
+log(y_{i}) &amp; \sim &amp; Normal( \mu_{i}, \sigma) &amp; \textrm{[likelihood]}\\
+\mu_{i} &amp; = &amp; \alpha_{CID[i]} + \beta_{CID[i]} (r_{i} - \overline{r}) &amp; \textrm{[linear model]}\\
+\alpha &amp; \sim &amp; Normal(1, 0.1) &amp; \textrm{[$\alpha$ prior]}\\
+\beta &amp; \sim &amp; Normal(0, 0.3) &amp; \textrm{[$\beta$ prior]}\\
+\sigma &amp; \sim &amp; Exponential(1)  &amp; \textrm{[$\sigma$ prior]}
+\end{array}
+\]</span></p>
+<div class="sourceCode" id="cb861"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb861-1"><a href="rethinking-chapter-9.html#cb861-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(rugged)</span>
+<span id="cb861-2"><a href="rethinking-chapter-9.html#cb861-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb861-3"><a href="rethinking-chapter-9.html#cb861-3" aria-hidden="true" tabindex="-1"></a>data_rugged <span class="ot">&lt;-</span> rugged <span class="sc">%&gt;%</span> </span>
+<span id="cb861-4"><a href="rethinking-chapter-9.html#cb861-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb861-5"><a href="rethinking-chapter-9.html#cb861-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">log_gdp =</span> <span class="fu">log</span>(rgdppc_2000)) <span class="sc">%&gt;%</span> </span>
+<span id="cb861-6"><a href="rethinking-chapter-9.html#cb861-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">complete.cases</span>(rgdppc_2000)) <span class="sc">%&gt;%</span> </span>
+<span id="cb861-7"><a href="rethinking-chapter-9.html#cb861-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">log_gdp_std =</span> log_gdp <span class="sc">/</span> <span class="fu">mean</span>(log_gdp),</span>
+<span id="cb861-8"><a href="rethinking-chapter-9.html#cb861-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">rugged_std =</span> rugged <span class="sc">/</span> <span class="fu">max</span>(rugged),</span>
+<span id="cb861-9"><a href="rethinking-chapter-9.html#cb861-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">cont_idx =</span> <span class="fu">as.integer</span>(<span class="dv">2</span> <span class="sc">-</span> cont_africa))</span></code></pre></div>
+<p>The old way using <code>quap()</code></p>
+<div class="sourceCode" id="cb862"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb862-1"><a href="rethinking-chapter-9.html#cb862-1" aria-hidden="true" tabindex="-1"></a>model_rugged_slope <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
+<span id="cb862-2"><a href="rethinking-chapter-9.html#cb862-2" aria-hidden="true" tabindex="-1"></a>   <span class="at">flist =</span> <span class="fu">alist</span>(</span>
+<span id="cb862-3"><a href="rethinking-chapter-9.html#cb862-3" aria-hidden="true" tabindex="-1"></a>    log_gdp_std <span class="sc">~</span> <span class="fu">dnorm</span>(mu, sigma),</span>
+<span id="cb862-4"><a href="rethinking-chapter-9.html#cb862-4" aria-hidden="true" tabindex="-1"></a>    mu <span class="ot">&lt;-</span> alpha[cont_idx] <span class="sc">+</span> beta[cont_idx] <span class="sc">*</span> ( rugged_std <span class="sc">-</span> <span class="fl">0.215</span> ),</span>
+<span id="cb862-5"><a href="rethinking-chapter-9.html#cb862-5" aria-hidden="true" tabindex="-1"></a>    alpha[cont_idx] <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">1</span>, <span class="fl">0.1</span>),</span>
+<span id="cb862-6"><a href="rethinking-chapter-9.html#cb862-6" aria-hidden="true" tabindex="-1"></a>    beta[cont_idx] <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, <span class="fl">0.3</span>),</span>
+<span id="cb862-7"><a href="rethinking-chapter-9.html#cb862-7" aria-hidden="true" tabindex="-1"></a>    sigma <span class="sc">~</span> <span class="fu">dexp</span>(<span class="dv">1</span>)</span>
+<span id="cb862-8"><a href="rethinking-chapter-9.html#cb862-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb862-9"><a href="rethinking-chapter-9.html#cb862-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_rugged</span>
+<span id="cb862-10"><a href="rethinking-chapter-9.html#cb862-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb862-11"><a href="rethinking-chapter-9.html#cb862-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb862-12"><a href="rethinking-chapter-9.html#cb862-12" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(model_rugged_slope, <span class="at">depth =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb862-13"><a href="rethinking-chapter-9.html#cb862-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">knit_precis</span>()</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">param</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">5.5%</th>
+<th align="right">94.5%</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">alpha[1]</td>
+<td align="right">0.89</td>
+<td align="right">0.02</td>
+<td align="right">0.86</td>
+<td align="right">0.91</td>
+</tr>
+<tr class="even">
+<td align="left">alpha[2]</td>
+<td align="right">1.05</td>
+<td align="right">0.01</td>
+<td align="right">1.03</td>
+<td align="right">1.07</td>
+</tr>
+<tr class="odd">
+<td align="left">beta[1]</td>
+<td align="right">0.13</td>
+<td align="right">0.07</td>
+<td align="right">0.01</td>
+<td align="right">0.25</td>
+</tr>
+<tr class="even">
+<td align="left">beta[2]</td>
+<td align="right">-0.14</td>
+<td align="right">0.05</td>
+<td align="right">-0.23</td>
+<td align="right">-0.06</td>
+</tr>
+<tr class="odd">
+<td align="left">sigma</td>
+<td align="right">0.11</td>
+<td align="right">0.01</td>
+<td align="right">0.10</td>
+<td align="right">0.12</td>
+</tr>
+</tbody>
+</table>
+<p>Using <code>Stan</code> / <code>ulam()</code>:</p>
+<div class="sourceCode" id="cb863"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb863-1"><a href="rethinking-chapter-9.html#cb863-1" aria-hidden="true" tabindex="-1"></a>data_rugged_list <span class="ot">&lt;-</span> data_rugged <span class="sc">%&gt;%</span> </span>
+<span id="cb863-2"><a href="rethinking-chapter-9.html#cb863-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(log_gdp_std<span class="sc">:</span>cont_idx) <span class="sc">%&gt;%</span> </span>
+<span id="cb863-3"><a href="rethinking-chapter-9.html#cb863-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.list</span>()</span>
+<span id="cb863-4"><a href="rethinking-chapter-9.html#cb863-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb863-5"><a href="rethinking-chapter-9.html#cb863-5" aria-hidden="true" tabindex="-1"></a>model_rugged_slope_stan <span class="ot">&lt;-</span> <span class="fu">ulam</span>(</span>
+<span id="cb863-6"><a href="rethinking-chapter-9.html#cb863-6" aria-hidden="true" tabindex="-1"></a>   <span class="at">flist =</span> <span class="fu">alist</span>(</span>
+<span id="cb863-7"><a href="rethinking-chapter-9.html#cb863-7" aria-hidden="true" tabindex="-1"></a>    log_gdp_std <span class="sc">~</span> <span class="fu">dnorm</span>(mu, sigma),</span>
+<span id="cb863-8"><a href="rethinking-chapter-9.html#cb863-8" aria-hidden="true" tabindex="-1"></a>    mu <span class="ot">&lt;-</span> alpha[cont_idx] <span class="sc">+</span> beta[cont_idx] <span class="sc">*</span> ( rugged_std <span class="sc">-</span> <span class="fl">0.215</span> ),</span>
+<span id="cb863-9"><a href="rethinking-chapter-9.html#cb863-9" aria-hidden="true" tabindex="-1"></a>    alpha[cont_idx] <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">1</span>, <span class="fl">0.1</span>),</span>
+<span id="cb863-10"><a href="rethinking-chapter-9.html#cb863-10" aria-hidden="true" tabindex="-1"></a>    beta[cont_idx] <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, <span class="fl">0.3</span>),</span>
+<span id="cb863-11"><a href="rethinking-chapter-9.html#cb863-11" aria-hidden="true" tabindex="-1"></a>    sigma <span class="sc">~</span> <span class="fu">dexp</span>(<span class="dv">1</span>)</span>
+<span id="cb863-12"><a href="rethinking-chapter-9.html#cb863-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb863-13"><a href="rethinking-chapter-9.html#cb863-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_rugged_list,</span>
+<span id="cb863-14"><a href="rethinking-chapter-9.html#cb863-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
+<span id="cb863-15"><a href="rethinking-chapter-9.html#cb863-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">cores =</span> <span class="dv">4</span></span>
+<span id="cb863-16"><a href="rethinking-chapter-9.html#cb863-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Looking at the translated Stan code</p>
+<div class="sourceCode" id="cb864"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb864-1"><a href="rethinking-chapter-9.html#cb864-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stancode</span>(model_rugged_slope_stan)</span></code></pre></div>
+<pre><code>#&gt; data{
+#&gt;     vector[170] log_gdp_std;
+#&gt;     vector[170] rugged_std;
+#&gt;     int cont_idx[170];
+#&gt; }
+#&gt; parameters{
+#&gt;     vector[2] alpha;
+#&gt;     vector[2] beta;
+#&gt;     real&lt;lower=0&gt; sigma;
+#&gt; }
+#&gt; model{
+#&gt;     vector[170] mu;
+#&gt;     sigma ~ exponential( 1 );
+#&gt;     beta ~ normal( 0 , 0.3 );
+#&gt;     alpha ~ normal( 1 , 0.1 );
+#&gt;     for ( i in 1:170 ) {
+#&gt;         mu[i] = alpha[cont_idx[i]] + beta[cont_idx[i]] * (rugged_std[i] - 0.215);
+#&gt;     }
+#&gt;     log_gdp_std ~ normal( mu , sigma );
+#&gt; }</code></pre>
+<p>The model summaries</p>
+<div class="sourceCode" id="cb866"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb866-1"><a href="rethinking-chapter-9.html#cb866-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(model_rugged_slope_stan)</span></code></pre></div>
+<pre><code>#&gt; Hamiltonian Monte Carlo approximation
+#&gt; 2000 samples from 4 chains
+#&gt; 
+#&gt; Sampling durations (seconds):
+#&gt;         warmup sample total
+#&gt; chain:1   0.04   0.03  0.07
+#&gt; chain:2   0.04   0.03  0.07
+#&gt; chain:3   0.04   0.02  0.06
+#&gt; chain:4   0.04   0.02  0.06
+#&gt; 
+#&gt; Formula:
+#&gt; log_gdp_std ~ dnorm(mu, sigma)
+#&gt; mu &lt;- alpha[cont_idx] + beta[cont_idx] * (rugged_std - 0.215)
+#&gt; alpha[cont_idx] ~ dnorm(1, 0.1)
+#&gt; beta[cont_idx] ~ dnorm(0, 0.3)
+#&gt; sigma ~ dexp(1)</code></pre>
+<div class="sourceCode" id="cb868"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb868-1"><a href="rethinking-chapter-9.html#cb868-1" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(model_rugged_slope_stan, <span class="at">depth =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb868-2"><a href="rethinking-chapter-9.html#cb868-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">knit_precis</span>()</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">param</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">5.5%</th>
+<th align="right">94.5%</th>
+<th align="right">n_eff</th>
+<th align="right">Rhat4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">alpha[1]</td>
+<td align="right">0.89</td>
+<td align="right">0.02</td>
+<td align="right">0.86</td>
+<td align="right">0.91</td>
+<td align="right">2435.26</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">alpha[2]</td>
+<td align="right">1.05</td>
+<td align="right">0.01</td>
+<td align="right">1.03</td>
+<td align="right">1.07</td>
+<td align="right">3005.13</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">beta[1]</td>
+<td align="right">0.13</td>
+<td align="right">0.08</td>
+<td align="right">0.01</td>
+<td align="right">0.25</td>
+<td align="right">2783.03</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">beta[2]</td>
+<td align="right">-0.14</td>
+<td align="right">0.05</td>
+<td align="right">-0.23</td>
+<td align="right">-0.06</td>
+<td align="right">2377.51</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">sigma</td>
+<td align="right">0.11</td>
+<td align="right">0.01</td>
+<td align="right">0.10</td>
+<td align="right">0.12</td>
+<td align="right">3068.93</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb869"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb869-1"><a href="rethinking-chapter-9.html#cb869-1" aria-hidden="true" tabindex="-1"></a>my_lower <span class="ot">&lt;-</span> <span class="cf">function</span>(data, mapping, ...) {</span>
+<span id="cb869-2"><a href="rethinking-chapter-9.html#cb869-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data =</span> data, <span class="at">mapping =</span> mapping) <span class="sc">+</span> </span>
+<span id="cb869-3"><a href="rethinking-chapter-9.html#cb869-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bin2d</span>() <span class="sc">+</span></span>
+<span id="cb869-4"><a href="rethinking-chapter-9.html#cb869-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> clr0, </span>
+<span id="cb869-5"><a href="rethinking-chapter-9.html#cb869-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">high =</span> clr2) <span class="sc">+</span></span>
+<span id="cb869-6"><a href="rethinking-chapter-9.html#cb869-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span>
+<span id="cb869-7"><a href="rethinking-chapter-9.html#cb869-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb869-8"><a href="rethinking-chapter-9.html#cb869-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb869-9"><a href="rethinking-chapter-9.html#cb869-9" aria-hidden="true" tabindex="-1"></a>my_upper <span class="ot">&lt;-</span> <span class="cf">function</span>(...){</span>
+<span id="cb869-10"><a href="rethinking-chapter-9.html#cb869-10" aria-hidden="true" tabindex="-1"></a>          <span class="fu">ggally_cor</span>(...,<span class="at">display_grid =</span> <span class="cn">FALSE</span>) <span class="sc">+</span> <span class="fu">theme_void</span>()</span>
+<span id="cb869-11"><a href="rethinking-chapter-9.html#cb869-11" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb869-12"><a href="rethinking-chapter-9.html#cb869-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb869-13"><a href="rethinking-chapter-9.html#cb869-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb869-14"><a href="rethinking-chapter-9.html#cb869-14" aria-hidden="true" tabindex="-1"></a><span class="fu">extract.samples</span>(model_rugged_slope_stan) <span class="sc">%&gt;%</span> </span>
+<span id="cb869-15"><a href="rethinking-chapter-9.html#cb869-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb869-16"><a href="rethinking-chapter-9.html#cb869-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb869-17"><a href="rethinking-chapter-9.html#cb869-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggpairs</span>(</span>
+<span id="cb869-18"><a href="rethinking-chapter-9.html#cb869-18" aria-hidden="true" tabindex="-1"></a>     <span class="at">lower =</span> <span class="fu">list</span>(<span class="at">continuous =</span> <span class="fu">wrap</span>(my_lower)),</span>
+<span id="cb869-19"><a href="rethinking-chapter-9.html#cb869-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">diag =</span> <span class="fu">list</span>(<span class="at">continuous =</span> <span class="fu">wrap</span>(<span class="st">&quot;densityDiag&quot;</span>, <span class="at">fill =</span> fll0,</span>
+<span id="cb869-20"><a href="rethinking-chapter-9.html#cb869-20" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">color =</span> clr0d, <span class="at">adjust =</span> .<span class="dv">7</span>)),</span>
+<span id="cb869-21"><a href="rethinking-chapter-9.html#cb869-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">upper =</span> <span class="fu">list</span>(<span class="at">continuous =</span> <span class="fu">wrap</span>(my_upper ,</span>
+<span id="cb869-22"><a href="rethinking-chapter-9.html#cb869-22" aria-hidden="true" tabindex="-1"></a>          <span class="at">size =</span> <span class="dv">5</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">family =</span> <span class="st">&quot;Josefin sans&quot;</span>)) ) <span class="sc">+</span></span>
+<span id="cb869-23"><a href="rethinking-chapter-9.html#cb869-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">panel.border =</span> <span class="fu">element_rect</span>(<span class="at">color =</span> clr_dark, <span class="at">fill =</span> <span class="st">&quot;transparent&quot;</span>))</span></code></pre></div>
+<p><img src="rethinking_c9_files/figure-html/unnamed-chunk-17-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p>The density for <span class="math inline">\(\sigma\)</span> is skewed, which is expected.</p>
+<div id="checking-the-chain" class="section level3" number="10.4.1">
+<h3><span class="header-section-number">10.4.1</span> Checking the Chain</h3>
+<p><strong>Trace plot</strong></p>
+<div class="sourceCode" id="cb870"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb870-1"><a href="rethinking-chapter-9.html#cb870-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggmcmc)</span>
+<span id="cb870-2"><a href="rethinking-chapter-9.html#cb870-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb870-3"><a href="rethinking-chapter-9.html#cb870-3" aria-hidden="true" tabindex="-1"></a>rugged_pars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;alpha[1]&quot;</span>, <span class="st">&quot;alpha[2]&quot;</span>, <span class="st">&quot;beta[1]&quot;</span>, <span class="st">&quot;beta[2]&quot;</span>)</span>
+<span id="cb870-4"><a href="rethinking-chapter-9.html#cb870-4" aria-hidden="true" tabindex="-1"></a>clr_chains <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">n =</span> <span class="dv">4</span>, <span class="at">alpha =</span> .<span class="dv">7</span>){scales<span class="sc">::</span><span class="fu">colour_ramp</span>(<span class="at">colors =</span> <span class="fu">c</span>(clr0dd, clr2))(<span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">length.out =</span> n))<span class="sc">%&gt;%</span> <span class="fu">clr_lighten</span>(.<span class="dv">2</span>) <span class="sc">%&gt;%</span> <span class="fu">clr_alpha</span>(<span class="at">alpha =</span> alpha)}</span>
+<span id="cb870-5"><a href="rethinking-chapter-9.html#cb870-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb870-6"><a href="rethinking-chapter-9.html#cb870-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggs</span>(model_rugged_slope_stan<span class="sc">@</span>stanfit, <span class="at">inc_warmup =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb870-7"><a href="rethinking-chapter-9.html#cb870-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chain =</span> <span class="fu">factor</span>(Chain)) <span class="sc">%&gt;%</span> </span>
+<span id="cb870-8"><a href="rethinking-chapter-9.html#cb870-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Parameter <span class="sc">!=</span> <span class="st">&quot;sigma&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb870-9"><a href="rethinking-chapter-9.html#cb870-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Iteration, <span class="at">y =</span> value)) <span class="sc">+</span></span>
+<span id="cb870-10"><a href="rethinking-chapter-9.html#cb870-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="at">geom =</span> <span class="st">&quot;rect&quot;</span>, </span>
+<span id="cb870-11"><a href="rethinking-chapter-9.html#cb870-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">xmin =</span> <span class="dv">0</span>, <span class="at">xmax =</span> <span class="dv">500</span>, <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
+<span id="cb870-12"><a href="rethinking-chapter-9.html#cb870-12" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> clr0d, <span class="at">alpha =</span> .<span class="dv">3</span>, <span class="at">size =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb870-13"><a href="rethinking-chapter-9.html#cb870-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">color =</span> chain),</span>
+<span id="cb870-14"><a href="rethinking-chapter-9.html#cb870-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> .<span class="dv">15</span>) <span class="sc">+</span></span>
+<span id="cb870-15"><a href="rethinking-chapter-9.html#cb870-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">clr_chains</span>() ) <span class="sc">+</span></span>
+<span id="cb870-16"><a href="rethinking-chapter-9.html#cb870-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Parameter, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
+<span id="cb870-17"><a href="rethinking-chapter-9.html#cb870-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;custom trace plots with warmups via ggmcmc::ggs()&quot;</span>,</span>
+<span id="cb870-18"><a href="rethinking-chapter-9.html#cb870-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb870-19"><a href="rethinking-chapter-9.html#cb870-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>) </span></code></pre></div>
+<p><img src="rethinking_c9_files/figure-html/unnamed-chunk-18-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p><strong>Trace Rank plot</strong></p>
+<div class="sourceCode" id="cb871"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb871-1"><a href="rethinking-chapter-9.html#cb871-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bayesplot)</span>
+<span id="cb871-2"><a href="rethinking-chapter-9.html#cb871-2" aria-hidden="true" tabindex="-1"></a>model_rugged_slope_stan<span class="sc">@</span>stanfit <span class="sc">%&gt;%</span> </span>
+<span id="cb871-3"><a href="rethinking-chapter-9.html#cb871-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mcmc_rank_overlay</span>(<span class="at">pars =</span> <span class="fu">vars</span>(<span class="st">`</span><span class="at">alpha[1]</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">beta[2]</span><span class="st">`</span>), <span class="at">n_bins =</span> <span class="dv">60</span>) <span class="sc">+</span></span>
+<span id="cb871-4"><a href="rethinking-chapter-9.html#cb871-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">clr_chains</span>() ) <span class="sc">+</span></span>
+<span id="cb871-5"><a href="rethinking-chapter-9.html#cb871-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;custom trank plots&quot;</span>) <span class="sc">+</span></span>
+<span id="cb871-6"><a href="rethinking-chapter-9.html#cb871-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># coord_cartesian(ylim = c(0, NA)) +</span></span>
+<span id="cb871-7"><a href="rethinking-chapter-9.html#cb871-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
+<p><img src="rethinking_c9_files/figure-html/unnamed-chunk-19-1.svg" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="care-and-feeding-of-your-markov-chain" class="section level2" number="10.5">
+<h2><span class="header-section-number">10.5</span> Care and feeding of your Markov Chain</h2>
+<div class="sourceCode" id="cb872"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb872-1"><a href="rethinking-chapter-9.html#cb872-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">11</span>)</span>
+<span id="cb872-2"><a href="rethinking-chapter-9.html#cb872-2" aria-hidden="true" tabindex="-1"></a>model_flat <span class="ot">&lt;-</span> <span class="fu">ulam</span>(</span>
+<span id="cb872-3"><a href="rethinking-chapter-9.html#cb872-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">flist =</span> <span class="fu">alist</span>(</span>
+<span id="cb872-4"><a href="rethinking-chapter-9.html#cb872-4" aria-hidden="true" tabindex="-1"></a>    y <span class="sc">~</span> <span class="fu">dnorm</span>( mu, sigma ),</span>
+<span id="cb872-5"><a href="rethinking-chapter-9.html#cb872-5" aria-hidden="true" tabindex="-1"></a>    mu <span class="ot">&lt;-</span> alpha,</span>
+<span id="cb872-6"><a href="rethinking-chapter-9.html#cb872-6" aria-hidden="true" tabindex="-1"></a>    alpha <span class="sc">~</span> <span class="fu">dnorm</span>( <span class="dv">0</span>, <span class="dv">1000</span> ),</span>
+<span id="cb872-7"><a href="rethinking-chapter-9.html#cb872-7" aria-hidden="true" tabindex="-1"></a>    sigma <span class="sc">~</span> <span class="fu">dexp</span>( <span class="fl">0.0001</span> )</span>
+<span id="cb872-8"><a href="rethinking-chapter-9.html#cb872-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb872-9"><a href="rethinking-chapter-9.html#cb872-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)),</span>
+<span id="cb872-10"><a href="rethinking-chapter-9.html#cb872-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">3</span></span>
+<span id="cb872-11"><a href="rethinking-chapter-9.html#cb872-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb873"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb873-1"><a href="rethinking-chapter-9.html#cb873-1" aria-hidden="true" tabindex="-1"></a><span class="fu">precis</span>(model_flat) <span class="sc">%&gt;%</span> </span>
+<span id="cb873-2"><a href="rethinking-chapter-9.html#cb873-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">knit_precis</span>()</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">param</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">5.5%</th>
+<th align="right">94.5%</th>
+<th align="right">n_eff</th>
+<th align="right">Rhat4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">alpha</td>
+<td align="right">-30.28</td>
+<td align="right">334.06</td>
+<td align="right">-622.79</td>
+<td align="right">381.89</td>
+<td align="right">116.47</td>
+<td align="right">1.03</td>
+</tr>
+<tr class="even">
+<td align="left">sigma</td>
+<td align="right">626.24</td>
+<td align="right">1475.25</td>
+<td align="right">6.93</td>
+<td align="right">2764.99</td>
+<td align="right">106.15</td>
+<td align="right">1.05</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb874"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb874-1"><a href="rethinking-chapter-9.html#cb874-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggs</span>(model_flat<span class="sc">@</span>stanfit, <span class="at">inc_warmup =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb874-2"><a href="rethinking-chapter-9.html#cb874-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">chain =</span> <span class="fu">factor</span>(Chain)) <span class="sc">%&gt;%</span> </span>
+<span id="cb874-3"><a href="rethinking-chapter-9.html#cb874-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Iteration, <span class="at">y =</span> value)) <span class="sc">+</span></span>
+<span id="cb874-4"><a href="rethinking-chapter-9.html#cb874-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="at">geom =</span> <span class="st">&quot;rect&quot;</span>, </span>
+<span id="cb874-5"><a href="rethinking-chapter-9.html#cb874-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">xmin =</span> <span class="dv">0</span>, <span class="at">xmax =</span> <span class="dv">500</span>, <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
+<span id="cb874-6"><a href="rethinking-chapter-9.html#cb874-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> clr0d, <span class="at">alpha =</span> .<span class="dv">3</span>, <span class="at">size =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb874-7"><a href="rethinking-chapter-9.html#cb874-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">color =</span> chain),</span>
+<span id="cb874-8"><a href="rethinking-chapter-9.html#cb874-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> .<span class="dv">25</span>) <span class="sc">+</span></span>
+<span id="cb874-9"><a href="rethinking-chapter-9.html#cb874-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">clr_chains</span>(<span class="at">alpha =</span> <span class="dv">1</span>), <span class="at">guide =</span><span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb874-10"><a href="rethinking-chapter-9.html#cb874-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Parameter, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
+<span id="cb874-11"><a href="rethinking-chapter-9.html#cb874-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span>
+<span id="cb874-12"><a href="rethinking-chapter-9.html#cb874-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb874-13"><a href="rethinking-chapter-9.html#cb874-13" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> model_flat<span class="sc">@</span>stanfit <span class="sc">%&gt;%</span> </span>
+<span id="cb874-14"><a href="rethinking-chapter-9.html#cb874-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mcmc_rank_overlay</span>(<span class="at">pars =</span> <span class="fu">vars</span>(<span class="st">`</span><span class="at">alpha</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">sigma</span><span class="st">`</span>), <span class="at">n_bins =</span> <span class="dv">60</span>) <span class="sc">+</span></span>
+<span id="cb874-15"><a href="rethinking-chapter-9.html#cb874-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">clr_chains</span>(), <span class="at">guide =</span><span class="st">&quot;none&quot;</span>)</span>
+<span id="cb874-16"><a href="rethinking-chapter-9.html#cb874-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb874-17"><a href="rethinking-chapter-9.html#cb874-17" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">/</span> p2</span></code></pre></div>
+<p><img src="rethinking_c9_files/figure-html/unnamed-chunk-22-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<hr />
+<div class="sourceCode" id="cb875"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb875-1"><a href="rethinking-chapter-9.html#cb875-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rlang)</span>
+<span id="cb875-2"><a href="rethinking-chapter-9.html#cb875-2" aria-hidden="true" tabindex="-1"></a>chapter9_models <span class="ot">&lt;-</span> <span class="fu">env</span>(</span>
+<span id="cb875-3"><a href="rethinking-chapter-9.html#cb875-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb875-4"><a href="rethinking-chapter-9.html#cb875-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb875-5"><a href="rethinking-chapter-9.html#cb875-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(chapter9_models, <span class="st">&quot;envs/chapter9_models.rds&quot;</span>)</span></code></pre></div>
+</div>
+<div id="homework-7" class="section level2" number="10.6">
+<h2><span class="header-section-number">10.6</span> Homework</h2>
+<p><strong>E1</strong></p>
+<p><strong>E2</strong></p>
+<p><strong>E3</strong></p>
+<p><strong>E4</strong></p>
+<p><strong>M1</strong></p>
+<p><strong>M2</strong></p>
+<p><strong>M3</strong></p>
+<p><strong>M4</strong></p>
+<p><strong>M5</strong></p>
+<p><strong>M6</strong></p>
+<p><strong>H1</strong></p>
+<p><strong>H2</strong></p>
+<p><strong>H3</strong></p>
+<p><strong>H4</strong></p>
+<p><strong>H5</strong></p>
+</div>
+<div id="brms-section-7" class="section level2" number="10.7">
+<h2><span class="header-section-number">10.7</span> {brms} section</h2>
+</div>
+<div id="pymc3-section-7" class="section level2" number="10.8">
+<h2><span class="header-section-number">10.8</span> pymc3 section</h2>
+<hr />
+<div id="myModal" class="modal">
+<span class="close">×</span>
+<img class="modal-content" id="img01">
+<div id="caption">
+
+</div>
+</div>
+<script src="./js/zoom.js"></script>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="rethinking-chapter-8.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="bayesian-statistics-the-fun-way.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": "github"
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

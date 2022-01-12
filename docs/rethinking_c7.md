@@ -1014,8 +1014,8 @@ PSIS(chapter5_models$model_multiple)
 ```
 
 ```
-#>       PSIS      lppd  penalty  std_err
-#> 1 129.9451 -64.97254 6.176689 15.34672
+#>       PSIS     lppd  penalty  std_err
+#> 1 130.5724 -65.2862 6.489572 15.73172
 ```
 
 With the *Student T* distribution as a the likelihood, $k$ is reduced as there is more mass in the tails of the distribution (thus, Idaho is less *surprising*)
@@ -1026,8 +1026,8 @@ PSIS(model_multiple_sudent)
 ```
 
 ```
-#>       PSIS      lppd  penalty std_err
-#> 1 134.2209 -67.11045 7.209632 11.9681
+#>       PSIS     lppd  penalty  std_err
+#> 1 134.1112 -67.0556 7.158867 11.87624
 ```
 
 
@@ -2178,32 +2178,7 @@ Defining custom functions to work with the special case for the last model (whic
 
 ```r
 expose_functions(brms_c7_model_brain_size6, vectorize = TRUE)
-```
 
-```
-#> Running /usr/local/lib/R/bin/R CMD SHLIB foo.c
-#> gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I"/home/kluk/R/x86_64-pc-linux-gnu-library/4.0/Rcpp/include/"  -I"/home/kluk/R/x86_64-pc-linux-gnu-library/4.0/RcppEigen/include/"  -I"/home/kluk/R/x86_64-pc-linux-gnu-library/4.0/RcppEigen/include/unsupported"  -I"/home/kluk/R/x86_64-pc-linux-gnu-library/4.0/BH/include" -I"/home/kluk/R/x86_64-pc-linux-gnu-library/4.0/StanHeaders/include/src/"  -I"/home/kluk/R/x86_64-pc-linux-gnu-library/4.0/StanHeaders/include/"  -I"/home/kluk/R/x86_64-pc-linux-gnu-library/4.0/RcppParallel/include/"  -I"/home/kluk/R/x86_64-pc-linux-gnu-library/4.0/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DBOOST_NO_AUTO_PTR  -include '/home/kluk/R/x86_64-pc-linux-gnu-library/4.0/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/usr/local/include   -fpic  -g -O2  -c foo.c -o foo.o
-#> In file included from /home/kluk/R/x86_64-pc-linux-gnu-library/4.0/RcppEigen/include/Eigen/Core:88,
-#>                  from /home/kluk/R/x86_64-pc-linux-gnu-library/4.0/RcppEigen/include/Eigen/Dense:1,
-#>                  from /home/kluk/R/x86_64-pc-linux-gnu-library/4.0/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13,
-#>                  from <command-line>:
-#> /home/kluk/R/x86_64-pc-linux-gnu-library/4.0/RcppEigen/include/Eigen/src/Core/util/Macros.h:628:1: error: unknown type name ‘namespace’
-#>   628 | namespace Eigen {
-#>       | ^~~~~~~~~
-#> /home/kluk/R/x86_64-pc-linux-gnu-library/4.0/RcppEigen/include/Eigen/src/Core/util/Macros.h:628:17: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
-#>   628 | namespace Eigen {
-#>       |                 ^
-#> In file included from /home/kluk/R/x86_64-pc-linux-gnu-library/4.0/RcppEigen/include/Eigen/Dense:1,
-#>                  from /home/kluk/R/x86_64-pc-linux-gnu-library/4.0/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13,
-#>                  from <command-line>:
-#> /home/kluk/R/x86_64-pc-linux-gnu-library/4.0/RcppEigen/include/Eigen/Core:96:10: fatal error: complex: No such file or directory
-#>    96 | #include <complex>
-#>       |          ^~~~~~~~~
-#> compilation terminated.
-#> make: *** [/usr/local/lib/R/etc/Makeconf:172: foo.o] Error 1
-```
-
-```r
 posterior_epred_custom_normal <- function(prep) {
   mu <- prep$dpars$mu
   mu 

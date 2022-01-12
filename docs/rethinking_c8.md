@@ -825,62 +825,935 @@ write_rds(chapter8_models, "envs/chapter8_models.rds")
 
 **E1**
 
-
+1. Bread dough rises because of `yeast * temperature` 
+2. `Education * country` leads to higher income
+3. `Gasoline * key` makes car go 
 
 **E2**
+
+Which ones of the following explanations invoke an interaction
+
+1. Caramelizing onions requires cooking over low heat and making sure the onions do not dry out.
+2. A car will go faster when it has more cylinders and when it has a better fuel injector.
+3. ~~Most people acquire their political beliefs from their parents, unless they get them instead from their friends.~~
+4. ~~Intelligent animals tend to be either highly social or have manipulative appendages (hands, tentacles, etc.).~~
 
 
 
 **E3**
 
-
-
-**E4**
-
-
+$$
+\begin{array}{rrcl}
+1. & caramel & = & \alpha + \beta_{temp} \times temp + \beta_{moist} \times moist + \beta_{drying} \times temp \times  moist\\
+2. & max\_speed & = & \alpha_{[cyl]} + \beta_{efficieny[cyl]} \times inject \\
+3. & polit & = & \alpha_{[influence\_group]} \\
+4. & intelligence & = & \alpha_{[appendages]} + beta_{sociality} \times sociality\\
+\end{array}
+$$
 
 **M1**
 
-
+This could be due to a three-way interaction, where the effect of *water on blooms* and of *light on blooms*, as well as the *interaction effect of water and light on blooms* also depend on temperature, with high temperature intervening negatively on all other effects.
 
 **M2**
 
+$$
+\begin{array}{rcl}
+\mu_{i} & = & \alpha_{[temp]} + \beta_{W[temp]} W_{i} + \beta_{S[temp]} S_{i} + \beta_{WS[temp]}  W_{i} S_{i}\\
+\end{array}
+$$
 
+with 
+
+- $\alpha_{[hot]} = 0$
+- $\beta_{W[hot]} = 0$
+- $\beta_{S[hot]} = 0$
+- $\beta_{WS[hot]} = 0$
 
 **M3**
 
 
+```r
+n <- 5e2
+raven_data <- tibble(
+  wolves_std = rep(round(c(1, 3, 10)/10, digits = 2),
+               each = n), #rbinom(n, size = 10, .45),
+  wolve_area = rnorm(n = n * 3),
+  raven = rnorm(n = n * 3,
+                mean = wolves_std + wolve_area / wolves_std, sd = 1.5))
+
+raven_data %>% 
+  ggplot(aes(x = wolve_area, y = raven)) +
+  geom_point(color = clr_alpha(clr0d)) +
+  facet_wrap(wolves_std~ ., labeller = label_both)
+```
+
+<img src="rethinking_c8_files/figure-html/M3-1.svg" width="672" style="display: block; margin: auto;" />
+
+There should be non-linear effects once the wolves deplete all their food sources.
 
 **M4**
 
 
+```r
+model_tulips_interaction_restricted <- quap(
+   flist = alist(
+    blooms_std ~ dnorm(mu, sigma),
+    mu <- alpha + beta_w * water_cent + beta_s * shade_cent + beta_ws  * water_cent * shade_cent,
+    alpha ~ dnorm(.5, .25),
+    beta_w ~ dunif(0,.5),
+    beta_s ~ dunif(-.5,0),
+    beta_ws ~ dnorm(0,.5),
+    sigma ~ dexp(1)
+  ),
+  data = data_tulips,
+  start = list(beta_w = .25,beta_s = -.25, beta_ws = .2)
+)
 
-**M5**
+precis(model_tulips_interaction_restricted) %>% 
+  knit_precis()
+```
 
 
 
-**M6**
+|param   |  mean|   sd|  5.5%| 94.5%|
+|:-------|-----:|----:|-----:|-----:|
+|beta_w  |  0.21| 0.03|  0.16|  0.26|
+|beta_s  | -0.12| 0.03| -0.16| -0.07|
+|beta_ws | -0.15| 0.04| -0.20| -0.09|
+|alpha   |  0.36| 0.02|  0.32|  0.40|
+|sigma   |  0.12| 0.02|  0.10|  0.15|
 
+```r
+# set.seed(5)
+tulips_simple_prior_restricted <- extract.prior(model_tulips_interaction_restricted,
+                                     data = tulip_range) %>% 
+  as_tibble() %>% 
+  mutate(.draw = row_number(),
+         grid = rep(list(cross_df(list(water_cent = -1:1,
+                             shade_cent = -1:1))), n()),
+          model = "simple") %>% 
+  unnest(grid) %>% 
+  mutate(blooms = alpha + beta_w * water_cent + beta_s * shade_cent)
+
+tulips_interaction_prior_restricted <- extract.prior(model_tulips_interaction_restricted,
+                                          data = tulip_range) %>% 
+  as_tibble() %>% 
+  mutate(.draw = row_number(),
+         grid = rep(list(cross_df(list(water_cent = -1:1,
+                             shade_cent = -1:1))), n()),
+          model = "interaction") %>% 
+  unnest(grid) %>% 
+  mutate(blooms = alpha + beta_w * water_cent + beta_s * shade_cent + beta_ws  * water_cent * shade_cent)
+
+tulips_prior_restricted_pi <- tulips_interaction_prior_restricted %>% 
+  group_by( water_cent, shade_cent ) %>% 
+  summarise(mean = mean(blooms),
+            PI_lower = PI(blooms, prob = .97)[1],
+            PI_upper = PI(blooms, prob = .97)[2]) %>% 
+  ungroup() 
+
+tulips_interaction_prior_restricted %>%
+  ggplot(aes(x = water_cent)) +
+  geom_line(data = . %>% 
+              filter(.draw < 41),
+            aes(y = blooms ,
+                group = .draw, color = .draw == 20)) +
+  geom_hline(yintercept = c(0, 1), linetype = 3, color = clr_dark) +
+  facet_grid(. ~ shade_cent, labeller = label_both, switch = "y") +
+  scale_color_manual(values = c(`FALSE` = clr_alpha(clr0d), `TRUE` = fll1)) +
+  theme(legend.position = "bottom",
+        strip.placement = "outside") +
+  coord_cartesian(ylim = c(-.35,1.35))
+```
+
+<img src="rethinking_c8_files/figure-html/M4-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 **H1**
 
 
+```r
+model_tulips_bed_plain <- quap(
+   flist = alist(
+    blooms_std ~ dnorm(mu, sigma),
+    mu <- alpha[bed] + beta_w * water_cent + beta_s * shade_cent + beta_ws  * water_cent * shade_cent,
+    alpha[bed] ~ dnorm(.5, .25),
+    beta_w ~ dnorm(0,.25),
+    beta_s ~ dnorm(0,.25),
+    beta_ws ~ dnorm(0,.25),
+    sigma ~ dexp(1)
+  ),
+  data = data_tulips
+)
+
+precis(model_tulips_bed_plain, depth = 2)  %>% 
+  knit_precis()
+```
+
+
+
+|param    |  mean|   sd|  5.5%| 94.5%|
+|:--------|-----:|----:|-----:|-----:|
+|alpha[1] |  0.27| 0.04|  0.22|  0.33|
+|alpha[2] |  0.40| 0.04|  0.34|  0.45|
+|alpha[3] |  0.41| 0.04|  0.35|  0.47|
+|beta_w   |  0.21| 0.03|  0.17|  0.25|
+|beta_s   | -0.11| 0.03| -0.15| -0.07|
+|beta_ws  | -0.14| 0.03| -0.19| -0.09|
+|sigma    |  0.11| 0.01|  0.08|  0.13|
 
 **H2**
 
 
+```r
+compare(model_tulips_interaction,
+        model_tulips_bed_plain) %>% 
+  knit_precis(param_name = "model")
+```
+
+
+
+|model                    |   WAIC|    SE| dWAIC| dSE| pWAIC| weight|
+|:------------------------|------:|-----:|-----:|---:|-----:|------:|
+|model_tulips_bed_plain   | -22.98|  9.96|  0.00|  NA|  9.94|   0.62|
+|model_tulips_interaction | -22.03| 10.49|  0.95| 7.8|  6.63|   0.38|
+
+There seems to be some preference for the model including `bed`, but the weight is only at ~66% and the SEs are quite large compared to the $\Delta WAIC$.
+
+posterior distributions of the model parameters
+
+
+```r
+library(tidybayes)
+library(tidybayes.rethinking)
+model_tulips_bed_plain %>%
+  recover_types(data_tulips) %>%
+  spread_draws(alpha[bed], beta_w, beta_s, beta_ws) %>%
+  dplyr::select(-.chain, -.iteration) %>% 
+  pivot_longer(cols = -c(bed, .draw),
+               names_to = "parameter") %>% 
+  ggplot(aes(y = bed, x = value)) +
+  # geom_vline(xintercept = 0, linetype = 3, color = clr_dark) +
+  stat_halfeye(color = clr_dark,aes( fill = parameter)) +
+  facet_wrap(parameter ~ ., scales = "free_x", nrow = 1) +
+  scale_fill_manual(values = c(fll0,fll1,fll2,fll3), guide = "none")
+```
+
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-25-1.svg" width="672" style="display: block; margin: auto;" />
+
+The improvement of the bed model seems to stem from the fact that tulips in the 'a' treatment tend to have a lower blooming score.
+
+posterior predictive
+
+
+```r
+model_tulips_bed_plain %>%
+  recover_types(data_tulips) %>%
+  spread_draws(alpha[bed], beta_w, beta_s, beta_ws) %>%
+  dplyr::select(-.chain, -.iteration) %>% 
+  mutate(new_data = list(crossing(water_cent = c(-1,1), shade_cent = c(-1:1)))) %>% 
+  unnest(new_data) %>% 
+  mutate(blooms = alpha +
+           beta_w * water_cent +
+           beta_s * shade_cent +
+           beta_ws * water_cent * shade_cent) %>% 
+  ggplot(aes(x = water_cent)) +
+  geom_line(data = . %>% 
+              group_by(bed) %>% 
+              filter(.draw < 51) %>%
+              ungroup(),
+            aes(y = blooms ,
+                group = str_c(shade_cent, .draw), color = .draw == 50)) +
+  geom_point(data = data_tulips, aes(y = blooms_std),
+             color = clr_dark) +
+  facet_grid(shade_cent ~ bed, labeller = label_both,switch = "y") +
+  scale_color_manual(values = c(`FALSE` = fll0, `TRUE` = fll1)) +
+  theme(legend.position = "bottom",
+        strip.placement = "outside")
+```
+
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-26-1.svg" width="672" style="display: block; margin: auto;" />
+
 
 **H3**
 
+a)
+
+
+```r
+psis_k <- tibble(waic_penalty = (function(){
+  set.seed(set.seed(23))
+  WAIC(model_rugged_slope, pointwise = TRUE)$penalty})(),
+  psis_k = (function(){
+    set.seed(set.seed(23))
+    PSIS(model_rugged_slope, pointwise = TRUE)$k})(),
+  country = data_rugged$country,
+  cont_africa = data_rugged$cont_africa
+)
+
+ psis_k %>% 
+  ggplot(aes(x = psis_k ,y = waic_penalty)) +
+  geom_vline(xintercept = .5, color = clr_dark, linetype = 3) +
+  geom_point(shape = 21, size = 2, color = clr0dd, fill = fll0) +
+  ggrepel::geom_text_repel(data = psis_k,
+            aes(x = psis_k, label = country),
+            family = "Josefin Sans", direction = "both", max.overlaps = 1) +
+  facet_wrap(cont_africa ~ . ) +
+   labs(subtitle = "gaussian")
+```
+
+<img src="rethinking_c8_files/figure-html/H3-1.svg" width="672" style="display: block; margin: auto;" />
+
+The Seychelles, Tajikistan and Switzerland seem to be the most influential points.
+All of those have a very rugged topography and extreme GDP values (both positive and negative) 
+
+b)
+
+
+```r
+model_rugged_robust <- quap(
+   flist = alist(
+    log_gdp_std ~ dstudent(nu = 2, mu, sigma),
+    mu <- alpha[cont_idx] + beta[cont_idx] * ( rugged_std - 0.215 ),
+    alpha[cont_idx] ~ dnorm(1, 0.1),
+    beta[cont_idx] ~ dnorm(0, 0.3),
+    sigma ~ dexp(1)
+  ),
+  data = data_rugged
+)
+
+psis_k_robust <- tibble(waic_penalty = (function(){
+  set.seed(set.seed(23))
+  WAIC(model_rugged_robust, pointwise = TRUE)$penalty})(),
+  psis_k = (function(){
+    set.seed(set.seed(23))
+    PSIS(model_rugged_robust, pointwise = TRUE)$k})(),
+  country = data_rugged$country,
+  cont_africa = data_rugged$cont_africa
+)
+
+ psis_k_robust %>% 
+  ggplot(aes(x = psis_k ,y = waic_penalty)) +
+  geom_vline(xintercept = .5, color = clr_dark, linetype = 3) +
+  geom_point(shape = 21, size = 2, color = clr1, fill = fll1) +
+  ggrepel::geom_text_repel(data = psis_k_robust,
+            aes(x = psis_k, label = country),
+            family = "Josefin Sans", direction = "both", max.overlaps = 1) +
+  facet_wrap(cont_africa ~ . ) +
+   labs(subtitle = "student-t")
+```
+
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-27-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+
+```r
+rugged_slope_posterior_robust <- bind_rows(
+  draw_posterior_samples(1, model = model_rugged_robust),
+  draw_posterior_samples(2, model = model_rugged_robust))
+
+rugged_slope_posterior_robust_pi <- rugged_slope_posterior_robust %>% 
+   group_by(rugged_std, cont_idx) %>% 
+  summarise(mean = mean(log_gdp_std),
+            PI_lower = PI(log_gdp_std, prob = .97)[1],
+            PI_upper = PI(log_gdp_std, prob = .97)[2]) %>% 
+  ungroup()
+
+ggplot(mapping = aes(x = rugged_std)) +
+  geom_smooth(data = rugged_slope_posterior_robust_pi, stat = "identity",
+              aes(y = mean, ymin = PI_lower, ymax = PI_upper,
+                 color = factor(cont_idx), 
+                 fill = after_scale(clr_alpha(clr_lighten(color)))),
+              size = .2) +
+  geom_point(data = data_rugged,
+             aes(y = log_gdp_std,
+                 color = factor(cont_idx), 
+                 fill = after_scale(clr_alpha(color))),
+             size = 1.5, shape = 21) +
+  ggrepel::geom_text_repel(data = data_rugged %>% 
+                             filter(country %in% c("Seychelles", "Switzerland",
+                                                   "Tajikistan", "Lesotho", "Nepal")),
+             aes(y = log_gdp_std,
+                 x = rugged_std + .1,
+                 label = country),
+             force = 20,
+            hjust = 0, family = fnt_sel) +
+  labs(y = "log GDP (prop of mean)") +
+  facet_wrap(cont_idx ~ .) +
+  scale_color_manual("Continent",
+                     values = c(`1` = clr1, `2` = clr0dd),
+                     labels = c(`1` = "Africa", `2` = "Other"))
+```
+
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-28-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 **H4**
 
 
+```r
+data(nettle)
+data_nettle <- nettle %>% 
+  as_tibble() %>% 
+  mutate(lang.per.capita = num.lang / k.pop,
+         lang_per_cap_log = log(lang.per.capita),
+         lang_per_cap_log_std = standardize(lang_per_cap_log),
+         area_log_std = standardize(log(area)),
+         season_duration_scl = mean.growing.season / max(mean.growing.season),
+         season_sd_scl = sd.growing.season / max(sd.growing.season))
+
+data_nettle %>% 
+  dplyr::select(lang_per_cap_log:season_sd_scl) %>% 
+  precis()
+```
+
+```
+#>                               mean        sd          5.5%      94.5%
+#> lang_per_cap_log     -5.456606e+00 1.5207459 -7.8066714131 -3.4116252
+#> lang_per_cap_log_std -1.934656e-16 1.0000000 -1.5453372117  1.3447223
+#> area_log_std          2.619731e-17 1.0000000 -1.4475375475  1.3737581
+#> season_duration_scl   5.867905e-01 0.2619871  0.0692416667  0.9926458
+#> season_sd_scl         2.894700e-01 0.1816151  0.0008943782  0.5961755
+#>                          histogram
+#> lang_per_cap_log        ▁▁▂▅▇▂▂▁▁▁
+#> lang_per_cap_log_std ▁▁▁▂▃▇▇▂▃▁▁▁▁
+#> area_log_std           ▁▁▁▅▃▇▅▇▃▁▁
+#> season_duration_scl     ▃▁▃▂▃▇▇▇▃▃
+#> season_sd_scl           ▃▇▇▇▂▂▁▁▁▁
+```
+
+a)
+
+$$
+\begin{array}{rclr}
+L_{i} & \sim & Normal( \mu_{i}, \sigma) & \textrm{[likelihood]}\\
+\mu_{i} & = & \alpha + \beta_{D} D_{i} + \beta_{A} A_{i}& \textrm{[linear model]} \\
+\alpha & \sim & Log-Normal(0, 0.15) & \textrm{[$\alpha$ prior]}\\
+\beta_{D} & \sim & Normal(0, 0.25) & \textrm{[$\beta_{W}$ prior]}\\
+\beta_{A} & \sim & Normal(0, 0.25) & \textrm{[$\beta_{S}$ prior]}\\
+\sigma & \sim & Exponential(1)  & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+
+```r
+model_lang_dur_area <- quap(
+   flist = alist(
+    lang_per_cap_log_std ~ dnorm(mu, sigma),
+    mu <- alpha + 
+      beta_d * season_duration_scl + 
+      beta_a * area_log_std ,
+    alpha ~ dnorm(0, 0.15),
+    c(beta_d, beta_a) ~ dnorm(0, 0.25),
+    sigma ~ dexp(1)
+  ),
+  data = data_nettle
+)
+
+precis(model_lang_dur_area) %>% 
+  knit_precis()
+```
+
+
+
+|param  |  mean|   sd|  5.5%| 94.5%|
+|:------|-----:|----:|-----:|-----:|
+|alpha  | -0.07| 0.11| -0.25|  0.11|
+|beta_d |  0.19| 0.18| -0.10|  0.48|
+|beta_a | -0.22| 0.10| -0.38| -0.06|
+|sigma  |  0.94| 0.08|  0.81|  1.06|
+
+```r
+area_classes <- quantile(data_nettle$area_log_std, seq(0,1,length.out = 4))
+area_means <- (area_classes[1:3]+area_classes[2:4])/2
+
+model_lang_dur_area %>%
+  spread_draws(alpha, beta_d, beta_a) %>%
+  dplyr::select(-.chain, -.iteration) %>% 
+  mutate(new_data = list(crossing(season_duration_scl = range(data_nettle$season_duration_scl),
+                                  area_log_std = area_means))) %>% 
+  unnest(new_data) %>% 
+  mutate(lang_per_cap_log_std = alpha +
+           beta_d * season_duration_scl +
+           beta_a * area_log_std,
+         area_class = cut(area_log_std,area_classes + c(-.1, rep(0, 2), .1)),
+         area_mean = area_means[as.numeric(area_class)] %>%  round(digits = 2)) %>% 
+  ggplot(aes(x = season_duration_scl)) +
+  geom_line(data = . %>%
+              filter(.draw < 51) %>%
+              ungroup(),
+            aes(y = lang_per_cap_log_std ,
+                group = str_c(.draw, area_log_std), color = area_log_std)) +
+ geom_hline(yintercept = range(data_nettle$lang_per_cap_log_std),
+             linetype = 3, color = clr_dark) +
+  geom_point(data = data_nettle %>% 
+               mutate(area_class = cut(area_log_std,area_classes + c(-.1, rep(0, 2), .1)),
+                      area_mean = area_means[as.numeric(area_class)] %>%  round(digits = 2)),
+             aes(y = lang_per_cap_log_std,
+                 fill = area_log_std, color = after_scale(clr_darken(fill))),
+             shape = 21) + 
+  scale_color_gradientn(colours = c(fll0, fll1), guide = "none") +
+  scale_fill_gradientn(colours = c(clr0, clr1), guide = "none") +
+  facet_wrap(. ~ area_mean, labeller = label_both) +
+  theme(legend.position = "bottom",
+        strip.placement = "outside")
+```
+
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-29-1.svg" width="672" style="display: block; margin: auto;" />
+
+b)
+
+$$
+\begin{array}{rclr}
+L_{i} & \sim & Normal( \mu_{i}, \sigma) & \textrm{[likelihood]}\\
+\mu_{i} & = & \alpha + \beta_{S} S_{i} + \beta_{A} A_{i}& \textrm{[linear model]} \\
+\alpha & \sim & Log-Normal(0, 0.15) & \textrm{[$\alpha$ prior]}\\
+\beta_{S} & \sim & Normal(0, 0.25) & \textrm{[$\beta_{W}$ prior]}\\
+\beta_{A} & \sim & Normal(0, 0.25) & \textrm{[$\beta_{S}$ prior]}\\
+\sigma & \sim & Exponential(1)  & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+
+```r
+model_lang_sd_area <- quap(
+   flist = alist(
+    lang_per_cap_log_std ~ dnorm(mu, sigma),
+    mu <- alpha + 
+      beta_s * season_sd_scl + 
+      beta_a * area_log_std ,
+    alpha ~ dnorm(0, 0.15),
+    c(beta_s, beta_a) ~ dnorm(0, 0.25),
+    sigma ~ dexp(1)
+  ),
+  data = data_nettle
+)
+
+precis(model_lang_sd_area) %>% 
+  knit_precis()
+```
+
+
+
+|param  |  mean|   sd|  5.5%| 94.5%|
+|:------|-----:|----:|-----:|-----:|
+|alpha  |  0.02| 0.10| -0.14|  0.17|
+|beta_s | -0.09| 0.22| -0.45|  0.26|
+|beta_a | -0.23| 0.10| -0.39| -0.06|
+|sigma  |  0.95| 0.08|  0.82|  1.07|
+
+```r
+model_lang_sd_area %>%
+  spread_draws(alpha, beta_s, beta_a) %>%
+  dplyr::select(-.chain, -.iteration) %>% 
+  mutate(new_data = list(crossing(season_sd_scl = range(data_nettle$season_sd_scl),
+                                  area_log_std = area_means))) %>% 
+  unnest(new_data) %>% 
+  mutate(lang_per_cap_log_std = alpha +
+           beta_s * season_sd_scl +
+           beta_a * area_log_std,
+         area_class = cut(area_log_std,area_classes + c(-.1, rep(0, 2), .1)),
+         area_mean = area_means[as.numeric(area_class)] %>%  round(digits = 2)) %>% 
+  ggplot(aes(x = season_sd_scl)) +
+  geom_line(data = . %>%
+              filter(.draw < 51) %>%
+              ungroup(),
+            aes(y = lang_per_cap_log_std ,
+                group = str_c(.draw, area_log_std), color = area_log_std)) +
+ geom_hline(yintercept = range(data_nettle$lang_per_cap_log_std),
+             linetype = 3, color = clr_dark) +
+  geom_point(data = data_nettle %>% 
+               mutate(area_class = cut(area_log_std,area_classes + c(-.1, rep(0, 2), .1)),
+                      area_mean = area_means[as.numeric(area_class)] %>%  round(digits = 2)),
+             aes(y = lang_per_cap_log_std,
+                 fill = area_log_std, color = after_scale(clr_darken(fill))),
+             shape = 21) + 
+  scale_color_gradientn(colours = c(fll0, fll1), guide = "none") +
+  scale_fill_gradientn(colours = c(clr0, clr1), guide = "none") +
+  facet_wrap(. ~ area_mean, labeller = label_both) +
+  theme(legend.position = "bottom",
+        strip.placement = "outside")
+```
+
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-30-1.svg" width="672" style="display: block; margin: auto;" />
+
+c)
+
+
+```r
+model_lang_inter <- quap(
+   flist = alist(
+    lang_per_cap_log_std ~ dnorm(mu, sigma),
+    mu <- alpha + 
+      beta_d * season_duration_scl + 
+      beta_s * season_sd_scl + 
+      beta_ds * season_duration_scl * season_sd_scl,
+    alpha ~ dnorm(0, 0.15),
+    c(beta_d, beta_s) ~ dnorm(0, 0.25),
+     beta_ds  ~ dnorm(0, 0.5),
+    sigma ~ dexp(1)
+  ),
+  data = data_nettle
+)
+
+precis(model_lang_inter) %>% 
+  knit_precis()
+```
+
+
+
+|param   |  mean|   sd|  5.5%| 94.5%|
+|:-------|-----:|----:|-----:|-----:|
+|alpha   | -0.04| 0.12| -0.23|  0.14|
+|beta_d  |  0.32| 0.19|  0.02|  0.63|
+|beta_s  | -0.20| 0.23| -0.57|  0.17|
+|beta_ds | -0.38| 0.43| -1.07|  0.31|
+|sigma   |  0.94| 0.08|  0.82|  1.07|
+
+```r
+sd_classes <- quantile(data_nettle$season_sd_scl, seq(0,1,length.out = 4))
+sd_means <- (sd_classes[1:3]+sd_classes[2:4])/2
+
+model_lang_inter %>%
+  spread_draws(alpha, beta_d, beta_s, beta_ds) %>%
+  dplyr::select(-.chain, -.iteration) %>% 
+  mutate(new_data = list(crossing(season_duration_scl = range(data_nettle$season_duration_scl),
+                                  season_sd_scl = sd_means))) %>% 
+  unnest(new_data) %>% 
+  mutate(lang_per_cap_log_std = alpha +
+           beta_d * season_duration_scl +
+           beta_s * season_sd_scl +
+           beta_ds * season_duration_scl * season_sd_scl,
+         sd_class = cut(season_sd_scl ,sd_classes + c(-.1, rep(0, 2), .1)),
+         sd_mean = sd_means[as.numeric(sd_class)] %>%  round(digits = 2)) %>% 
+  ggplot(aes(x = season_duration_scl)) +
+  geom_line(data = . %>%
+              filter(.draw < 51) %>%
+              ungroup(),
+            aes(y = lang_per_cap_log_std ,
+                group = str_c(.draw, season_sd_scl), color = season_sd_scl)) +
+ geom_hline(yintercept = range(data_nettle$lang_per_cap_log_std),
+             linetype = 3, color = clr_dark) +
+  geom_point(data = data_nettle %>% 
+               mutate(sd_class = cut(season_sd_scl ,sd_classes + c(-.1, rep(0, 2), .1)),
+         sd_mean = sd_means[as.numeric(sd_class)] %>%  round(digits = 2)),
+             aes(y = lang_per_cap_log_std,
+                 fill = season_sd_scl, color = after_scale(clr_darken(fill))),
+             shape = 21) + 
+  scale_color_gradientn(colours = c(fll0, fll1), guide = "none") +
+  scale_fill_gradientn(colours = c(clr0, clr1), guide = "none") +
+  facet_wrap(. ~ sd_mean, labeller = label_both) +
+  theme(legend.position = "bottom",
+        strip.placement = "outside")
+```
+
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-31-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+```r
+compare(model_lang_dur_area,
+        model_lang_sd_area,
+        model_lang_inter) %>% 
+  knit_precis(param_name = "model")
+```
+
+
+
+|model               |   WAIC|    SE| dWAIC|  dSE| pWAIC| weight|
+|:-------------------|------:|-----:|-----:|----:|-----:|------:|
+|model_lang_inter    | 208.83| 17.49|  0.00|   NA|  3.44|   0.46|
+|model_lang_dur_area | 209.64| 17.22|  0.81| 4.71|  4.60|   0.31|
+|model_lang_sd_area  | 210.24| 17.08|  1.41| 3.73|  4.09|   0.23|
 
 **H5**
 
+
+```r
+data("Wines2012")
+
+data_wine <- Wines2012 %>% 
+  as_tibble() %>% 
+  mutate(score_std = standardize(score),
+         wine_nat_idx = wine.amer + 1,
+         judge_nat_idx = judge.amer + 1,
+         wine_idx = as.numeric(wine),
+         judge_idx = as.numeric(judge))
+
+unique(data_wine$wine_idx) %>% sort()
+```
+
+```
+#>  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+```
+
+```r
+unique(data_wine$judge_idx) %>% sort()
+```
+
+```
+#> [1] 1 2 3 4 5 6 7 8 9
+```
+
+$$
+\begin{array}{rclr}
+S_{i} & \sim & Normal( \mu_{i}, \sigma) & \textrm{[likelihood]}\\
+\mu_{i} & = & \alpha_{J} + \alpha_{W} & \textrm{[linear model]} \\
+\alpha_{J} & \sim & Normal(0, 0.5) & \textrm{[$\alpha_{J}$ prior]}\\
+\alpha_{W} & \sim & Normal(0, 0.5) & \textrm{[$\alpha_{W}$ prior]}\\
+\sigma & \sim & Exponential(1)  & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+
+```r
+model_wine_static <- quap(
+  flist = alist(
+     score_std ~ dnorm(mu, sigma),
+    mu <- alpha_j[judge_idx] + alpha_w[wine_idx],
+    alpha_j[judge_idx]~ dnorm(0, 0.5),
+    alpha_w[wine_idx] ~ dnorm(0, 0.5),
+    sigma ~ dexp(1)
+  ),
+  data = data_wine
+)
+
+precis(model_wine_static, depth = 2) %>% 
+  knit_precis()
+```
+
+
+
+|param       |  mean|   sd|  5.5%| 94.5%|
+|:-----------|-----:|----:|-----:|-----:|
+|alpha_j[1]  | -0.28| 0.19| -0.58|  0.01|
+|alpha_j[2]  |  0.22| 0.19| -0.08|  0.51|
+|alpha_j[3]  |  0.21| 0.19| -0.09|  0.51|
+|alpha_j[4]  | -0.55| 0.19| -0.85| -0.25|
+|alpha_j[5]  |  0.81| 0.19|  0.51|  1.11|
+|alpha_j[6]  |  0.48| 0.19|  0.19|  0.78|
+|alpha_j[7]  |  0.13| 0.19| -0.16|  0.43|
+|alpha_j[8]  | -0.67| 0.19| -0.97| -0.37|
+|alpha_j[9]  | -0.35| 0.19| -0.65| -0.05|
+|alpha_w[1]  |  0.12| 0.25| -0.27|  0.51|
+|alpha_w[2]  |  0.09| 0.25| -0.30|  0.48|
+|alpha_w[3]  |  0.24| 0.25| -0.16|  0.63|
+|alpha_w[4]  |  0.48| 0.25|  0.09|  0.87|
+|alpha_w[5]  | -0.11| 0.25| -0.50|  0.28|
+|alpha_w[6]  | -0.32| 0.25| -0.71|  0.07|
+|alpha_w[7]  |  0.25| 0.25| -0.14|  0.64|
+|alpha_w[8]  |  0.24| 0.25| -0.16|  0.63|
+|alpha_w[9]  |  0.07| 0.25| -0.32|  0.46|
+|alpha_w[10] |  0.10| 0.25| -0.29|  0.50|
+|alpha_w[11] | -0.01| 0.25| -0.40|  0.38|
+|alpha_w[12] | -0.03| 0.25| -0.42|  0.37|
+|alpha_w[13] | -0.09| 0.25| -0.48|  0.30|
+|alpha_w[14] |  0.01| 0.25| -0.39|  0.40|
+|alpha_w[15] | -0.19| 0.25| -0.58|  0.20|
+|alpha_w[16] | -0.17| 0.25| -0.57|  0.22|
+|alpha_w[17] | -0.12| 0.25| -0.52|  0.27|
+|alpha_w[18] | -0.75| 0.25| -1.14| -0.35|
+|alpha_w[19] | -0.14| 0.25| -0.53|  0.25|
+|alpha_w[20] |  0.33| 0.25| -0.06|  0.73|
+|sigma       |  0.79| 0.04|  0.72|  0.85|
+
+
+```r
+wine_params <- data_wine %>% 
+  mutate(j = str_c(judge,"_",judge_idx),
+         w = str_c(wine,"_", wine_idx)) %>%
+  dplyr::select(j, w) %>% 
+  pivot_longer(everything(),names_to = "type") %>% 
+  filter(!duplicated(value)) %>% 
+  arrange(type, value) %>% 
+  separate(value, into = c("name", "idx"), sep = "_", convert = TRUE)
+
+precis(model_wine_static, depth = 2, pars = "alpha") %>% 
+  as_tibble_rn() %>%
+  mutate(type = str_remove(param, pattern =  "alpha_") %>% str_remove("\\[[0-9]*\\]"),
+         idx = str_extract(param, "[0-9]{1,2}") %>% as.integer()) %>%
+  left_join(wine_params, by = c("type", "idx")) %>%
+  group_by(type) %>% 
+  mutate(name = fct_reorder(name, mean),
+         name = str_c(str_pad(30 - as.numeric(name), width = 2, pad = 0),": ",name)) %>% 
+  ungroup() %>% 
+  ggplot(aes(y = name, color = type)) +
+  geom_vline(xintercept = 0, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_pointinterval(aes(xmin = `5.5%`,x = mean,
+                     xmax =`94.5%`)) +
+  scale_color_manual(values = c(j = clr0d, w = clr2), guide = "none") +
+  facet_wrap(type ~ . , scales = "free_y", nrow = 1) +
+  labs(x = "score_std") +
+  theme(axis.title.y = element_blank(),
+        strip.placement = "outside")
+```
+
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-34-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+**H6**
+
+$$
+\begin{array}{rclr}
+S_{i} & \sim & Normal( \mu_{i}, \sigma) & \textrm{[likelihood]}\\
+\mu_{i} & = & \alpha_{J} + \alpha_{W} + \alpha_{F} & \textrm{[linear model]} \\
+\alpha_{W} & \sim & Normal(0, 0.5) & \textrm{[$\alpha_{W}$ prior]}\\
+\alpha_{J} & \sim & Normal(0, 0.5) & \textrm{[$\alpha_{J}$ prior]}\\
+\alpha_{F} & \sim & Normal(0, 0.5) & \textrm{[$\alpha_{F}$ prior]}\\
+\sigma & \sim & Exponential(1)  & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+
+```r
+model_wine_nat <- quap(
+  flist = alist(
+     score_std ~ dnorm(mu, sigma),
+    mu <- alpha_j[judge_nat_idx] + alpha_w[wine_nat_idx] + alpha_f[flight],
+    alpha_j[judge_nat_idx]~ dnorm(0, 0.25),
+    alpha_w[wine_nat_idx] ~ dnorm(0, 0.25),
+    alpha_f[flight] ~ dnorm(0, 0.25),
+    sigma ~ dexp(1)
+  ),
+  data = data_wine
+)
+
+precis(model_wine_nat, depth = 2) %>% 
+  knit_precis()
+```
+
+
+
+|param      |  mean|   sd|  5.5%| 94.5%|
+|:----------|-----:|----:|-----:|-----:|
+|alpha_j[1] | -0.10| 0.16| -0.36|  0.15|
+|alpha_j[2] |  0.11| 0.16| -0.15|  0.36|
+|alpha_w[1] |  0.08| 0.16| -0.18|  0.34|
+|alpha_w[2] | -0.08| 0.16| -0.34|  0.18|
+|alpha_f[1] |  0.00| 0.16| -0.26|  0.26|
+|alpha_f[2] |  0.00| 0.16| -0.25|  0.26|
+|sigma      |  0.98| 0.05|  0.90|  1.07|
+
+
+```r
+wine_params <- tibble(type = rep(c("w", "j", "f"), each = 2),
+                      name = c(rep(c("america", "france"), 2),
+                               levels(data_wine$flight)),
+                      idx = rep(1:2, 3))
+
+precis(model_wine_nat, depth = 2, pars = "alpha") %>% 
+  as_tibble_rn() %>%
+  mutate(type = str_remove(param, pattern =  "alpha_") %>% str_remove("\\[[0-9]*\\]"),
+         idx = str_extract(param, "[0-9]{1,2}") %>% as.integer()) %>%
+  left_join(wine_params, by = c("type", "idx")) %>%
+  group_by(type) %>% 
+  mutate(name = fct_reorder(name, mean),
+         name = str_c(str_pad(30 - as.numeric(name), width = 2, pad = 0),": ",name)) %>% 
+  ungroup() %>% 
+  ggplot(aes(y = name, color = type)) +
+  geom_vline(xintercept = 0, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_pointinterval(aes(xmin = `5.5%`,x = mean,
+                     xmax =`94.5%`)) +
+  scale_color_manual(values = c(j = clr0d, w = clr2, f = clr_dark), guide = "none") +
+  facet_wrap(type ~ . , scales = "free_y", ncol = 1) +
+  labs(x = "score_std") +
+  theme(axis.title.y = element_blank(),
+        strip.placement = "outside")
+```
+
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-35-1.svg" width="672" style="display: block; margin: auto;" />
+
+
+**H7**
+
+$$
+\begin{array}{rclr}
+S_{i} & \sim & Normal( \mu_{i}, \sigma) & \textrm{[likelihood]}\\
+\mu_{i} & = & \alpha_{J} + \alpha_{W} + \alpha_{F} + \beta_{JF} \times J + \beta_{WF} \times W + \beta_{JW} \times J & \textrm{[linear model]} \\
+\alpha_{W} & \sim & Normal(0, 0.5) & \textrm{[$\alpha_{W}$ prior]}\\
+\alpha_{J} & \sim & Normal(0, 0.5) & \textrm{[$\alpha_{J}$ prior]}\\
+\alpha_{F} & \sim & Normal(0, 0.5) & \textrm{[$\alpha_{F}$ prior]}\\
+\beta_{WF} & \sim & Normal(0, 0.5) & \textrm{[$\alpha_{WF}$ prior]}\\
+\beta_{JF} & \sim & Normal(0, 0.5) & \textrm{[$\alpha_{JF}$ prior]}\\
+\beta_{JW} & \sim & Normal(0, 0.5) & \textrm{[$\alpha_{JW}$ prior]}\\
+\sigma & \sim & Exponential(1)  & \textrm{[$\sigma$ prior]}
+\end{array}
+$$
+
+
+```r
+model_wine_inter <- quap(
+  flist = alist(
+     score_std ~ dnorm(mu, sigma),
+    mu <- alpha_j[judge_nat_idx] + alpha_w[wine_nat_idx] + alpha_f[flight] +
+      beta_jf[flight] * judge.amer + beta_wf[flight] * wine.amer + beta_jw[wine_nat_idx] * judge.amer,
+    alpha_j[judge_nat_idx]~ dnorm(0, 0.5),
+    alpha_w[wine_nat_idx] ~ dnorm(0, 0.5),
+    alpha_f[flight] ~ dnorm(0, 0.5),
+    beta_jf[flight] ~ dnorm(0, 0.5),
+    beta_wf[flight] ~ dnorm(0, 0.5),
+    beta_jw[wine_nat_idx] ~ dnorm(0, 0.5),
+    sigma ~ dexp(1)
+  ),
+  data = data_wine
+)
+
+precis(model_wine_inter, depth = 2) %>% 
+  knit_precis()
+```
+
+
+
+|param      |  mean|   sd|  5.5%| 94.5%|
+|:----------|-----:|----:|-----:|-----:|
+|alpha_j[1] | -0.09| 0.33| -0.62|  0.43|
+|alpha_j[2] |  0.08| 0.39| -0.55|  0.70|
+|alpha_w[1] |  0.04| 0.33| -0.48|  0.57|
+|alpha_w[2] | -0.06| 0.36| -0.64|  0.53|
+|alpha_f[1] |  0.12| 0.32| -0.40|  0.64|
+|alpha_f[2] | -0.13| 0.32| -0.65|  0.39|
+|beta_jf[1] |  0.06| 0.34| -0.48|  0.61|
+|beta_jf[2] |  0.02| 0.34| -0.53|  0.56|
+|beta_wf[1] | -0.27| 0.34| -0.81|  0.27|
+|beta_wf[2] |  0.21| 0.34| -0.33|  0.75|
+|beta_jw[1] |  0.09| 0.35| -0.46|  0.65|
+|beta_jw[2] | -0.01| 0.34| -0.56|  0.54|
+|sigma      |  0.97| 0.05|  0.89|  1.05|
+
+
+```r
+p1 <- precis(model_wine_inter, depth = 2, pars = c("alpha", "beta")) %>% 
+  as_tibble_rn() %>%
+  mutate(type = str_remove(param, pattern =  "alpha_") %>% str_remove("\\[[0-9]*\\]"),
+         idx = str_extract(param, "[0-9]{1,2}") %>% as.integer(),
+         across(mean:`94.5%`,.fns = (function(x){ x * sd(data_wine$score) + mean(data_wine$score)}))) %>%
+  # left_join(wine_params, by = c("type", "idx")) %>%
+  # group_by(type) %>% 
+  # mutate(name = fct_reorder(name, mean),
+  #        name = str_c(str_pad(30 - as.numeric(name), width = 2, pad = 0),": ",name)) %>% 
+  # ungroup() %>% 
+  ggplot(aes(y = factor(idx), color = type)) +
+  # geom_vline(xintercept = 0, lty = 3, color = rgb(0,0,0,.6)) +
+  geom_pointinterval(aes(xmin = `5.5%`,x = mean,
+                     xmax =`94.5%`)) +
+  scale_color_manual(values = c(j = clr0d, w = clr0d, f = clr0d,
+                                beta_wf = clr1, beta_jw = clr1, beta_jf = clr1),
+                     guide = "none") +
+  facet_grid(type ~ . , scales = "free_y", switch = "y") +
+  labs(x = "score") +
+  scale_x_continuous(limits = c(7.5, 20)) +
+  theme(axis.title.y = element_blank(),
+        strip.placement = "outside")
+
+p2 <- data_wine %>% 
+  ggplot(aes(x = score)) +
+  geom_density(adjust = .6, color = clr0dd, fill = fll0) +
+  scale_x_continuous(limits = c(7.5, 20)) 
+
+p1 / p2 + plot_layout(heights = c(1,.2))
+```
+
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-36-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ## {brms} section
@@ -1005,7 +1878,7 @@ prior_rugged_restricted %>%
 p1 + p2
 ```
 
-<img src="rethinking_c8_files/figure-html/unnamed-chunk-29-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-41-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1186,7 +2059,7 @@ p2 <- fitted(brms_c8_model_rugged_index,
 p1 + p2 + plot_layout(guides = "collect") & theme(legend.position = "bottom")
 ```
 
-<img src="rethinking_c8_files/figure-html/unnamed-chunk-37-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-49-1.svg" width="672" style="display: block; margin: auto;" />
 
 #### Adding an interaction does work
 
@@ -1345,7 +2218,7 @@ tibble(Normal = brms_c8_model_rugged_slope$criteria$loo$diagnostics$pareto_k,
   coord_cartesian(ylim = c(1.5, 2.4))
 ```
 
-<img src="rethinking_c8_files/figure-html/unnamed-chunk-41-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-53-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1420,7 +2293,7 @@ data_rugged_centered %>%
   theme(legend.position = "none")
 ```
 
-<img src="rethinking_c8_files/figure-html/unnamed-chunk-43-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-55-1.svg" width="672" style="display: block; margin: auto;" />
 
 ### Symetry of Interactions
 
@@ -1450,7 +2323,7 @@ fitted(brms_c8_model_rugged_slope,
                   ylim = c(-0.3, 0.2))
 ```
 
-<img src="rethinking_c8_files/figure-html/unnamed-chunk-44-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-56-1.svg" width="672" style="display: block; margin: auto;" />
 
 ### Continuous Interactions
 
@@ -1560,7 +2433,7 @@ rbind(fitted(brms_c8_model_tulips_simple, newdata = new_data,
                   ylim = c(0, 1)) 
 ```
 
-<img src="rethinking_c8_files/figure-html/unnamed-chunk-47-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-59-1.svg" width="672" style="display: block; margin: auto;" />
 
 ### Plotting Prior Predictions
 
@@ -1613,7 +2486,7 @@ rbind(fitted(brms_c8_model_tulips_simple_prior, newdata = new_data,
                   expand = 0) 
 ```
 
-<img src="rethinking_c8_files/figure-html/unnamed-chunk-49-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-61-1.svg" width="672" style="display: block; margin: auto;" />
 
 ### {brms} `conditional_effects()`
 
@@ -1655,7 +2528,7 @@ p3 <- plot(c_eff, points = TRUE,
 p1 + p2 + p3
 ```
 
-<img src="rethinking_c8_files/figure-html/unnamed-chunk-51-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-63-1.svg" width="672" style="display: block; margin: auto;" />
 
 Simple bi-variate model, no interaction:
 
@@ -1679,7 +2552,7 @@ p <- plot(c_eff, points = TRUE,
 p[[1]] + p[[2]]
 ```
 
-<img src="rethinking_c8_files/figure-html/unnamed-chunk-53-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-65-1.svg" width="672" style="display: block; margin: auto;" />
 
 Non-linear interaction model:
 
@@ -1706,7 +2579,7 @@ p <- plot(c_eff, points = TRUE,
 p[[1]] + p[[2]]
 ```
 
-<img src="rethinking_c8_files/figure-html/unnamed-chunk-55-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-67-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1722,7 +2595,7 @@ p[[1]] +
   theme(legend.position = "bottom")
 ```
 
-<img src="rethinking_c8_files/figure-html/unnamed-chunk-56-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-68-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1736,7 +2609,7 @@ plot(c_eff, plot = FALSE)[[1]] +
   theme(legend.position = "bottom")
 ```
 
-<img src="rethinking_c8_files/figure-html/unnamed-chunk-57-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-69-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1779,7 +2652,7 @@ plot(c_eff,
   facet_wrap(~ shade_cent, labeller = label_both)
 ```
 
-<img src="rethinking_c8_files/figure-html/unnamed-chunk-60-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c8_files/figure-html/unnamed-chunk-72-1.svg" width="672" style="display: block; margin: auto;" />
 
 ## pymc3 section
 
