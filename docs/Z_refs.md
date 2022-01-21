@@ -41,7 +41,7 @@ sessionInfo()
 #>  [1] reticulate_1.22      bayesplot_1.8.1      mixedup_0.3.9       
 #>  [4] tidybayes_3.0.1      rethinking_2.21      cmdstanr_0.4.0.9000 
 #>  [7] rstan_2.21.2         StanHeaders_2.21.0-7 ggdag_0.2.3.9000    
-#> [10] GGally_1.5.0         ggtext_0.1.1         brms_2.16.1         
+#> [10] GGally_2.1.2         ggtext_0.1.1         brms_2.16.1         
 #> [13] Rcpp_1.0.6           EnvStats_2.4.0       ggraph_2.0.5.9000   
 #> [16] tidygraph_1.2.0      glue_1.4.2           patchwork_1.1.0.9000
 #> [19] prismatic_1.0.0.9000 forcats_0.5.1        stringr_1.4.0       
@@ -136,7 +136,7 @@ session_info.show(html = False)
 #> Python 3.8.10 (default, Nov 26 2021, 20:14:08) [GCC 9.3.0]
 #> Linux-5.11.0-46-generic-x86_64-with-glibc2.29
 #> -----
-#> Session information updated at 2022-01-12 17:36
+#> Session information updated at 2022-01-21 18:16
 ```
 
 <center>

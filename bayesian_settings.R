@@ -38,6 +38,9 @@ clr_grd5 <- c(clr0d, clr1, "black")
 
 clr_bayes <- c(prior = clr0d, likelihood = clr1, posterior = clr2)
 
+clr_current <- NULL
+fll_current <- function(){clr_alpha(clr_current)}
+
 fnt_sel <- "Josefin Sans"
 theme_set(theme_minimal(base_family = fnt_sel) +
             theme(plot.title = element_text(hjust = .5)))
@@ -112,4 +115,58 @@ knit_precis <- function(prec, param_name = "param"){
   d %>% 
     set_names(nm = c(param_name, names(d)[2:length(names(d))])) %>% 
     knitr::kable()
+}
+
+
+my_lower <- function(data, mapping, col = clr2, ...) {
+  ggplot(data = data, mapping = mapping) + 
+    geom_bin2d() +
+    scale_fill_gradient(low = clr0, 
+                        high = col) +
+    theme(panel.grid = element_blank())
+}
+
+my_upper <- function(...){
+  ggally_cor(...,display_grid = FALSE) + theme_void()
+}
+
+my_diag <- function(data, mapping, col = clr2, ...) {
+  require(ggdist)
+  ggplot(data = data, mapping = mapping) + 
+    stat_slab(slab_type = "pdf",
+              aes(fill_ramp = stat(cut_cdf_qi(cdf, .width = c(1, .95, 0.66)))),
+              color = col, size = .5,
+              adjust = .75,
+              normalize = "xy",
+              trim = FALSE, n = 301) +
+    scale_colour_ramp_discrete(from = col, aesthetics = "fill_ramp", guide = "none")+
+    theme(axis.text.y = element_blank(),
+          axis.title.y = element_blank())
+}
+
+
+posterior_pairs <- function(model, col = clr2, ...){
+  extract.samples(model) %>% 
+  as.data.frame() %>% 
+  as_tibble() %>% 
+  ggpairs(
+    lower = list(continuous = wrap(my_lower, col = col)),
+    diag = list(continuous = wrap(my_diag, fill = fll0,
+                                             col = col, adjust = .7)),
+    upper = list(continuous = wrap(my_upper ,
+                                   size = 5, color = "black", family = fnt_sel)),
+    ... ) +
+  theme(panel.border = element_rect(color = clr_dark, fill = "transparent"))
+}
+
+general_pairs <- function(data, col = clr2, ...){
+  data %>% 
+    ggpairs(
+      lower = list(continuous = wrap(my_lower, col = col)),
+      diag = list(continuous = wrap(my_diag, fill = fll0,
+                                    col = col, adjust = .7)),
+      upper = list(continuous = wrap(my_upper ,
+                                     size = 5, color = "black", family = fnt_sel)),
+      ... ) +
+    theme(panel.border = element_rect(color = clr_dark, fill = "transparent"))
 }

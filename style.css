@@ -66,6 +66,13 @@ hr {
 .think code {
   color: #E9E5D9 !important; }
 
+.beware blockquote {
+  color: #FFFFFF !important;
+  border-left: 4px solid #B35136 !important; }
+
+.think blockquote {
+  border-left: 4px solid #858585 !important; }
+
 /* code folding buttons ----------- */
 .button {
   color: #ccc; }
