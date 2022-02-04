@@ -938,7 +938,7 @@ data_sim_num %>%
 ```
 
 ```
-#> # A tibble: 1 x 1
+#> # A tibble: 1 × 1
 #>    mean
 #>   <dbl>
 #> 1 -4.59
@@ -3080,7 +3080,7 @@ mixedup::extract_fixef(brms_c5_model_spurious)
 ```
 
 ```
-#> # A tibble: 3 x 5
+#> # A tibble: 3 × 5
 #>   term      value    se lower_2.5 upper_97.5
 #>   <chr>     <dbl> <dbl>     <dbl>      <dbl>
 #> 1 Intercept 0.05  0.096    -0.135      0.242
@@ -3454,7 +3454,7 @@ mixedup::extract_fixef(brms_c5_model_milk_cortex_sim)
 ```
 
 ```
-#> # A tibble: 2 x 5
+#> # A tibble: 2 × 5
 #>   term          value    se lower_2.5 upper_97.5
 #>   <chr>         <dbl> <dbl>     <dbl>      <dbl>
 #> 1 Intercept     0.003 0.162    -0.324      0.321
@@ -3466,7 +3466,7 @@ mixedup::extract_fixef(brms_c5_model_milk_weight_sim)
 ```
 
 ```
-#> # A tibble: 2 x 5
+#> # A tibble: 2 × 5
 #>   term       value    se lower_2.5 upper_97.5
 #>   <chr>      <dbl> <dbl>     <dbl>      <dbl>
 #> 1 Intercept  0.005 0.152    -0.293      0.307
@@ -3478,7 +3478,7 @@ mixedup::extract_fixef(brms_c5_model_milk_multi_sim)
 ```
 
 ```
-#> # A tibble: 3 x 5
+#> # A tibble: 3 × 5
 #>   term           value    se lower_2.5 upper_97.5
 #>   <chr>          <dbl> <dbl>     <dbl>      <dbl>
 #> 1 Intercept     -0.047 0.081    -0.208      0.112
@@ -3605,7 +3605,7 @@ mixedup::extract_fixef(brms_c5_model_milk_house)
 ```
 
 ```
-#> # A tibble: 7 x 5
+#> # A tibble: 7 × 5
 #>   term                 value    se lower_2.5 upper_97.5
 #>   <chr>                <dbl> <dbl>     <dbl>      <dbl>
 #> 1 cladeApe            -0.431 0.261    -0.932      0.082
@@ -3661,7 +3661,7 @@ mixedup::extract_fixef(brms_c5_model_milk_house_correct_index)
 ```
 
 ```
-#> # A tibble: 8 x 5
+#> # A tibble: 8 × 5
 #>   term                   value    se lower_2.5 upper_97.5
 #>   <chr>                  <dbl> <dbl>     <dbl>      <dbl>
 #> 1 a_cladeApe            -0.395 0.28     -0.936      0.146

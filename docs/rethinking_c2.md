@@ -67,7 +67,7 @@ tibble(draws = 1:3,
 ```
 
 ```{=html}
-<template id="3861388b-ea30-43f3-aca2-da51bbe24932"><style>
+<template id="d94661f8-9631-4de9-a35a-88a0687339f2"><style>
 .tabwid table{
   border-spacing:0px !important;
   border-collapse:collapse;
@@ -101,15 +101,15 @@ tibble(draws = 1:3,
 .tabwid table tr {
 background-color: transparent;
 }
-</style><div class="tabwid"><style>.cl-37d36c0e{}.cl-37ce1c0e{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-37ce2ff0{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-37ce5cf0{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-37ce5d18{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-37ce5d22{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-37d36c0e'>
+</style><div class="tabwid"><style>.cl-8c0b740e{}.cl-8c065078{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-8c066428{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-8c069146{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c06915a{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c06916e{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class='cl-8c0b740e'>
 ```
 
 ```{=html}
-<thead><tr style="overflow-wrap:break-word;"><td class="cl-37ce5d22"><p class="cl-37ce2ff0"><span class="cl-37ce1c0e">draws</span></p></td><td class="cl-37ce5d22"><p class="cl-37ce2ff0"><span class="cl-37ce1c0e">marbles</span></p></td><td class="cl-37ce5d22"><p class="cl-37ce2ff0"><span class="cl-37ce1c0e">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-37ce5cf0"><p class="cl-37ce2ff0"><span class="cl-37ce1c0e">1</span></p></td><td class="cl-37ce5cf0"><p class="cl-37ce2ff0"><span class="cl-37ce1c0e">4</span></p></td><td class="cl-37ce5cf0"><p class="cl-37ce2ff0"><span class="cl-37ce1c0e">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-37ce5cf0"><p class="cl-37ce2ff0"><span class="cl-37ce1c0e">2</span></p></td><td class="cl-37ce5cf0"><p class="cl-37ce2ff0"><span class="cl-37ce1c0e">4</span></p></td><td class="cl-37ce5cf0"><p class="cl-37ce2ff0"><span class="cl-37ce1c0e">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-37ce5d18"><p class="cl-37ce2ff0"><span class="cl-37ce1c0e">3</span></p></td><td class="cl-37ce5d18"><p class="cl-37ce2ff0"><span class="cl-37ce1c0e">4</span></p></td><td class="cl-37ce5d18"><p class="cl-37ce2ff0"><span class="cl-37ce1c0e">64</span></p></td></tr></tbody></table></div></template>
-<div class="flextable-shadow-host" id="64b1e7ec-cc92-49a4-be22-833858da2c2c"></div>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-8c06916e"><p class="cl-8c066428"><span class="cl-8c065078">draws</span></p></td><td class="cl-8c06916e"><p class="cl-8c066428"><span class="cl-8c065078">marbles</span></p></td><td class="cl-8c06916e"><p class="cl-8c066428"><span class="cl-8c065078">possibilities</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-8c069146"><p class="cl-8c066428"><span class="cl-8c065078">1</span></p></td><td class="cl-8c069146"><p class="cl-8c066428"><span class="cl-8c065078">4</span></p></td><td class="cl-8c069146"><p class="cl-8c066428"><span class="cl-8c065078">4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-8c069146"><p class="cl-8c066428"><span class="cl-8c065078">2</span></p></td><td class="cl-8c069146"><p class="cl-8c066428"><span class="cl-8c065078">4</span></p></td><td class="cl-8c069146"><p class="cl-8c066428"><span class="cl-8c065078">16</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-8c06915a"><p class="cl-8c066428"><span class="cl-8c065078">3</span></p></td><td class="cl-8c06915a"><p class="cl-8c066428"><span class="cl-8c065078">4</span></p></td><td class="cl-8c06915a"><p class="cl-8c066428"><span class="cl-8c065078">64</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="e366bd96-fb0d-4001-8cbd-a9669946f1fa"></div>
 <script>
-var dest = document.getElementById("64b1e7ec-cc92-49a4-be22-833858da2c2c");
-var template = document.getElementById("3861388b-ea30-43f3-aca2-da51bbe24932");
+var dest = document.getElementById("e366bd96-fb0d-4001-8cbd-a9669946f1fa");
+var template = document.getElementById("d94661f8-9631-4de9-a35a-88a0687339f2");
 var caption = template.content.querySelector("caption");
 if(caption) {
   caption.style.cssText = "display:block;text-align:center;";
@@ -328,7 +328,7 @@ d %>%
 ```
 
 ```
-#> # A tibble: 450 x 6
+#> # A tibble: 450 × 6
 #> # Groups:   p_water [50]
 #>    n_trials toss  n_success p_water lagged_n_trials lagged_n_success
 #>       <int> <chr>     <int>   <dbl>           <int>            <int>
@@ -516,19 +516,133 @@ compare_qa(w_in = 24, l_in = 12)
 ```
 #> 
 #> 
-#> |      mean|        sd|      5.5%|     94.5%|qa         |
-#> |---------:|---------:|---------:|---------:|:----------|
-#> | 0.6666668| 0.1571338| 0.4155367| 0.9177969|W: 6, L: 3 |
+#> <table class="kable_wrapper">
+#> <tbody>
+#>   <tr>
+#>    <td> 
+#> 
+#> |         x|
+#> |---------:|
+#> | 0.6666666|
+#> 
+#>  </td>
+#>    <td> 
+#> 
+#> |         x|
+#> |---------:|
+#> | 0.1571338|
+#> 
+#>  </td>
+#>    <td> 
+#> 
+#> |         x|
+#> |---------:|
+#> | 0.4155365|
+#> 
+#>  </td>
+#>    <td> 
+#> 
+#> |         x|
+#> |---------:|
+#> | 0.9177968|
+#> 
+#>  </td>
+#>    <td> 
+#> 
+#> |x          |
+#> |:----------|
+#> |W: 6, L: 3 |
+#> 
+#>  </td>
+#>   </tr>
+#> </tbody>
+#> </table>
 #> 
 #> 
-#> |      mean|        sd|      5.5%|     94.5%|qa          |
-#> |---------:|---------:|---------:|---------:|:-----------|
-#> | 0.6666662| 0.1111104| 0.4890902| 0.8442421|W: 12, L: 6 |
+#> <table class="kable_wrapper">
+#> <tbody>
+#>   <tr>
+#>    <td> 
+#> 
+#> |         x|
+#> |---------:|
+#> | 0.6666662|
+#> 
+#>  </td>
+#>    <td> 
+#> 
+#> |         x|
+#> |---------:|
+#> | 0.1111104|
+#> 
+#>  </td>
+#>    <td> 
+#> 
+#> |         x|
+#> |---------:|
+#> | 0.4890902|
+#> 
+#>  </td>
+#>    <td> 
+#> 
+#> |         x|
+#> |---------:|
+#> | 0.8442421|
+#> 
+#>  </td>
+#>    <td> 
+#> 
+#> |x           |
+#> |:-----------|
+#> |W: 12, L: 6 |
+#> 
+#>  </td>
+#>   </tr>
+#> </tbody>
+#> </table>
 #> 
 #> 
-#> |      mean|        sd|      5.5%|     94.5%|qa           |
-#> |---------:|---------:|---------:|---------:|:------------|
-#> | 0.6666665| 0.0785669| 0.5411014| 0.7922316|W: 24, L: 12 |
+#> <table class="kable_wrapper">
+#> <tbody>
+#>   <tr>
+#>    <td> 
+#> 
+#> |        x|
+#> |--------:|
+#> | 0.666667|
+#> 
+#>  </td>
+#>    <td> 
+#> 
+#> |         x|
+#> |---------:|
+#> | 0.0785669|
+#> 
+#>  </td>
+#>    <td> 
+#> 
+#> |        x|
+#> |--------:|
+#> | 0.541102|
+#> 
+#>  </td>
+#>    <td> 
+#> 
+#> |        x|
+#> |--------:|
+#> | 0.792232|
+#> 
+#>  </td>
+#>    <td> 
+#> 
+#> |x            |
+#> |:------------|
+#> |W: 24, L: 12 |
+#> 
+#>  </td>
+#>   </tr>
+#> </tbody>
+#> </table>
 ```
 
 <img src="rethinking_c2_files/figure-html/unnamed-chunk-17-1.svg" width="672" style="display: block; margin: auto;" />
@@ -840,7 +954,7 @@ tibble(pr_on_testa = c("A","B"),
 ```
 
 ```
-#> # A tibble: 2 x 2
+#> # A tibble: 2 × 2
 #>   pr_on_testa genetic_test
 #>   <chr>              <dbl>
 #> 1 A                  0.696
@@ -858,7 +972,7 @@ tibble(pr_on_testa = c("A","B"),
 ```
 
 ```
-#> # A tibble: 2 x 2
+#> # A tibble: 2 × 2
 #>   pr_on_testa genetic_test
 #>   <chr>              <dbl>
 #> 1 A                  0.562

@@ -43,7 +43,8 @@ fll_current <- function(){clr_alpha(clr_current)}
 
 fnt_sel <- "Josefin Sans"
 theme_set(theme_minimal(base_family = fnt_sel) +
-            theme(plot.title = element_text(hjust = .5)))
+            theme(plot.title = element_text(hjust = .5),
+                  plot.subtitle = element_text(hjust = .5)))
 
 mth <- function(str){
   str_c("<span style = 'font-family:Helvetica;'>", str, "</span>")

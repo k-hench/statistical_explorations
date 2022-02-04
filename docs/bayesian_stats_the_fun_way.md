@@ -518,7 +518,7 @@ p_b_superior
 ```
 
 ```
-#> [1] 0.9585
+#> [1] 0.95905
 ```
 
 ```r
@@ -633,7 +633,7 @@ bayes_fs %>%
 ```
 
 ```
-#> # A tibble: 1 x 1
+#> # A tibble: 1 × 1
 #>   p_lower_than_half
 #>               <dbl>
 #> 1              1.00

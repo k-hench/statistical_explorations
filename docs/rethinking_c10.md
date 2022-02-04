@@ -162,7 +162,7 @@ data_binom
 ```
 
 ```
-#> # A tibble: 4 x 4
+#> # A tibble: 4 × 4
 #>   distribution p         exp_val entropy
 #>   <chr>        <list>      <dbl>   <dbl>
 #> 1 A            <dbl [4]>       1    1.39

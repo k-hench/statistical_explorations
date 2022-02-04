@@ -70,6 +70,9 @@ hr {
   color: #FFFFFF !important;
   border-left: 4px solid #B35136 !important; }
 
+.book .book-body .page-wrapper .page-inner section.normal .beware a {
+  color: #FFFFFF !important; }
+
 .think blockquote {
   border-left: 4px solid #858585 !important; }
 

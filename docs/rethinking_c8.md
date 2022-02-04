@@ -1462,9 +1462,9 @@ compare(model_lang_dur_area,
 
 |model               |   WAIC|    SE| dWAIC|  dSE| pWAIC| weight|
 |:-------------------|------:|-----:|-----:|----:|-----:|------:|
-|model_lang_inter    | 208.31| 17.09|  0.00|   NA|  3.16|   0.46|
-|model_lang_dur_area | 208.81| 16.68|  0.50| 4.13|  4.05|   0.35|
-|model_lang_sd_area  | 210.06| 16.83|  1.75| 3.59|  3.99|   0.19|
+|model_lang_inter    | 208.58| 17.13|  0.00|   NA|  3.32|   0.43|
+|model_lang_dur_area | 208.70| 16.77|  0.12| 4.40|  4.04|   0.40|
+|model_lang_sd_area  | 210.40| 17.17|  1.82| 3.69|  4.15|   0.17|
 
 **H5**
 
@@ -1813,7 +1813,7 @@ prior_rugged_draft %>%
 ```
 
 ```
-#> # A tibble: 1 x 1
+#> # A tibble: 1 × 1
 #>       a
 #>   <dbl>
 #> 1 0.552
@@ -1866,7 +1866,7 @@ prior_rugged_restricted %>%
 ```
 
 ```
-#> # A tibble: 1 x 1
+#> # A tibble: 1 × 1
 #>        a
 #>    <dbl>
 #> 1 0.0382
@@ -1979,7 +1979,7 @@ qi(posterior_rugged_index$diff, .width = .89) %>% as_tibble()
 ```
 
 ```
-#> # A tibble: 1 x 2
+#> # A tibble: 1 × 2
 #>       V1     V2
 #>    <dbl>  <dbl>
 #> 1 -0.200 -0.138
@@ -2146,7 +2146,7 @@ tibble(k = brms_c8_model_rugged_slope$criteria$loo$diagnostics$pareto_k,
 ```
 
 ```
-#> # A tibble: 170 x 2
+#> # A tibble: 170 × 2
 #>        k   row
 #>    <dbl> <int>
 #>  1 0.512   145

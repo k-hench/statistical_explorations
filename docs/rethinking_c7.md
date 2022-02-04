@@ -476,7 +476,7 @@ tibble(model_degree = 1:6,
 ```
 
 ```
-#> # A tibble: 6 x 3
+#> # A tibble: 6 × 3
 #>   model_degree model  log_prob_score
 #>          <int> <list>          <dbl>
 #> 1            1 <map>            2.42
@@ -800,7 +800,7 @@ comp_waic %>%
 ```
 
 ```
-#> # A tibble: 3 x 8
+#> # A tibble: 3 × 8
 #>   model           WAIC    SE dWAIC   dSE pWAIC   weight deviance
 #>   <chr>          <dbl> <dbl> <dbl> <dbl> <dbl>    <dbl>    <dbl>
 #> 1 post_treatment  361.  14.2   0    NA    3.57 1.00e+ 0     354.
@@ -820,7 +820,7 @@ compare(chapter6_models$model_fungus_post_treatment,
 ```
 
 ```
-#> # A tibble: 3 x 7
+#> # A tibble: 3 × 7
 #>    PSIS    SE dPSIS   dSE pPSIS   weight param                                  
 #>   <dbl> <dbl> <dbl> <dbl> <dbl>    <dbl> <chr>                                  
 #> 1  362.  14.3   0    NA    3.93 1.00e+ 0 chapter6_models$model_fungus_post_trea…
@@ -843,7 +843,7 @@ tibble(post_treatment = WAIC(chapter6_models$model_fungus_post_treatment, pointw
 ```
 
 ```
-#> # A tibble: 2 x 2
+#> # A tibble: 2 × 2
 #>   comparison se_of_model_differnce
 #>   <chr>                      <dbl>
 #> 1 post-only                  10.5 
@@ -929,7 +929,7 @@ compare(chapter5_models$model_age,
 ```
 
 ```
-#> # A tibble: 3 x 7
+#> # A tibble: 3 × 7
 #>    WAIC    SE dWAIC    dSE pWAIC   weight param                         
 #>   <dbl> <dbl> <dbl>  <dbl> <dbl>    <dbl> <chr>                         
 #> 1  127.  14.2  0    NA      4.41 0.679    chapter5_models$model_age     
@@ -1015,7 +1015,7 @@ PSIS(chapter5_models$model_multiple)
 
 ```
 #>       PSIS      lppd  penalty  std_err
-#> 1 130.3451 -65.17254 6.370172 15.83098
+#> 1 131.1055 -65.55275 6.770658 16.10847
 ```
 
 With the *Student T* distribution as a the likelihood, $k$ is reduced as there is more mass in the tails of the distribution (thus, Idaho is less *surprising*)
@@ -1026,8 +1026,8 @@ PSIS(model_multiple_sudent)
 ```
 
 ```
-#>       PSIS      lppd  penalty std_err
-#> 1 133.5574 -66.77871 6.799953 11.9602
+#>       PSIS      lppd  penalty  std_err
+#> 1 134.2833 -67.14166 7.215684 11.86066
 ```
 
 
@@ -1802,7 +1802,7 @@ data_birds %>%
 ```
 
 ```
-#> # A tibble: 3 x 8
+#> # A tibble: 3 × 8
 #>   island species_a species_b species_c species_d species_e total entropy
 #>    <int>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl> <dbl>   <dbl>
 #> 1      1      0.2       0.2       0.2      0.2       0.2       1   1.61 
@@ -2387,7 +2387,7 @@ weather_happy %>%
 ```
 
 ```
-#> # A tibble: 2 x 3
+#> # A tibble: 2 × 3
 #>   person        total_hit total_happy
 #>   <chr>             <dbl>       <dbl>
 #> 1 newcomer            7         -15  
@@ -2402,7 +2402,7 @@ weather_happy %>% count(person, hit) %>%
 ```
 
 ```
-#> # A tibble: 2 x 2
+#> # A tibble: 2 × 2
 #>   person        joint_likelihood
 #>   <chr>                    <dbl>
 #> 1 newcomer               0      
@@ -2422,7 +2422,7 @@ tibble(direction = c("Earth to Mars", "Mars to Earth"),
 ```
 
 ```
-#> # A tibble: 2 x 6
+#> # A tibble: 2 × 6
 #>   direction       p_1   q_1   p_2   q_2  d_kl
 #>   <chr>         <dbl> <dbl> <dbl> <dbl> <dbl>
 #> 1 Earth to Mars  0.01  0.7   0.99  0.3   1.14
@@ -2447,7 +2447,7 @@ tibble(direction = c("Earth to Mars", "Mars to Earth"),
 ```
 
 ```
-#> # A tibble: 7 x 2
+#> # A tibble: 7 × 2
 #>   species     log_probability_score
 #>   <chr>                       <dbl>
 #> 1 afarensis                   0.379
@@ -2465,7 +2465,7 @@ lppd_by_sepc %>%
 ```
 
 ```
-#> # A tibble: 1 x 1
+#> # A tibble: 1 × 1
 #>   total_log_probability_score
 #>                         <dbl>
 #> 1                        1.40
@@ -2500,7 +2500,7 @@ brms_prob_score %>%
 ```
 
 ```
-#> # A tibble: 1 x 1
+#> # A tibble: 1 × 1
 #>   total_log_probability_score
 #>                         <dbl>
 #> 1                        1.40
@@ -2530,7 +2530,7 @@ tibble(name = str_c("brms_c7_model_brain_size", c("",2:6))) %>%
 ```
 
 ```
-#> # A tibble: 6 x 3
+#> # A tibble: 6 × 3
 #>   name                      brms_fit  total_log_probability_score
 #>   <chr>                     <list>                          <dbl>
 #> 1 brms_c7_model_brain_size  <brmsfit>                       1.40 
@@ -2655,7 +2655,7 @@ waic(brms_c7_model_cars)$pointwise %>%
 ```
 
 ```
-#> # A tibble: 50 x 3
+#> # A tibble: 50 × 3
 #>    elpd_waic p_waic  waic
 #>        <dbl>  <dbl> <dbl>
 #>  1     -3.65 0.0217  7.30
@@ -2755,7 +2755,7 @@ tibble(waic_no_treatment = brms_c6_model_fungus_no_treatment$criteria$waic$point
 ```
 
 ```
-#> # A tibble: 1 x 1
+#> # A tibble: 1 × 1
 #>   diff_se
 #>     <dbl>
 #> 1    11.6
@@ -2885,7 +2885,7 @@ chapter5_models$data_waffle %>%
 ```
 
 ```
-#> # A tibble: 1 x 2
+#> # A tibble: 1 × 2
 #>   Location Loc  
 #>   <fct>    <fct>
 #> 1 Idaho    ID
@@ -3026,7 +3026,7 @@ rbind(bayes_R2(brms_c5_model_multiple),
 ```
 
 ```
-#> # A tibble: 3 x 2
+#> # A tibble: 3 × 2
 #>   model                  r_square_posterior_mean
 #>   <chr>                                    <dbl>
 #> 1 brms_c5_model_multiple                   0.329

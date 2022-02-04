@@ -102,7 +102,7 @@ data.frame(a = my_samples) %>%
 ```
 
 ```
-#> # A tibble: 1 x 1
+#> # A tibble: 1 × 1
 #>      rho
 #>    <dbl>
 #> 1 -0.911
@@ -1331,14 +1331,14 @@ compare(chapter5_models$model_age,
 ```
 
 ```
-#>                                    WAIC       SE     dWAIC        dSE    pWAIC
-#> chapter5_models$model_age      127.2709 14.41303  0.000000         NA 4.596135
-#> chapter5_models$model_multiple 129.1756 14.48622  1.904769  0.9899689 5.820602
-#> chapter5_models$model_marriage 140.1808 10.89342 12.909909 10.7798137 3.512297
+#>                                    WAIC       SE    dWAIC        dSE    pWAIC
+#> chapter5_models$model_age      127.2710 14.41392  0.00000         NA 4.596311
+#> chapter5_models$model_multiple 129.1756 14.48622  1.90464  0.9901551 5.820602
+#> chapter5_models$model_marriage 140.1808 10.89342 12.90978 10.7806058 3.512297
 #>                                     weight
-#> chapter5_models$model_age      0.720776443
-#> chapter5_models$model_multiple 0.278089984
-#> chapter5_models$model_marriage 0.001133573
+#> chapter5_models$model_age      0.720763509
+#> chapter5_models$model_multiple 0.278102866
+#> chapter5_models$model_marriage 0.001133625
 ```
 
 
@@ -1621,7 +1621,7 @@ as_draws_df(brms_c9_model_rugged_slope)  %>%
 ```
 
 ```
-#> # A tibble: 8 x 7
+#> # A tibble: 8 × 7
 #>   name            value  .lower   .upper .width .point .interval
 #>   <chr>           <dbl>   <dbl>    <dbl>  <dbl> <chr>  <chr>    
 #> 1 .chain          1      1        1        0.89 mean   hdi      

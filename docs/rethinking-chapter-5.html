@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6 Rethinking: Chapter 5 | Statistical Explorations</title>
   <meta name="description" content="statistical explorations by kh" />
-  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6 Rethinking: Chapter 5 | Statistical Explorations" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Kosmas Hench" />
 
 
-<meta name="date" content="2022-01-21" />
+<meta name="date" content="2022-02-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,9 @@
   
 <link rel="prev" href="rethinking-chapter-4.html"/>
 <link rel="next" href="rethinking-chapter-6.html"/>
-<script src="libs/header-attrs-2.9.6/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.11.15/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -50,7 +51,9 @@
 
 
 
-
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <link href="libs/tabwid-1.0.0/tabwid.css" rel="stylesheet" />
 
 <script>
@@ -650,6 +653,29 @@ code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
 
@@ -666,292 +692,337 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="https://github.com/k-hench/statistical_explorations">github repository</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Intro</a></li>
-<li class="chapter" data-level="2" data-path="rethinking-chapter-1.html"><a href="rethinking-chapter-1.html"><i class="fa fa-check"></i><b>2</b> Rethinking: Chapter 1</a></li>
-<li class="chapter" data-level="3" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html"><i class="fa fa-check"></i><b>3</b> Rethinking: Chapter 2</a>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Intro<span></span></a></li>
+<li class="chapter" data-level="2" data-path="rethinking-chapter-1.html"><a href="rethinking-chapter-1.html"><i class="fa fa-check"></i><b>2</b> Rethinking: Chapter 1<span></span></a></li>
+<li class="chapter" data-level="3" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html"><i class="fa fa-check"></i><b>3</b> Rethinking: Chapter 2<span></span></a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#counting-possibilities"><i class="fa fa-check"></i><b>3.1</b> Counting possibilities</a></li>
-<li class="chapter" data-level="3.2" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#building-a-model"><i class="fa fa-check"></i><b>3.2</b> Building a Model</a></li>
-<li class="chapter" data-level="3.3" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#making-the-model-go-bayes-theorem"><i class="fa fa-check"></i><b>3.3</b> Making the model go / Bayes’ Theorem</a></li>
-<li class="chapter" data-level="3.4" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#motors-grid-approximation"><i class="fa fa-check"></i><b>3.4</b> Motors: Grid Approximation</a></li>
-<li class="chapter" data-level="3.5" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#quadratic-approximation"><i class="fa fa-check"></i><b>3.5</b> Quadratic Approximation</a></li>
-<li class="chapter" data-level="3.6" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#marcov-chain-monte-carlo-mcmc"><i class="fa fa-check"></i><b>3.6</b> Marcov Chain Monte Carlo (MCMC)</a></li>
-<li class="chapter" data-level="3.7" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#homework"><i class="fa fa-check"></i><b>3.7</b> Homework</a></li>
-<li class="chapter" data-level="3.8" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#brms-section"><i class="fa fa-check"></i><b>3.8</b> {brms} section</a></li>
-<li class="chapter" data-level="3.9" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#pymc3-section"><i class="fa fa-check"></i><b>3.9</b> pymc3 section</a></li>
+<li class="chapter" data-level="3.1" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#counting-possibilities"><i class="fa fa-check"></i><b>3.1</b> Counting possibilities<span></span></a></li>
+<li class="chapter" data-level="3.2" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#building-a-model"><i class="fa fa-check"></i><b>3.2</b> Building a Model<span></span></a></li>
+<li class="chapter" data-level="3.3" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#making-the-model-go-bayes-theorem"><i class="fa fa-check"></i><b>3.3</b> Making the model go / Bayes’ Theorem<span></span></a></li>
+<li class="chapter" data-level="3.4" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#motors-grid-approximation"><i class="fa fa-check"></i><b>3.4</b> Motors: Grid Approximation<span></span></a></li>
+<li class="chapter" data-level="3.5" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#quadratic-approximation"><i class="fa fa-check"></i><b>3.5</b> Quadratic Approximation<span></span></a></li>
+<li class="chapter" data-level="3.6" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#marcov-chain-monte-carlo-mcmc"><i class="fa fa-check"></i><b>3.6</b> Marcov Chain Monte Carlo (MCMC)<span></span></a></li>
+<li class="chapter" data-level="3.7" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#homework"><i class="fa fa-check"></i><b>3.7</b> Homework<span></span></a></li>
+<li class="chapter" data-level="3.8" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#brms-section"><i class="fa fa-check"></i><b>3.8</b> {brms} section<span></span></a></li>
+<li class="chapter" data-level="3.9" data-path="rethinking-chapter-2.html"><a href="rethinking-chapter-2.html#pymc3-section"><i class="fa fa-check"></i><b>3.9</b> pymc3 section<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html"><i class="fa fa-check"></i><b>4</b> Rethinking: Chapter 3</a>
+<li class="chapter" data-level="4" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html"><i class="fa fa-check"></i><b>4</b> Rethinking: Chapter 3<span></span></a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#sampling-from-a-grid-approximate-posterior"><i class="fa fa-check"></i><b>4.1</b> Sampling from a grid approximate posterior</a></li>
-<li class="chapter" data-level="4.2" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#sampling-to-summarize"><i class="fa fa-check"></i><b>4.2</b> Sampling to Summarize</a>
+<li class="chapter" data-level="4.1" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#sampling-from-a-grid-approximate-posterior"><i class="fa fa-check"></i><b>4.1</b> Sampling from a grid approximate posterior<span></span></a></li>
+<li class="chapter" data-level="4.2" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#sampling-to-summarize"><i class="fa fa-check"></i><b>4.2</b> Sampling to Summarize<span></span></a>
 <ul>
-<li class="chapter" data-level="4.2.1" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#intervals-of-devined-boundaries"><i class="fa fa-check"></i><b>4.2.1</b> Intervals of devined boundaries</a></li>
-<li class="chapter" data-level="4.2.2" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#intervals-of-defined-mass"><i class="fa fa-check"></i><b>4.2.2</b> Intervals of defined mass</a></li>
+<li class="chapter" data-level="4.2.1" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#intervals-of-devined-boundaries"><i class="fa fa-check"></i><b>4.2.1</b> Intervals of devined boundaries<span></span></a></li>
+<li class="chapter" data-level="4.2.2" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#intervals-of-defined-mass"><i class="fa fa-check"></i><b>4.2.2</b> Intervals of defined mass<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="4.3" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#point-estimates"><i class="fa fa-check"></i><b>4.3</b> Point estimates</a></li>
-<li class="chapter" data-level="4.4" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#sample-to-simulate-prediction"><i class="fa fa-check"></i><b>4.4</b> sample to simulate prediction</a></li>
-<li class="chapter" data-level="4.5" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#homework-1"><i class="fa fa-check"></i><b>4.5</b> Homework</a></li>
-<li class="chapter" data-level="4.6" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#brms-section-1"><i class="fa fa-check"></i><b>4.6</b> {brms} section</a></li>
-<li class="chapter" data-level="4.7" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#pymc3-section-1"><i class="fa fa-check"></i><b>4.7</b> pymc3 section</a></li>
+<li class="chapter" data-level="4.3" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#point-estimates"><i class="fa fa-check"></i><b>4.3</b> Point estimates<span></span></a></li>
+<li class="chapter" data-level="4.4" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#sample-to-simulate-prediction"><i class="fa fa-check"></i><b>4.4</b> sample to simulate prediction<span></span></a></li>
+<li class="chapter" data-level="4.5" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#homework-1"><i class="fa fa-check"></i><b>4.5</b> Homework<span></span></a></li>
+<li class="chapter" data-level="4.6" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#brms-section-1"><i class="fa fa-check"></i><b>4.6</b> {brms} section<span></span></a></li>
+<li class="chapter" data-level="4.7" data-path="rethinking-chapter-3.html"><a href="rethinking-chapter-3.html#pymc3-section-1"><i class="fa fa-check"></i><b>4.7</b> pymc3 section<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html"><i class="fa fa-check"></i><b>5</b> Rethinking: Chapter 4</a>
+<li class="chapter" data-level="5" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html"><i class="fa fa-check"></i><b>5</b> Rethinking: Chapter 4<span></span></a>
 <ul>
-<li class="chapter" data-level="5.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#why-normal-distributions-are-normal"><i class="fa fa-check"></i><b>5.1</b> Why normal distributions are normal</a>
+<li class="chapter" data-level="5.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#why-normal-distributions-are-normal"><i class="fa fa-check"></i><b>5.1</b> Why normal distributions are normal<span></span></a>
 <ul>
-<li class="chapter" data-level="5.1.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#normal-by-addition"><i class="fa fa-check"></i><b>5.1.1</b> Normal by addition</a></li>
+<li class="chapter" data-level="5.1.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#normal-by-addition"><i class="fa fa-check"></i><b>5.1.1</b> Normal by addition<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="5.2" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#normal-by-multiplication-and-by-log-multiplication"><i class="fa fa-check"></i><b>5.2</b> Normal by multiplication and by log-multiplication</a>
+<li class="chapter" data-level="5.2" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#normal-by-multiplication-and-by-log-multiplication"><i class="fa fa-check"></i><b>5.2</b> Normal by multiplication and by log-multiplication<span></span></a>
 <ul>
-<li class="chapter" data-level="5.2.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#using-the-gaussian-distribution"><i class="fa fa-check"></i><b>5.2.1</b> using the Gaussian distribution</a></li>
+<li class="chapter" data-level="5.2.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#using-the-gaussian-distribution"><i class="fa fa-check"></i><b>5.2.1</b> using the Gaussian distribution<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="5.3" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#a-language-for-describing-models"><i class="fa fa-check"></i><b>5.3</b> A language for describing models</a>
+<li class="chapter" data-level="5.3" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#a-language-for-describing-models"><i class="fa fa-check"></i><b>5.3</b> A language for describing models<span></span></a>
 <ul>
-<li class="chapter" data-level="5.3.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#gaussian-model-of-height"><i class="fa fa-check"></i><b>5.3.1</b> Gaussian model of height</a></li>
+<li class="chapter" data-level="5.3.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#gaussian-model-of-height"><i class="fa fa-check"></i><b>5.3.1</b> Gaussian model of height<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="5.4" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#linear-prediction"><i class="fa fa-check"></i><b>5.4</b> Linear Prediction</a>
+<li class="chapter" data-level="5.4" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#linear-prediction"><i class="fa fa-check"></i><b>5.4</b> Linear Prediction<span></span></a>
 <ul>
-<li class="chapter" data-level="5.4.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#finding-the-posterior-distribution"><i class="fa fa-check"></i><b>5.4.1</b> Finding the posterior Distribution</a></li>
+<li class="chapter" data-level="5.4.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#finding-the-posterior-distribution"><i class="fa fa-check"></i><b>5.4.1</b> Finding the posterior Distribution<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="5.5" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#curves-from-lines"><i class="fa fa-check"></i><b>5.5</b> Curves from lines</a></li>
-<li class="chapter" data-level="5.6" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#splines"><i class="fa fa-check"></i><b>5.6</b> Splines</a></li>
-<li class="chapter" data-level="5.7" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#homework-2"><i class="fa fa-check"></i><b>5.7</b> Homework</a></li>
-<li class="chapter" data-level="5.8" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#brms-section-2"><i class="fa fa-check"></i><b>5.8</b> {brms} section</a>
+<li class="chapter" data-level="5.5" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#curves-from-lines"><i class="fa fa-check"></i><b>5.5</b> Curves from lines<span></span></a></li>
+<li class="chapter" data-level="5.6" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#splines"><i class="fa fa-check"></i><b>5.6</b> Splines<span></span></a></li>
+<li class="chapter" data-level="5.7" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#homework-2"><i class="fa fa-check"></i><b>5.7</b> Homework<span></span></a></li>
+<li class="chapter" data-level="5.8" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#brms-section-2"><i class="fa fa-check"></i><b>5.8</b> {brms} section<span></span></a>
 <ul>
-<li class="chapter" data-level="5.8.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#linear-model-of-adult-height"><i class="fa fa-check"></i><b>5.8.1</b> linear model of adult height</a></li>
+<li class="chapter" data-level="5.8.1" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#linear-model-of-adult-height"><i class="fa fa-check"></i><b>5.8.1</b> linear model of adult height<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="5.9" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#pymc3-section-2"><i class="fa fa-check"></i><b>5.9</b> pymc3 section</a></li>
+<li class="chapter" data-level="5.9" data-path="rethinking-chapter-4.html"><a href="rethinking-chapter-4.html#pymc3-section-2"><i class="fa fa-check"></i><b>5.9</b> pymc3 section<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html"><i class="fa fa-check"></i><b>6</b> Rethinking: Chapter 5</a>
+<li class="chapter" data-level="6" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html"><i class="fa fa-check"></i><b>6</b> Rethinking: Chapter 5<span></span></a>
 <ul>
-<li class="chapter" data-level="6.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#directed-acyclic-graphs"><i class="fa fa-check"></i><b>6.1</b> Directed Acyclic Graphs</a></li>
-<li class="chapter" data-level="6.2" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multiple-regression-notion"><i class="fa fa-check"></i><b>6.2</b> Multiple Regression notion</a>
+<li class="chapter" data-level="6.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#directed-acyclic-graphs"><i class="fa fa-check"></i><b>6.1</b> Directed Acyclic Graphs<span></span></a></li>
+<li class="chapter" data-level="6.2" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multiple-regression-notion"><i class="fa fa-check"></i><b>6.2</b> Multiple Regression notion<span></span></a>
 <ul>
-<li class="chapter" data-level="6.2.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#visualizations-for-multivariate-regressions"><i class="fa fa-check"></i><b>6.2.1</b> Visualizations for multivariate regressions</a></li>
+<li class="chapter" data-level="6.2.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#visualizations-for-multivariate-regressions"><i class="fa fa-check"></i><b>6.2.1</b> Visualizations for multivariate regressions<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6.3" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#masked-relationship"><i class="fa fa-check"></i><b>6.3</b> Masked relationship</a>
+<li class="chapter" data-level="6.3" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#masked-relationship"><i class="fa fa-check"></i><b>6.3</b> Masked relationship<span></span></a>
 <ul>
-<li class="chapter" data-level="6.3.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#bi-variate-models"><i class="fa fa-check"></i><b>6.3.1</b> Bi-variate models</a></li>
-<li class="chapter" data-level="6.3.2" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#simulate-a-masking-relationship"><i class="fa fa-check"></i><b>6.3.2</b> Simulate a masking relationship</a></li>
+<li class="chapter" data-level="6.3.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#bi-variate-models"><i class="fa fa-check"></i><b>6.3.1</b> Bi-variate models<span></span></a></li>
+<li class="chapter" data-level="6.3.2" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#simulate-a-masking-relationship"><i class="fa fa-check"></i><b>6.3.2</b> Simulate a masking relationship<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6.4" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#categorical-variables"><i class="fa fa-check"></i><b>6.4</b> Categorical Variables</a>
+<li class="chapter" data-level="6.4" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#categorical-variables"><i class="fa fa-check"></i><b>6.4</b> Categorical Variables<span></span></a>
 <ul>
-<li class="chapter" data-level="6.4.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#indicator-vs.-index-variable-binary-categories"><i class="fa fa-check"></i><b>6.4.1</b> Indicator vs. Index variable (binary categories)</a></li>
-<li class="chapter" data-level="6.4.2" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multiple-categories"><i class="fa fa-check"></i><b>6.4.2</b> Multiple categories</a></li>
+<li class="chapter" data-level="6.4.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#indicator-vs.-index-variable-binary-categories"><i class="fa fa-check"></i><b>6.4.1</b> Indicator vs. Index variable (binary categories)<span></span></a></li>
+<li class="chapter" data-level="6.4.2" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multiple-categories"><i class="fa fa-check"></i><b>6.4.2</b> Multiple categories<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6.5" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#homework-3"><i class="fa fa-check"></i><b>6.5</b> Homework</a></li>
-<li class="chapter" data-level="6.6" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#brms-section-3"><i class="fa fa-check"></i><b>6.6</b> {brms} section</a>
+<li class="chapter" data-level="6.5" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#homework-3"><i class="fa fa-check"></i><b>6.5</b> Homework<span></span></a></li>
+<li class="chapter" data-level="6.6" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#brms-section-3"><i class="fa fa-check"></i><b>6.6</b> {brms} section<span></span></a>
 <ul>
-<li class="chapter" data-level="6.6.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#age-at-marriage-model"><i class="fa fa-check"></i><b>6.6.1</b> Age at marriage Model</a></li>
-<li class="chapter" data-level="6.6.2" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#marriage-rate-model"><i class="fa fa-check"></i><b>6.6.2</b> Marriage rate Model</a></li>
-<li class="chapter" data-level="6.6.3" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multiple-regression"><i class="fa fa-check"></i><b>6.6.3</b> Multiple regression</a></li>
-<li class="chapter" data-level="6.6.4" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multivariate-posteriors"><i class="fa fa-check"></i><b>6.6.4</b> Multivariate Posteriors</a></li>
-<li class="chapter" data-level="6.6.5" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#counterfactual-plots-1"><i class="fa fa-check"></i><b>6.6.5</b> Counterfactual plots</a></li>
-<li class="chapter" data-level="6.6.6" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#masked-relationships"><i class="fa fa-check"></i><b>6.6.6</b> Masked Relationships</a></li>
-<li class="chapter" data-level="6.6.7" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#categorical-variables-1"><i class="fa fa-check"></i><b>6.6.7</b> Categorical Variables</a></li>
-<li class="chapter" data-level="6.6.8" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#alternative-ways-to-model-multiple-categories"><i class="fa fa-check"></i><b>6.6.8</b> Alternative ways to model multiple categories</a></li>
-<li class="chapter" data-level="6.6.9" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multilevel-anova"><i class="fa fa-check"></i><b>6.6.9</b> Multilevel ANOVA</a></li>
+<li class="chapter" data-level="6.6.1" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#age-at-marriage-model"><i class="fa fa-check"></i><b>6.6.1</b> Age at marriage Model<span></span></a></li>
+<li class="chapter" data-level="6.6.2" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#marriage-rate-model"><i class="fa fa-check"></i><b>6.6.2</b> Marriage rate Model<span></span></a></li>
+<li class="chapter" data-level="6.6.3" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multiple-regression"><i class="fa fa-check"></i><b>6.6.3</b> Multiple regression<span></span></a></li>
+<li class="chapter" data-level="6.6.4" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multivariate-posteriors"><i class="fa fa-check"></i><b>6.6.4</b> Multivariate Posteriors<span></span></a></li>
+<li class="chapter" data-level="6.6.5" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#counterfactual-plots-1"><i class="fa fa-check"></i><b>6.6.5</b> Counterfactual plots<span></span></a></li>
+<li class="chapter" data-level="6.6.6" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#masked-relationships"><i class="fa fa-check"></i><b>6.6.6</b> Masked Relationships<span></span></a></li>
+<li class="chapter" data-level="6.6.7" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#categorical-variables-1"><i class="fa fa-check"></i><b>6.6.7</b> Categorical Variables<span></span></a></li>
+<li class="chapter" data-level="6.6.8" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#alternative-ways-to-model-multiple-categories"><i class="fa fa-check"></i><b>6.6.8</b> Alternative ways to model multiple categories<span></span></a></li>
+<li class="chapter" data-level="6.6.9" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#multilevel-anova"><i class="fa fa-check"></i><b>6.6.9</b> Multilevel ANOVA<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6.7" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#pymc3-section-3"><i class="fa fa-check"></i><b>6.7</b> pymc3 section</a></li>
+<li class="chapter" data-level="6.7" data-path="rethinking-chapter-5.html"><a href="rethinking-chapter-5.html#pymc3-section-3"><i class="fa fa-check"></i><b>6.7</b> pymc3 section<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="7" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html"><i class="fa fa-check"></i><b>7</b> Rethinking: Chapter 6</a>
+<li class="chapter" data-level="7" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html"><i class="fa fa-check"></i><b>7</b> Rethinking: Chapter 6<span></span></a>
 <ul>
-<li class="chapter" data-level="7.1" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#multicolliniarity"><i class="fa fa-check"></i><b>7.1</b> Multicolliniarity</a></li>
-<li class="chapter" data-level="7.2" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#post-treatment-bias"><i class="fa fa-check"></i><b>7.2</b> Post-treatment bias</a></li>
-<li class="chapter" data-level="7.3" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#collider-bias"><i class="fa fa-check"></i><b>7.3</b> Collider Bias</a>
+<li class="chapter" data-level="7.1" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#multicolliniarity"><i class="fa fa-check"></i><b>7.1</b> Multicolliniarity<span></span></a></li>
+<li class="chapter" data-level="7.2" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#post-treatment-bias"><i class="fa fa-check"></i><b>7.2</b> Post-treatment bias<span></span></a></li>
+<li class="chapter" data-level="7.3" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#collider-bias"><i class="fa fa-check"></i><b>7.3</b> Collider Bias<span></span></a>
 <ul>
-<li class="chapter" data-level="7.3.1" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#the-haunted-dag"><i class="fa fa-check"></i><b>7.3.1</b> The haunted DAG</a></li>
-<li class="chapter" data-level="7.3.2" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#shutting-the-backdoor"><i class="fa fa-check"></i><b>7.3.2</b> Shutting the Backdoor</a></li>
-<li class="chapter" data-level="7.3.3" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#two-roads"><i class="fa fa-check"></i><b>7.3.3</b> Two Roads</a></li>
-<li class="chapter" data-level="7.3.4" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#backdoor-waffles"><i class="fa fa-check"></i><b>7.3.4</b> Backdoor Waffles</a></li>
+<li class="chapter" data-level="7.3.1" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#the-haunted-dag"><i class="fa fa-check"></i><b>7.3.1</b> The haunted DAG<span></span></a></li>
+<li class="chapter" data-level="7.3.2" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#shutting-the-backdoor"><i class="fa fa-check"></i><b>7.3.2</b> Shutting the Backdoor<span></span></a></li>
+<li class="chapter" data-level="7.3.3" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#two-roads"><i class="fa fa-check"></i><b>7.3.3</b> Two Roads<span></span></a></li>
+<li class="chapter" data-level="7.3.4" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#backdoor-waffles"><i class="fa fa-check"></i><b>7.3.4</b> Backdoor Waffles<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="7.4" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#homework-4"><i class="fa fa-check"></i><b>7.4</b> Homework</a></li>
-<li class="chapter" data-level="7.5" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#brms-section-4"><i class="fa fa-check"></i><b>7.5</b> {brms} section</a>
+<li class="chapter" data-level="7.4" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#homework-4"><i class="fa fa-check"></i><b>7.4</b> Homework<span></span></a></li>
+<li class="chapter" data-level="7.5" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#brms-section-4"><i class="fa fa-check"></i><b>7.5</b> {brms} section<span></span></a>
 <ul>
-<li class="chapter" data-level="7.5.1" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#multicolliniarity-1"><i class="fa fa-check"></i><b>7.5.1</b> Multicolliniarity</a></li>
-<li class="chapter" data-level="7.5.2" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#post-treatment-bias-1"><i class="fa fa-check"></i><b>7.5.2</b> Post-treatment bias</a></li>
-<li class="chapter" data-level="7.5.3" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#collider-bias-1"><i class="fa fa-check"></i><b>7.5.3</b> Collider Bias</a></li>
-<li class="chapter" data-level="7.5.4" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#summary"><i class="fa fa-check"></i><b>7.5.4</b> Summary</a></li>
+<li class="chapter" data-level="7.5.1" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#multicolliniarity-1"><i class="fa fa-check"></i><b>7.5.1</b> Multicolliniarity<span></span></a></li>
+<li class="chapter" data-level="7.5.2" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#post-treatment-bias-1"><i class="fa fa-check"></i><b>7.5.2</b> Post-treatment bias<span></span></a></li>
+<li class="chapter" data-level="7.5.3" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#collider-bias-1"><i class="fa fa-check"></i><b>7.5.3</b> Collider Bias<span></span></a></li>
+<li class="chapter" data-level="7.5.4" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#summary"><i class="fa fa-check"></i><b>7.5.4</b> Summary<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="7.6" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#pymc3-section-4"><i class="fa fa-check"></i><b>7.6</b> pymc3 section</a></li>
+<li class="chapter" data-level="7.6" data-path="rethinking-chapter-6.html"><a href="rethinking-chapter-6.html#pymc3-section-4"><i class="fa fa-check"></i><b>7.6</b> pymc3 section<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="8" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html"><i class="fa fa-check"></i><b>8</b> Rethinking: Chapter 7</a>
+<li class="chapter" data-level="8" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html"><i class="fa fa-check"></i><b>8</b> Rethinking: Chapter 7<span></span></a>
 <ul>
-<li class="chapter" data-level="8.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#the-problem-with-parameters"><i class="fa fa-check"></i><b>8.1</b> The Problem with Parameters</a>
+<li class="chapter" data-level="8.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#the-problem-with-parameters"><i class="fa fa-check"></i><b>8.1</b> The Problem with Parameters<span></span></a>
 <ul>
-<li class="chapter" data-level="8.1.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#the-burial-of-r2"><i class="fa fa-check"></i><b>8.1.1</b> The burial of R<sup>2</sup></a></li>
-<li class="chapter" data-level="8.1.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#higher-order-polynomials"><i class="fa fa-check"></i><b>8.1.2</b> Higher order polynomials</a></li>
-<li class="chapter" data-level="8.1.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#underfitting"><i class="fa fa-check"></i><b>8.1.3</b> Underfitting</a></li>
+<li class="chapter" data-level="8.1.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#the-burial-of-r2"><i class="fa fa-check"></i><b>8.1.1</b> The burial of R<sup>2</sup><span></span></a></li>
+<li class="chapter" data-level="8.1.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#higher-order-polynomials"><i class="fa fa-check"></i><b>8.1.2</b> Higher order polynomials<span></span></a></li>
+<li class="chapter" data-level="8.1.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#underfitting"><i class="fa fa-check"></i><b>8.1.3</b> Underfitting<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="8.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#entropy-and-accuracy"><i class="fa fa-check"></i><b>8.2</b> Entropy and Accuracy</a>
+<li class="chapter" data-level="8.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#entropy-and-accuracy"><i class="fa fa-check"></i><b>8.2</b> Entropy and Accuracy<span></span></a>
 <ul>
-<li class="chapter" data-level="8.2.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#entropy"><i class="fa fa-check"></i><b>8.2.1</b> Entropy</a></li>
-<li class="chapter" data-level="8.2.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#accuracy"><i class="fa fa-check"></i><b>8.2.2</b> Accuracy</a></li>
-<li class="chapter" data-level="8.2.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#estimating-divergence"><i class="fa fa-check"></i><b>8.2.3</b> Estimating Divergence</a></li>
-<li class="chapter" data-level="8.2.4" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#scoring-the-right-data"><i class="fa fa-check"></i><b>8.2.4</b> Scoring the right data</a></li>
+<li class="chapter" data-level="8.2.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#entropy"><i class="fa fa-check"></i><b>8.2.1</b> Entropy<span></span></a></li>
+<li class="chapter" data-level="8.2.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#accuracy"><i class="fa fa-check"></i><b>8.2.2</b> Accuracy<span></span></a></li>
+<li class="chapter" data-level="8.2.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#estimating-divergence"><i class="fa fa-check"></i><b>8.2.3</b> Estimating Divergence<span></span></a></li>
+<li class="chapter" data-level="8.2.4" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#scoring-the-right-data"><i class="fa fa-check"></i><b>8.2.4</b> Scoring the right data<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="8.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#golem-taming-regularization"><i class="fa fa-check"></i><b>8.3</b> Golem taming: regularization</a>
+<li class="chapter" data-level="8.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#golem-taming-regularization"><i class="fa fa-check"></i><b>8.3</b> Golem taming: regularization<span></span></a>
 <ul>
-<li class="chapter" data-level="8.3.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#cross-validataion"><i class="fa fa-check"></i><b>8.3.1</b> Cross-validataion</a></li>
-<li class="chapter" data-level="8.3.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#information-criteria"><i class="fa fa-check"></i><b>8.3.2</b> Information Criteria</a></li>
-<li class="chapter" data-level="8.3.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#comparing-cv-psis-and-waic"><i class="fa fa-check"></i><b>8.3.3</b> Comparing CV, PSIS and WAIC</a></li>
+<li class="chapter" data-level="8.3.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#cross-validataion"><i class="fa fa-check"></i><b>8.3.1</b> Cross-validataion<span></span></a></li>
+<li class="chapter" data-level="8.3.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#information-criteria"><i class="fa fa-check"></i><b>8.3.2</b> Information Criteria<span></span></a></li>
+<li class="chapter" data-level="8.3.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#comparing-cv-psis-and-waic"><i class="fa fa-check"></i><b>8.3.3</b> Comparing CV, PSIS and WAIC<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="8.4" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#model-comparison"><i class="fa fa-check"></i><b>8.4</b> Model comparison</a>
+<li class="chapter" data-level="8.4" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#model-comparison"><i class="fa fa-check"></i><b>8.4</b> Model comparison<span></span></a>
 <ul>
-<li class="chapter" data-level="8.4.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#model-mis-selection"><i class="fa fa-check"></i><b>8.4.1</b> Model mis-selection</a></li>
-<li class="chapter" data-level="8.4.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#outliers-and-other-illusions"><i class="fa fa-check"></i><b>8.4.2</b> Outliers and other illusions</a></li>
+<li class="chapter" data-level="8.4.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#model-mis-selection"><i class="fa fa-check"></i><b>8.4.1</b> Model mis-selection<span></span></a></li>
+<li class="chapter" data-level="8.4.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#outliers-and-other-illusions"><i class="fa fa-check"></i><b>8.4.2</b> Outliers and other illusions<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="8.5" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#homework-5"><i class="fa fa-check"></i><b>8.5</b> Homework</a></li>
-<li class="chapter" data-level="8.6" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#brms-section-5"><i class="fa fa-check"></i><b>8.6</b> {brms} section</a>
+<li class="chapter" data-level="8.5" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#homework-5"><i class="fa fa-check"></i><b>8.5</b> Homework<span></span></a></li>
+<li class="chapter" data-level="8.6" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#brms-section-5"><i class="fa fa-check"></i><b>8.6</b> {brms} section<span></span></a>
 <ul>
-<li class="chapter" data-level="8.6.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#the-problem-with-parameters-1"><i class="fa fa-check"></i><b>8.6.1</b> The problem with parameters</a></li>
-<li class="chapter" data-level="8.6.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#entropy-and-accuracy-1"><i class="fa fa-check"></i><b>8.6.2</b> Entropy and accuracy</a></li>
-<li class="chapter" data-level="8.6.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#information-criteria-1"><i class="fa fa-check"></i><b>8.6.3</b> Information criteria</a></li>
-<li class="chapter" data-level="8.6.4" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#model-comparison-1"><i class="fa fa-check"></i><b>8.6.4</b> Model comparison</a></li>
-<li class="chapter" data-level="8.6.5" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#outliers-and-other-illusions-1"><i class="fa fa-check"></i><b>8.6.5</b> Outliers and other illusions</a></li>
-<li class="chapter" data-level="8.6.6" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#brms-r2"><i class="fa fa-check"></i><b>8.6.6</b> {brms} <span class="math inline">\(r^2\)</span></a></li>
+<li class="chapter" data-level="8.6.1" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#the-problem-with-parameters-1"><i class="fa fa-check"></i><b>8.6.1</b> The problem with parameters<span></span></a></li>
+<li class="chapter" data-level="8.6.2" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#entropy-and-accuracy-1"><i class="fa fa-check"></i><b>8.6.2</b> Entropy and accuracy<span></span></a></li>
+<li class="chapter" data-level="8.6.3" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#information-criteria-1"><i class="fa fa-check"></i><b>8.6.3</b> Information criteria<span></span></a></li>
+<li class="chapter" data-level="8.6.4" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#model-comparison-1"><i class="fa fa-check"></i><b>8.6.4</b> Model comparison<span></span></a></li>
+<li class="chapter" data-level="8.6.5" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#outliers-and-other-illusions-1"><i class="fa fa-check"></i><b>8.6.5</b> Outliers and other illusions<span></span></a></li>
+<li class="chapter" data-level="8.6.6" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#brms-r2"><i class="fa fa-check"></i><b>8.6.6</b> {brms} <span class="math inline">\(r^2\)</span><span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="8.7" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#pymc3-section-5"><i class="fa fa-check"></i><b>8.7</b> pymc3 section</a></li>
+<li class="chapter" data-level="8.7" data-path="rethinking-chapter-7.html"><a href="rethinking-chapter-7.html#pymc3-section-5"><i class="fa fa-check"></i><b>8.7</b> pymc3 section<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html"><i class="fa fa-check"></i><b>9</b> Rethinking: Chapter 8</a>
+<li class="chapter" data-level="9" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html"><i class="fa fa-check"></i><b>9</b> Rethinking: Chapter 8<span></span></a>
 <ul>
-<li class="chapter" data-level="9.1" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#building-an-interaction"><i class="fa fa-check"></i><b>9.1</b> Building an Interaction</a>
+<li class="chapter" data-level="9.1" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#building-an-interaction"><i class="fa fa-check"></i><b>9.1</b> Building an Interaction<span></span></a>
 <ul>
-<li class="chapter" data-level="9.1.1" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#adding-an-index-variable-is-not-enough"><i class="fa fa-check"></i><b>9.1.1</b> Adding an index variable is not enough</a></li>
-<li class="chapter" data-level="9.1.2" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#adding-an-interaction-does-work"><i class="fa fa-check"></i><b>9.1.2</b> Adding an interaction does work</a></li>
+<li class="chapter" data-level="9.1.1" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#adding-an-index-variable-is-not-enough"><i class="fa fa-check"></i><b>9.1.1</b> Adding an index variable is not enough<span></span></a></li>
+<li class="chapter" data-level="9.1.2" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#adding-an-interaction-does-work"><i class="fa fa-check"></i><b>9.1.2</b> Adding an interaction does work<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="9.2" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#symetry-of-interactions"><i class="fa fa-check"></i><b>9.2</b> Symetry of Interactions</a></li>
-<li class="chapter" data-level="9.3" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#continuous-interaction"><i class="fa fa-check"></i><b>9.3</b> Continuous Interaction</a>
+<li class="chapter" data-level="9.2" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#symetry-of-interactions"><i class="fa fa-check"></i><b>9.2</b> Symetry of Interactions<span></span></a></li>
+<li class="chapter" data-level="9.3" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#continuous-interaction"><i class="fa fa-check"></i><b>9.3</b> Continuous Interaction<span></span></a>
 <ul>
-<li class="chapter" data-level="9.3.1" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#model-without-interaction"><i class="fa fa-check"></i><b>9.3.1</b> Model without Interaction</a></li>
-<li class="chapter" data-level="9.3.2" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#model-with-interaction"><i class="fa fa-check"></i><b>9.3.2</b> Model with Interaction</a></li>
-<li class="chapter" data-level="9.3.3" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-the-posterior-predictions"><i class="fa fa-check"></i><b>9.3.3</b> Plotting the Posterior Predictions</a></li>
-<li class="chapter" data-level="9.3.4" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-the-prior-predictions"><i class="fa fa-check"></i><b>9.3.4</b> Plotting the Prior Predictions</a></li>
+<li class="chapter" data-level="9.3.1" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#model-without-interaction"><i class="fa fa-check"></i><b>9.3.1</b> Model without Interaction<span></span></a></li>
+<li class="chapter" data-level="9.3.2" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#model-with-interaction"><i class="fa fa-check"></i><b>9.3.2</b> Model with Interaction<span></span></a></li>
+<li class="chapter" data-level="9.3.3" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-the-posterior-predictions"><i class="fa fa-check"></i><b>9.3.3</b> Plotting the Posterior Predictions<span></span></a></li>
+<li class="chapter" data-level="9.3.4" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-the-prior-predictions"><i class="fa fa-check"></i><b>9.3.4</b> Plotting the Prior Predictions<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="9.4" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#homework-6"><i class="fa fa-check"></i><b>9.4</b> Homework</a></li>
-<li class="chapter" data-level="9.5" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#brms-section-6"><i class="fa fa-check"></i><b>9.5</b> {brms} section</a>
+<li class="chapter" data-level="9.4" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#homework-6"><i class="fa fa-check"></i><b>9.4</b> Homework<span></span></a></li>
+<li class="chapter" data-level="9.5" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#brms-section-6"><i class="fa fa-check"></i><b>9.5</b> {brms} section<span></span></a>
 <ul>
-<li class="chapter" data-level="9.5.1" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#building-an-interaction-1"><i class="fa fa-check"></i><b>9.5.1</b> Building an Interaction</a></li>
-<li class="chapter" data-level="9.5.2" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-the-interaction"><i class="fa fa-check"></i><b>9.5.2</b> Plotting the Interaction</a></li>
-<li class="chapter" data-level="9.5.3" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#symetry-of-interactions-1"><i class="fa fa-check"></i><b>9.5.3</b> Symetry of Interactions</a></li>
-<li class="chapter" data-level="9.5.4" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#continuous-interactions"><i class="fa fa-check"></i><b>9.5.4</b> Continuous Interactions</a></li>
-<li class="chapter" data-level="9.5.5" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-the-posterior-predictions-1"><i class="fa fa-check"></i><b>9.5.5</b> Plotting the Posterior Predictions</a></li>
-<li class="chapter" data-level="9.5.6" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-prior-predictions"><i class="fa fa-check"></i><b>9.5.6</b> Plotting Prior Predictions</a></li>
-<li class="chapter" data-level="9.5.7" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#brms-conditional_effects"><i class="fa fa-check"></i><b>9.5.7</b> {brms} <code>conditional_effects()</code></a></li>
+<li class="chapter" data-level="9.5.1" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#building-an-interaction-1"><i class="fa fa-check"></i><b>9.5.1</b> Building an Interaction<span></span></a></li>
+<li class="chapter" data-level="9.5.2" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-the-interaction"><i class="fa fa-check"></i><b>9.5.2</b> Plotting the Interaction<span></span></a></li>
+<li class="chapter" data-level="9.5.3" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#symetry-of-interactions-1"><i class="fa fa-check"></i><b>9.5.3</b> Symetry of Interactions<span></span></a></li>
+<li class="chapter" data-level="9.5.4" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#continuous-interactions"><i class="fa fa-check"></i><b>9.5.4</b> Continuous Interactions<span></span></a></li>
+<li class="chapter" data-level="9.5.5" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-the-posterior-predictions-1"><i class="fa fa-check"></i><b>9.5.5</b> Plotting the Posterior Predictions<span></span></a></li>
+<li class="chapter" data-level="9.5.6" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#plotting-prior-predictions"><i class="fa fa-check"></i><b>9.5.6</b> Plotting Prior Predictions<span></span></a></li>
+<li class="chapter" data-level="9.5.7" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#brms-conditional_effects"><i class="fa fa-check"></i><b>9.5.7</b> {brms} <code>conditional_effects()</code><span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="9.6" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#pymc3-section-6"><i class="fa fa-check"></i><b>9.6</b> pymc3 section</a></li>
+<li class="chapter" data-level="9.6" data-path="rethinking-chapter-8.html"><a href="rethinking-chapter-8.html#pymc3-section-6"><i class="fa fa-check"></i><b>9.6</b> pymc3 section<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="10" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html"><i class="fa fa-check"></i><b>10</b> Rethinking: Chapter 9</a>
+<li class="chapter" data-level="10" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html"><i class="fa fa-check"></i><b>10</b> Rethinking: Chapter 9<span></span></a>
 <ul>
-<li class="chapter" data-level="10.1" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#the-island-kingdom"><i class="fa fa-check"></i><b>10.1</b> The island Kingdom</a></li>
-<li class="chapter" data-level="10.2" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#metropolis-algotithms"><i class="fa fa-check"></i><b>10.2</b> Metropolis algotithms</a></li>
-<li class="chapter" data-level="10.3" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#hamiltonian-monte-carlo"><i class="fa fa-check"></i><b>10.3</b> Hamiltonian Monte Carlo</a></li>
-<li class="chapter" data-level="10.4" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#easy-hmc-rethinkingulam"><i class="fa fa-check"></i><b>10.4</b> Easy HMC: <code>rethinking::ulam()</code></a>
+<li class="chapter" data-level="10.1" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#the-island-kingdom"><i class="fa fa-check"></i><b>10.1</b> The island Kingdom<span></span></a></li>
+<li class="chapter" data-level="10.2" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#metropolis-algotithms"><i class="fa fa-check"></i><b>10.2</b> Metropolis algotithms<span></span></a></li>
+<li class="chapter" data-level="10.3" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#hamiltonian-monte-carlo"><i class="fa fa-check"></i><b>10.3</b> Hamiltonian Monte Carlo<span></span></a></li>
+<li class="chapter" data-level="10.4" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#easy-hmc-rethinkingulam"><i class="fa fa-check"></i><b>10.4</b> Easy HMC: <code>rethinking::ulam()</code><span></span></a>
 <ul>
-<li class="chapter" data-level="10.4.1" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#checking-the-chain"><i class="fa fa-check"></i><b>10.4.1</b> Checking the Chain</a></li>
+<li class="chapter" data-level="10.4.1" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#checking-the-chain"><i class="fa fa-check"></i><b>10.4.1</b> Checking the Chain<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="10.5" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#care-and-feeding-of-your-markov-chain"><i class="fa fa-check"></i><b>10.5</b> Care and feeding of your Markov Chain</a>
+<li class="chapter" data-level="10.5" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#care-and-feeding-of-your-markov-chain"><i class="fa fa-check"></i><b>10.5</b> Care and feeding of your Markov Chain<span></span></a>
 <ul>
-<li class="chapter" data-level="10.5.1" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#non-identifiable-parameters"><i class="fa fa-check"></i><b>10.5.1</b> Non-identifiable parameters</a></li>
+<li class="chapter" data-level="10.5.1" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#non-identifiable-parameters"><i class="fa fa-check"></i><b>10.5.1</b> Non-identifiable parameters<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="10.6" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#homework-7"><i class="fa fa-check"></i><b>10.6</b> Homework</a></li>
-<li class="chapter" data-level="10.7" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#brms-section-7"><i class="fa fa-check"></i><b>10.7</b> {brms} section</a>
+<li class="chapter" data-level="10.6" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#homework-7"><i class="fa fa-check"></i><b>10.6</b> Homework<span></span></a></li>
+<li class="chapter" data-level="10.7" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#brms-section-7"><i class="fa fa-check"></i><b>10.7</b> {brms} section<span></span></a>
 <ul>
-<li class="chapter" data-level="10.7.1" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#easy-hmc-brm"><i class="fa fa-check"></i><b>10.7.1</b> Easy HMC: <code>brm{}</code></a></li>
-<li class="chapter" data-level="10.7.2" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#care-and-feeding-of-your-markov-chain-1"><i class="fa fa-check"></i><b>10.7.2</b> Care and feeding of your Markov chain</a></li>
-<li class="chapter" data-level="10.7.3" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#non-identifiable-parameters-1"><i class="fa fa-check"></i><b>10.7.3</b> Non-identifiable parameters</a></li>
+<li class="chapter" data-level="10.7.1" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#easy-hmc-brm"><i class="fa fa-check"></i><b>10.7.1</b> Easy HMC: <code>brm{}</code><span></span></a></li>
+<li class="chapter" data-level="10.7.2" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#care-and-feeding-of-your-markov-chain-1"><i class="fa fa-check"></i><b>10.7.2</b> Care and feeding of your Markov chain<span></span></a></li>
+<li class="chapter" data-level="10.7.3" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#non-identifiable-parameters-1"><i class="fa fa-check"></i><b>10.7.3</b> Non-identifiable parameters<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="10.8" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#pymc3-section-7"><i class="fa fa-check"></i><b>10.8</b> pymc3 section</a></li>
+<li class="chapter" data-level="10.8" data-path="rethinking-chapter-9.html"><a href="rethinking-chapter-9.html#pymc3-section-7"><i class="fa fa-check"></i><b>10.8</b> pymc3 section<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="11" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html"><i class="fa fa-check"></i><b>11</b> Rethinking: Chapter 10</a>
+<li class="chapter" data-level="11" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html"><i class="fa fa-check"></i><b>11</b> Rethinking: Chapter 10<span></span></a>
 <ul>
-<li class="chapter" data-level="11.1" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#maximum-entropy"><i class="fa fa-check"></i><b>11.1</b> Maximum Entropy</a>
+<li class="chapter" data-level="11.1" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#maximum-entropy"><i class="fa fa-check"></i><b>11.1</b> Maximum Entropy<span></span></a>
 <ul>
-<li class="chapter" data-level="11.1.1" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#the-gaussian-family"><i class="fa fa-check"></i><b>11.1.1</b> The Gaussian Family</a></li>
-<li class="chapter" data-level="11.1.2" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#the-binomial-distribution"><i class="fa fa-check"></i><b>11.1.2</b> The Binomial Distribution</a></li>
+<li class="chapter" data-level="11.1.1" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#the-gaussian-family"><i class="fa fa-check"></i><b>11.1.1</b> The Gaussian Family<span></span></a></li>
+<li class="chapter" data-level="11.1.2" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#the-binomial-distribution"><i class="fa fa-check"></i><b>11.1.2</b> The Binomial Distribution<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="11.2" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#generalized-linear-models"><i class="fa fa-check"></i><b>11.2</b> Generalized linear Models</a>
+<li class="chapter" data-level="11.2" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#generalized-linear-models"><i class="fa fa-check"></i><b>11.2</b> Generalized linear Models<span></span></a>
 <ul>
-<li class="chapter" data-level="11.2.1" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#meet-the-family"><i class="fa fa-check"></i><b>11.2.1</b> Meet the Family</a></li>
-<li class="chapter" data-level="11.2.2" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#linking-linear-models-to-distributions"><i class="fa fa-check"></i><b>11.2.2</b> Linking linear models to distributions</a></li>
+<li class="chapter" data-level="11.2.1" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#meet-the-family"><i class="fa fa-check"></i><b>11.2.1</b> Meet the Family<span></span></a></li>
+<li class="chapter" data-level="11.2.2" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#linking-linear-models-to-distributions"><i class="fa fa-check"></i><b>11.2.2</b> Linking linear models to distributions<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="11.3" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#homework-8"><i class="fa fa-check"></i><b>11.3</b> Homework</a></li>
-<li class="chapter" data-level="11.4" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#brms-section-8"><i class="fa fa-check"></i><b>11.4</b> {brms} section</a></li>
-<li class="chapter" data-level="11.5" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#pymc3-section-8"><i class="fa fa-check"></i><b>11.5</b> pymc3 section</a></li>
+<li class="chapter" data-level="11.3" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#homework-8"><i class="fa fa-check"></i><b>11.3</b> Homework<span></span></a></li>
+<li class="chapter" data-level="11.4" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#brms-section-8"><i class="fa fa-check"></i><b>11.4</b> {brms} section<span></span></a></li>
+<li class="chapter" data-level="11.5" data-path="rethinking-chapter-10.html"><a href="rethinking-chapter-10.html#pymc3-section-8"><i class="fa fa-check"></i><b>11.5</b> pymc3 section<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="12" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html"><i class="fa fa-check"></i><b>12</b> Rethinking: Chapter 11</a>
+<li class="chapter" data-level="12" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html"><i class="fa fa-check"></i><b>12</b> Rethinking: Chapter 11<span></span></a>
 <ul>
-<li class="chapter" data-level="12.1" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#binomial-regression"><i class="fa fa-check"></i><b>12.1</b> Binomial Regression</a>
+<li class="chapter" data-level="12.1" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#binomial-regression"><i class="fa fa-check"></i><b>12.1</b> Binomial Regression<span></span></a>
 <ul>
-<li class="chapter" data-level="12.1.1" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#logistic-regression-prosocial-chimpanzees"><i class="fa fa-check"></i><b>12.1.1</b> Logistic Regression: Prosocial chimpanzees</a></li>
-<li class="chapter" data-level="12.1.2" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#relative-shark-and-absolute-deer"><i class="fa fa-check"></i><b>12.1.2</b> Relative Shark and Absolute Deer</a></li>
-<li class="chapter" data-level="12.1.3" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#aggregated-binomial-chimpanzees-again-condensed"><i class="fa fa-check"></i><b>12.1.3</b> Aggregated binomial: Chimpanzees again, condensed</a></li>
-<li class="chapter" data-level="12.1.4" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#aggregated-binomial-graduate-school-admissions"><i class="fa fa-check"></i><b>12.1.4</b> Aggregated binomial: Graduate School Admissions</a></li>
+<li class="chapter" data-level="12.1.1" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#logistic-regression-prosocial-chimpanzees"><i class="fa fa-check"></i><b>12.1.1</b> Logistic Regression: Prosocial chimpanzees<span></span></a></li>
+<li class="chapter" data-level="12.1.2" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#relative-shark-and-absolute-deer"><i class="fa fa-check"></i><b>12.1.2</b> Relative Shark and Absolute Deer<span></span></a></li>
+<li class="chapter" data-level="12.1.3" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#aggregated-binomial-chimpanzees-again-condensed"><i class="fa fa-check"></i><b>12.1.3</b> Aggregated binomial: Chimpanzees again, condensed<span></span></a></li>
+<li class="chapter" data-level="12.1.4" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#aggregated-binomial-graduate-school-admissions"><i class="fa fa-check"></i><b>12.1.4</b> Aggregated binomial: Graduate School Admissions<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="12.2" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#poisson-regression"><i class="fa fa-check"></i><b>12.2</b> Poisson Regression</a>
+<li class="chapter" data-level="12.2" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#poisson-regression"><i class="fa fa-check"></i><b>12.2</b> Poisson Regression<span></span></a>
 <ul>
-<li class="chapter" data-level="12.2.1" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#oceanic-tool-complexity"><i class="fa fa-check"></i><b>12.2.1</b> Oceanic Tool Complexity</a></li>
-<li class="chapter" data-level="12.2.2" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#modeling-tool-innovation"><i class="fa fa-check"></i><b>12.2.2</b> Modeling Tool Innovation</a></li>
-<li class="chapter" data-level="12.2.3" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#negative-binomial-gamma-poisson-models"><i class="fa fa-check"></i><b>12.2.3</b> Negative Binomial (gamma-Poisson) models</a></li>
-<li class="chapter" data-level="12.2.4" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#exposure-and-the-offset"><i class="fa fa-check"></i><b>12.2.4</b> Exposure and the Offset</a></li>
+<li class="chapter" data-level="12.2.1" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#oceanic-tool-complexity"><i class="fa fa-check"></i><b>12.2.1</b> Oceanic Tool Complexity<span></span></a></li>
+<li class="chapter" data-level="12.2.2" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#modeling-tool-innovation"><i class="fa fa-check"></i><b>12.2.2</b> Modeling Tool Innovation<span></span></a></li>
+<li class="chapter" data-level="12.2.3" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#negative-binomial-gamma-poisson-models"><i class="fa fa-check"></i><b>12.2.3</b> Negative Binomial (gamma-Poisson) models<span></span></a></li>
+<li class="chapter" data-level="12.2.4" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#exposure-and-the-offset"><i class="fa fa-check"></i><b>12.2.4</b> Exposure and the Offset<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="12.3" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#multinomial-and-categorical-models"><i class="fa fa-check"></i><b>12.3</b> Multinomial and Categorical Models</a></li>
-<li class="chapter" data-level="12.4" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#homework-9"><i class="fa fa-check"></i><b>12.4</b> Homework</a></li>
-<li class="chapter" data-level="12.5" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#brms-section-9"><i class="fa fa-check"></i><b>12.5</b> {brms} section</a></li>
-<li class="chapter" data-level="12.6" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#pymc3-section-9"><i class="fa fa-check"></i><b>12.6</b> pymc3 section</a></li>
-</ul></li>
-<li class="chapter" data-level="13" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html"><i class="fa fa-check"></i><b>13</b> Bayesian Statistics the Fun Way</a>
+<li class="chapter" data-level="12.3" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#multinomial-and-categorical-models"><i class="fa fa-check"></i><b>12.3</b> Multinomial and Categorical Models<span></span></a>
 <ul>
-<li class="chapter" data-level="13.1" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#conditioning-probabilities"><i class="fa fa-check"></i><b>13.1</b> Conditioning Probabilities</a></li>
-<li class="chapter" data-level="13.2" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#combining-probailities-based-on-logic"><i class="fa fa-check"></i><b>13.2</b> Combining Probailities based on logic</a></li>
-<li class="chapter" data-level="13.3" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-binomial-distribution-1"><i class="fa fa-check"></i><b>13.3</b> The binomial distribution</a></li>
-<li class="chapter" data-level="13.4" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-beta-distribution"><i class="fa fa-check"></i><b>13.4</b> The beta distribution</a></li>
-<li class="chapter" data-level="13.5" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#bayes-theorem"><i class="fa fa-check"></i><b>13.5</b> Bayes’ Theorem</a></li>
-<li class="chapter" data-level="13.6" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-i"><i class="fa fa-check"></i><b>13.6</b> Parameter Estimation (I)</a></li>
-<li class="chapter" data-level="13.7" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-normal-distribution"><i class="fa fa-check"></i><b>13.7</b> The normal distribution</a></li>
-<li class="chapter" data-level="13.8" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#cummulative-density-and-quantile-function"><i class="fa fa-check"></i><b>13.8</b> Cummulative Density and Quantile Function</a></li>
-<li class="chapter" data-level="13.9" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-with-prior-probabilities"><i class="fa fa-check"></i><b>13.9</b> Parameter estimation with prior probabilities</a></li>
-<li class="chapter" data-level="13.10" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#monte-carlosimulation"><i class="fa fa-check"></i><b>13.10</b> Monte CarloSimulation</a></li>
-<li class="chapter" data-level="13.11" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#posterior-odds"><i class="fa fa-check"></i><b>13.11</b> Posterior Odds</a></li>
-<li class="chapter" data-level="13.12" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-ii"><i class="fa fa-check"></i><b>13.12</b> Parameter Estimation (II)</a></li>
+<li class="chapter" data-level="12.3.1" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#predictor-matches-to-outcomes"><i class="fa fa-check"></i><b>12.3.1</b> Predictor Matches to Outcomes<span></span></a></li>
+<li class="chapter" data-level="12.3.2" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#predictors-matched-to-observations"><i class="fa fa-check"></i><b>12.3.2</b> Predictors Matched to Observations<span></span></a></li>
+<li class="chapter" data-level="12.3.3" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#multinomial-in-disguise-as-poisson"><i class="fa fa-check"></i><b>12.3.3</b> Multinomial in Disguise as Poisson<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="14" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html"><i class="fa fa-check"></i><b>14</b> Mixed Models with R</a>
+<li class="chapter" data-level="12.4" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#homework-9"><i class="fa fa-check"></i><b>12.4</b> Homework<span></span></a></li>
+<li class="chapter" data-level="12.5" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#brms-section-9"><i class="fa fa-check"></i><b>12.5</b> {brms} section<span></span></a>
 <ul>
-<li class="chapter" data-level="14.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#standard-regregression-model"><i class="fa fa-check"></i><b>14.1</b> Standard regregression model</a></li>
-<li class="chapter" data-level="14.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#mixed-nodel"><i class="fa fa-check"></i><b>14.2</b> mixed nodel</a>
-<ul>
-<li class="chapter" data-level="14.2.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#student-specific-effect-initial-depiction"><i class="fa fa-check"></i><b>14.2.1</b> student specific effect (initial depiction)</a></li>
-<li class="chapter" data-level="14.2.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#as-multi-level-model"><i class="fa fa-check"></i><b>14.2.2</b> as multi-level model</a></li>
-<li class="chapter" data-level="14.2.3" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#mixed-model"><i class="fa fa-check"></i><b>14.2.3</b> Mixed Model</a></li>
-<li class="chapter" data-level="14.2.4" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#estimation-of-random-effects"><i class="fa fa-check"></i><b>14.2.4</b> Estimation of random effects</a></li>
-<li class="chapter" data-level="14.2.5" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#prediction"><i class="fa fa-check"></i><b>14.2.5</b> Prediction</a></li>
-<li class="chapter" data-level="14.2.6" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#cluster-level-covariates"><i class="fa fa-check"></i><b>14.2.6</b> Cluster Level Covariates</a></li>
+<li class="chapter" data-level="12.5.1" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#binomial-regression-1"><i class="fa fa-check"></i><b>12.5.1</b> Binomial Regression<span></span></a></li>
+<li class="chapter" data-level="12.5.2" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#poisson-regression-1"><i class="fa fa-check"></i><b>12.5.2</b> Poisson Regression<span></span></a></li>
+<li class="chapter" data-level="12.5.3" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#multinomial-and-categorical-models-1"><i class="fa fa-check"></i><b>12.5.3</b> Multinomial and Categorical Models<span></span></a></li>
+<li class="chapter" data-level="12.5.4" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#survival-analysis"><i class="fa fa-check"></i><b>12.5.4</b> Survival analysis<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="14.3" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#add-random-slope"><i class="fa fa-check"></i><b>14.3</b> Add random slope</a></li>
-<li class="chapter" data-level="14.4" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#cross-classified-models"><i class="fa fa-check"></i><b>14.4</b> Cross Classified models</a></li>
-<li class="chapter" data-level="14.5" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#hierachical-structure"><i class="fa fa-check"></i><b>14.5</b> Hierachical structure</a>
-<ul>
-<li class="chapter" data-level="14.5.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#crossed-vs.-nested"><i class="fa fa-check"></i><b>14.5.1</b> Crossed vs. nested</a></li>
+<li class="chapter" data-level="12.6" data-path="rethinking-chapter-11.html"><a href="rethinking-chapter-11.html#pymc3-section-9"><i class="fa fa-check"></i><b>12.6</b> pymc3 section<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="14.6" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#residual-structure"><i class="fa fa-check"></i><b>14.6</b> Residual Structure</a>
+<li class="chapter" data-level="13" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html"><i class="fa fa-check"></i><b>13</b> Rethinking: Chapter 12<span></span></a>
 <ul>
-<li class="chapter" data-level="14.6.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#heterogeneous-variance"><i class="fa fa-check"></i><b>14.6.1</b> Heterogeneous variance</a></li>
-<li class="chapter" data-level="14.6.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#autocorrelation"><i class="fa fa-check"></i><b>14.6.2</b> Autocorrelation</a></li>
-</ul></li>
-<li class="chapter" data-level="14.7" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#generalized-linear-mixed-models"><i class="fa fa-check"></i><b>14.7</b> Generalized Linear Mixed Models</a></li>
-<li class="chapter" data-level="14.8" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#issues-considderations"><i class="fa fa-check"></i><b>14.8</b> Issues/ Considderations</a>
+<li class="chapter" data-level="13.1" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#over-dispersed-counts"><i class="fa fa-check"></i><b>13.1</b> Over-Dispersed Counts<span></span></a>
 <ul>
-<li class="chapter" data-level="14.8.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#model-comparison-2"><i class="fa fa-check"></i><b>14.8.1</b> Model comparison</a></li>
+<li class="chapter" data-level="13.1.1" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#beta-binomial"><i class="fa fa-check"></i><b>13.1.1</b> Beta-Binomial<span></span></a></li>
+<li class="chapter" data-level="13.1.2" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#negative-binomial-or-gamma-poisson"><i class="fa fa-check"></i><b>13.1.2</b> Negative-Binomial or gamma-Poisson<span></span></a></li>
+<li class="chapter" data-level="13.1.3" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#over-dispersion-entropy-and-information-criteria"><i class="fa fa-check"></i><b>13.1.3</b> Over-dispersion, Entropy and Information Criteria<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="14.9" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#formula-summary"><i class="fa fa-check"></i><b>14.9</b> Formula summary</a></li>
-</ul></li>
-<li class="chapter" data-level="15" data-path="references-and-session-info.html"><a href="references-and-session-info.html"><i class="fa fa-check"></i><b>15</b> References and Session Info</a>
+<li class="chapter" data-level="13.2" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#zero-inflated-outcomes"><i class="fa fa-check"></i><b>13.2</b> Zero-Inflated Outcomes<span></span></a>
 <ul>
-<li class="chapter" data-level="15.1" data-path="references-and-session-info.html"><a href="references-and-session-info.html#session-info"><i class="fa fa-check"></i><b>15.1</b> Session Info</a>
-<ul>
-<li class="chapter" data-level="15.1.1" data-path="references-and-session-info.html"><a href="references-and-session-info.html#r-settings"><i class="fa fa-check"></i><b>15.1.1</b> R settings</a></li>
-<li class="chapter" data-level="15.1.2" data-path="references-and-session-info.html"><a href="references-and-session-info.html#python-settings"><i class="fa fa-check"></i><b>15.1.2</b> Python settings</a></li>
+<li class="chapter" data-level="13.2.1" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#zero-inflated-poisson"><i class="fa fa-check"></i><b>13.2.1</b> Zero-Inflated Poisson<span></span></a></li>
+<li class="chapter" data-level="13.2.2" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#zero-inflated-model-in-stan"><i class="fa fa-check"></i><b>13.2.2</b> Zero-Inflated Model in Stan<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="15.2" data-path="references-and-session-info.html"><a href="references-and-session-info.html#references"><i class="fa fa-check"></i><b>15.2</b> References</a></li>
+<li class="chapter" data-level="13.3" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#ordered-categorical-outcomes"><i class="fa fa-check"></i><b>13.3</b> Ordered Categorical Outcomes<span></span></a>
+<ul>
+<li class="chapter" data-level="13.3.1" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#moral-intuition"><i class="fa fa-check"></i><b>13.3.1</b> Moral Intuition<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="13.4" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#ordered-categorical-predictors"><i class="fa fa-check"></i><b>13.4</b> Ordered Categorical Predictors<span></span></a></li>
+<li class="chapter" data-level="13.5" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#homework-10"><i class="fa fa-check"></i><b>13.5</b> Homework<span></span></a></li>
+<li class="chapter" data-level="13.6" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#brms-section-10"><i class="fa fa-check"></i><b>13.6</b> {brms} section<span></span></a>
+<ul>
+<li class="chapter" data-level="13.6.1" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#over-dispersed-counts-1"><i class="fa fa-check"></i><b>13.6.1</b> Over-dispersed counts<span></span></a></li>
+<li class="chapter" data-level="13.6.2" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#zero-inflated-outcomes-1"><i class="fa fa-check"></i><b>13.6.2</b> Zero-inflated outcomes<span></span></a></li>
+<li class="chapter" data-level="13.6.3" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#ordered-categorical-outcomes-1"><i class="fa fa-check"></i><b>13.6.3</b> Ordered categorical outcomes<span></span></a></li>
+<li class="chapter" data-level="13.6.4" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#ordered-categorical-predictors-1"><i class="fa fa-check"></i><b>13.6.4</b> Ordered categorical predictors<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="13.7" data-path="rethinking-chapter-12.html"><a href="rethinking-chapter-12.html#pymc3-section-10"><i class="fa fa-check"></i><b>13.7</b> pymc3 section<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="rethinking-chapter-13.html"><a href="rethinking-chapter-13.html"><i class="fa fa-check"></i><b>14</b> Rethinking: Chapter 13<span></span></a>
+<ul>
+<li class="chapter" data-level="14.1" data-path="rethinking-chapter-13.html"><a href="rethinking-chapter-13.html#homework-11"><i class="fa fa-check"></i><b>14.1</b> Homework<span></span></a></li>
+<li class="chapter" data-level="14.2" data-path="rethinking-chapter-13.html"><a href="rethinking-chapter-13.html#brms-section-11"><i class="fa fa-check"></i><b>14.2</b> {brms} section<span></span></a></li>
+<li class="chapter" data-level="14.3" data-path="rethinking-chapter-13.html"><a href="rethinking-chapter-13.html#pymc3-section-11"><i class="fa fa-check"></i><b>14.3</b> pymc3 section<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="15" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html"><i class="fa fa-check"></i><b>15</b> Bayesian Statistics the Fun Way<span></span></a>
+<ul>
+<li class="chapter" data-level="15.1" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#conditioning-probabilities"><i class="fa fa-check"></i><b>15.1</b> Conditioning Probabilities<span></span></a></li>
+<li class="chapter" data-level="15.2" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#combining-probailities-based-on-logic"><i class="fa fa-check"></i><b>15.2</b> Combining Probailities based on logic<span></span></a></li>
+<li class="chapter" data-level="15.3" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-binomial-distribution-1"><i class="fa fa-check"></i><b>15.3</b> The binomial distribution<span></span></a></li>
+<li class="chapter" data-level="15.4" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-beta-distribution"><i class="fa fa-check"></i><b>15.4</b> The beta distribution<span></span></a></li>
+<li class="chapter" data-level="15.5" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#bayes-theorem"><i class="fa fa-check"></i><b>15.5</b> Bayes’ Theorem<span></span></a></li>
+<li class="chapter" data-level="15.6" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-i"><i class="fa fa-check"></i><b>15.6</b> Parameter Estimation (I)<span></span></a></li>
+<li class="chapter" data-level="15.7" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#the-normal-distribution"><i class="fa fa-check"></i><b>15.7</b> The normal distribution<span></span></a></li>
+<li class="chapter" data-level="15.8" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#cummulative-density-and-quantile-function"><i class="fa fa-check"></i><b>15.8</b> Cummulative Density and Quantile Function<span></span></a></li>
+<li class="chapter" data-level="15.9" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-with-prior-probabilities"><i class="fa fa-check"></i><b>15.9</b> Parameter estimation with prior probabilities<span></span></a></li>
+<li class="chapter" data-level="15.10" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#monte-carlosimulation"><i class="fa fa-check"></i><b>15.10</b> Monte CarloSimulation<span></span></a></li>
+<li class="chapter" data-level="15.11" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#posterior-odds"><i class="fa fa-check"></i><b>15.11</b> Posterior Odds<span></span></a></li>
+<li class="chapter" data-level="15.12" data-path="bayesian-statistics-the-fun-way.html"><a href="bayesian-statistics-the-fun-way.html#parameter-estimation-ii"><i class="fa fa-check"></i><b>15.12</b> Parameter Estimation (II)<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="16" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html"><i class="fa fa-check"></i><b>16</b> Mixed Models with R<span></span></a>
+<ul>
+<li class="chapter" data-level="16.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#standard-regregression-model"><i class="fa fa-check"></i><b>16.1</b> Standard regregression model<span></span></a></li>
+<li class="chapter" data-level="16.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#mixed-nodel"><i class="fa fa-check"></i><b>16.2</b> mixed nodel<span></span></a>
+<ul>
+<li class="chapter" data-level="16.2.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#student-specific-effect-initial-depiction"><i class="fa fa-check"></i><b>16.2.1</b> student specific effect (initial depiction)<span></span></a></li>
+<li class="chapter" data-level="16.2.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#as-multi-level-model"><i class="fa fa-check"></i><b>16.2.2</b> as multi-level model<span></span></a></li>
+<li class="chapter" data-level="16.2.3" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#mixed-model"><i class="fa fa-check"></i><b>16.2.3</b> Mixed Model<span></span></a></li>
+<li class="chapter" data-level="16.2.4" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#estimation-of-random-effects"><i class="fa fa-check"></i><b>16.2.4</b> Estimation of random effects<span></span></a></li>
+<li class="chapter" data-level="16.2.5" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#prediction"><i class="fa fa-check"></i><b>16.2.5</b> Prediction<span></span></a></li>
+<li class="chapter" data-level="16.2.6" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#cluster-level-covariates"><i class="fa fa-check"></i><b>16.2.6</b> Cluster Level Covariates<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="16.3" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#add-random-slope"><i class="fa fa-check"></i><b>16.3</b> Add random slope<span></span></a></li>
+<li class="chapter" data-level="16.4" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#cross-classified-models"><i class="fa fa-check"></i><b>16.4</b> Cross Classified models<span></span></a></li>
+<li class="chapter" data-level="16.5" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#hierachical-structure"><i class="fa fa-check"></i><b>16.5</b> Hierachical structure<span></span></a>
+<ul>
+<li class="chapter" data-level="16.5.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#crossed-vs.-nested"><i class="fa fa-check"></i><b>16.5.1</b> Crossed vs. nested<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="16.6" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#residual-structure"><i class="fa fa-check"></i><b>16.6</b> Residual Structure<span></span></a>
+<ul>
+<li class="chapter" data-level="16.6.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#heterogeneous-variance"><i class="fa fa-check"></i><b>16.6.1</b> Heterogeneous variance<span></span></a></li>
+<li class="chapter" data-level="16.6.2" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#autocorrelation"><i class="fa fa-check"></i><b>16.6.2</b> Autocorrelation<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="16.7" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#generalized-linear-mixed-models"><i class="fa fa-check"></i><b>16.7</b> Generalized Linear Mixed Models<span></span></a></li>
+<li class="chapter" data-level="16.8" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#issues-considderations"><i class="fa fa-check"></i><b>16.8</b> Issues/ Considderations<span></span></a>
+<ul>
+<li class="chapter" data-level="16.8.1" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#model-comparison-2"><i class="fa fa-check"></i><b>16.8.1</b> Model comparison<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="16.9" data-path="mixed-models-with-r.html"><a href="mixed-models-with-r.html#formula-summary"><i class="fa fa-check"></i><b>16.9</b> Formula summary<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="17" data-path="references-and-session-info.html"><a href="references-and-session-info.html"><i class="fa fa-check"></i><b>17</b> References and Session Info<span></span></a>
+<ul>
+<li class="chapter" data-level="17.1" data-path="references-and-session-info.html"><a href="references-and-session-info.html#session-info"><i class="fa fa-check"></i><b>17.1</b> Session Info<span></span></a>
+<ul>
+<li class="chapter" data-level="17.1.1" data-path="references-and-session-info.html"><a href="references-and-session-info.html#r-settings"><i class="fa fa-check"></i><b>17.1.1</b> R settings<span></span></a></li>
+<li class="chapter" data-level="17.1.2" data-path="references-and-session-info.html"><a href="references-and-session-info.html#python-settings"><i class="fa fa-check"></i><b>17.1.2</b> Python settings<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="17.2" data-path="references-and-session-info.html"><a href="references-and-session-info.html#references"><i class="fa fa-check"></i><b>17.2</b> References<span></span></a></li>
 </ul></li>
 </ul>
 
@@ -970,8 +1041,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="rethinking-chapter-5" class="section level1" number="6">
-<h1><span class="header-section-number">6</span> Rethinking: Chapter 5</h1>
+<div id="rethinking-chapter-5" class="section level1 hasAnchor" number="6">
+<h1><span class="header-section-number">6</span> Rethinking: Chapter 5<a href="rethinking-chapter-5.html#rethinking-chapter-5" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><strong>Spurious waffles</strong></p>
 <p>by <a href="https://xcelab.net/rm/statistical-rethinking/">Richard McElreath</a>, building on the Summaries by <a href="https://bookdown.org/content/4857/">Solomon Kurz</a> and <a href="https://sr2-solutions.wjakethompson.com/linear-models.html">Jake Thompson</a>.</p>
 <div class="sourceCode" id="cb291"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb291-1"><a href="rethinking-chapter-5.html#cb291-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
@@ -1215,8 +1286,8 @@ D_i &amp; {\sim} &amp; Normal(\mu, \sigma) &amp; \textrm{[likelihood]}\\
 <span id="cb300-3"><a href="rethinking-chapter-5.html#cb300-3" aria-hidden="true" tabindex="-1"></a>  p_age <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>()) <span class="sc">&amp;</span></span>
 <span id="cb300-4"><a href="rethinking-chapter-5.html#cb300-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lims</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">15</span>))</span></code></pre></div>
 <p><img src="rethinking_c5_files/figure-html/unnamed-chunk-8-1.svg" width="672" style="display: block; margin: auto;" /></p>
-<div id="directed-acyclic-graphs" class="section level2" number="6.1">
-<h2><span class="header-section-number">6.1</span> Directed Acyclic Graphs</h2>
+<div id="directed-acyclic-graphs" class="section level2 hasAnchor" number="6.1">
+<h2><span class="header-section-number">6.1</span> Directed Acyclic Graphs<a href="rethinking-chapter-5.html#directed-acyclic-graphs" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div class="sourceCode" id="cb301"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb301-1"><a href="rethinking-chapter-5.html#cb301-1" aria-hidden="true" tabindex="-1"></a>dag1 <span class="ot">&lt;-</span> <span class="fu">dagify</span>(</span>
 <span id="cb301-2"><a href="rethinking-chapter-5.html#cb301-2" aria-hidden="true" tabindex="-1"></a>  D <span class="sc">~</span> A <span class="sc">+</span> M,</span>
 <span id="cb301-3"><a href="rethinking-chapter-5.html#cb301-3" aria-hidden="true" tabindex="-1"></a>  M <span class="sc">~</span> A,</span>
@@ -1293,8 +1364,8 @@ D_i &amp; {\sim} &amp; Normal(\mu, \sigma) &amp; \textrm{[likelihood]}\\
 <span id="cb303-7"><a href="rethinking-chapter-5.html#cb303-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">impliedConditionalIndependencies</span>()</span></code></pre></div>
 <pre><code>#&gt; D _||_ M | A</code></pre>
 </div>
-<div id="multiple-regression-notion" class="section level2" number="6.2">
-<h2><span class="header-section-number">6.2</span> Multiple Regression notion</h2>
+<div id="multiple-regression-notion" class="section level2 hasAnchor" number="6.2">
+<h2><span class="header-section-number">6.2</span> Multiple Regression notion<a href="rethinking-chapter-5.html#multiple-regression-notion" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p><span class="math display">\[
 \begin{array}{cccr} 
 D_i &amp; {\sim} &amp; Normal(\mu, \sigma) &amp; \textrm{[likelihood]}\\
@@ -1471,15 +1542,15 @@ m = Xb
 <span id="cb311-2"><a href="rethinking-chapter-5.html#cb311-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">se =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb311-3"><a href="rethinking-chapter-5.html#cb311-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_coeftab</span>(ct_sim_codep)</span></code></pre></div>
 <p><img src="rethinking_c5_files/figure-html/unnamed-chunk-18-1.svg" width="672" style="display: block; margin: auto;" /></p>
-<div id="visualizations-for-multivariate-regressions" class="section level3" number="6.2.1">
-<h3><span class="header-section-number">6.2.1</span> Visualizations for multivariate regressions</h3>
+<div id="visualizations-for-multivariate-regressions" class="section level3 hasAnchor" number="6.2.1">
+<h3><span class="header-section-number">6.2.1</span> Visualizations for multivariate regressions<a href="rethinking-chapter-5.html#visualizations-for-multivariate-regressions" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
 <li><em>Predictor residual plots.</em> useful for understanding the model, but not much else</li>
 <li><em>Posterior prediction plots.</em> checking fit and assessing predictions</li>
 <li><em>Counterfactual plots.</em> implied predictions for imaginary experiments</li>
 </ul>
-<div id="predictor-residual-plots" class="section level4" number="6.2.1.1">
-<h4><span class="header-section-number">6.2.1.1</span> Predictor residual plots</h4>
+<div id="predictor-residual-plots" class="section level4 hasAnchor" number="6.2.1.1">
+<h4><span class="header-section-number">6.2.1.1</span> Predictor residual plots<a href="rethinking-chapter-5.html#predictor-residual-plots" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>predictor residual plot for <em>marriage rate</em></p>
 <div class="sourceCode" id="cb312"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb312-1"><a href="rethinking-chapter-5.html#cb312-1" aria-hidden="true" tabindex="-1"></a>pred_res_marriage <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
 <span id="cb312-2"><a href="rethinking-chapter-5.html#cb312-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">flist =</span> <span class="fu">alist</span>(</span>
@@ -1624,8 +1695,8 @@ m = Xb
 <span id="cb314-2"><a href="rethinking-chapter-5.html#cb314-2" aria-hidden="true" tabindex="-1"></a>  p_12 <span class="sc">+</span> p_22</span></code></pre></div>
 <p><img src="rethinking_c5_files/figure-html/unnamed-chunk-21-1.svg" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="posterior-preediction-plots" class="section level4" number="6.2.1.2">
-<h4><span class="header-section-number">6.2.1.2</span> Posterior Preediction Plots</h4>
+<div id="posterior-preediction-plots" class="section level4 hasAnchor" number="6.2.1.2">
+<h4><span class="header-section-number">6.2.1.2</span> Posterior Preediction Plots<a href="rethinking-chapter-5.html#posterior-preediction-plots" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <div class="sourceCode" id="cb315"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb315-1"><a href="rethinking-chapter-5.html#cb315-1" aria-hidden="true" tabindex="-1"></a>posterior_prediction <span class="ot">&lt;-</span> <span class="fu">link</span>(model_multiple) <span class="sc">%&gt;%</span> </span>
 <span id="cb315-2"><a href="rethinking-chapter-5.html#cb315-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb315-3"><a href="rethinking-chapter-5.html#cb315-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_names</span>(<span class="at">nm =</span> <span class="fu">seq_along</span>(data_waffle<span class="sc">$</span>divorce_std)) <span class="sc">%&gt;%</span> </span>
@@ -1740,8 +1811,8 @@ This is normal, they <em>“pull towards the mean”</em>.</p>
 </table>
 <p>Note, how the estimated mean for <code>beta_s</code> is close to 0 (0.09) – despite the correlation shown above 🤔`.</p>
 </div>
-<div id="counterfactual-plots" class="section level4" number="6.2.1.3">
-<h4><span class="header-section-number">6.2.1.3</span> Counterfactual Plots</h4>
+<div id="counterfactual-plots" class="section level4 hasAnchor" number="6.2.1.3">
+<h4><span class="header-section-number">6.2.1.3</span> Counterfactual Plots<a href="rethinking-chapter-5.html#counterfactual-plots" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <div class="sourceCode" id="cb318"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb318-1"><a href="rethinking-chapter-5.html#cb318-1" aria-hidden="true" tabindex="-1"></a>model_counterfactual <span class="ot">&lt;-</span> <span class="fu">quap</span>(</span>
 <span id="cb318-2"><a href="rethinking-chapter-5.html#cb318-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">flist =</span> <span class="fu">alist</span>(</span>
 <span id="cb318-3"><a href="rethinking-chapter-5.html#cb318-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># A -&gt; D &lt;- M</span></span>
@@ -1883,7 +1954,7 @@ This is normal, they <em>“pull towards the mean”</em>.</p>
 <span id="cb320-12"><a href="rethinking-chapter-5.html#cb320-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> row_idx, <span class="at">values_from =</span> value) <span class="sc">%&gt;%</span> </span>
 <span id="cb320-13"><a href="rethinking-chapter-5.html#cb320-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">effect =</span> <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="sc">-</span> <span class="st">`</span><span class="at">1</span><span class="st">`</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb320-14"><a href="rethinking-chapter-5.html#cb320-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean =</span> <span class="fu">mean</span>(effect))</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1 x 1
+<pre><code>#&gt; # A tibble: 1 × 1
 #&gt;    mean
 #&gt;   &lt;dbl&gt;
 #&gt; 1 -4.59</code></pre>
@@ -1922,8 +1993,8 @@ This is normal, they <em>“pull towards the mean”</em>.</p>
 </div>
 </div>
 </div>
-<div id="masked-relationship" class="section level2" number="6.3">
-<h2><span class="header-section-number">6.3</span> Masked relationship</h2>
+<div id="masked-relationship" class="section level2 hasAnchor" number="6.3">
+<h2><span class="header-section-number">6.3</span> Masked relationship<a href="rethinking-chapter-5.html#masked-relationship" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Loading the milk data</p>
 <div class="sourceCode" id="cb323"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb323-1"><a href="rethinking-chapter-5.html#cb323-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(milk)</span>
 <span id="cb323-2"><a href="rethinking-chapter-5.html#cb323-2" aria-hidden="true" tabindex="-1"></a>data_milk <span class="ot">&lt;-</span> milk <span class="sc">%&gt;%</span> </span>
@@ -2035,8 +2106,8 @@ This is normal, they <em>“pull towards the mean”</em>.</p>
 </tr>
 </tbody>
 </table>
-<div id="bi-variate-models" class="section level3" number="6.3.1">
-<h3><span class="header-section-number">6.3.1</span> Bi-variate models</h3>
+<div id="bi-variate-models" class="section level3 hasAnchor" number="6.3.1">
+<h3><span class="header-section-number">6.3.1</span> Bi-variate models<a href="rethinking-chapter-5.html#bi-variate-models" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div class="columns">
 <div class="column1st">
 <p>Neocortex effect on caloric content of milk
@@ -2435,8 +2506,8 @@ K_i &amp; {\sim} &amp; Normal(\mu_i, \sigma) &amp; \textrm{[likelihood]}\\
 <span id="cb338-2"><a href="rethinking-chapter-5.html#cb338-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">2</span>))</span></code></pre></div>
 <p><img src="rethinking_c5_files/figure-html/unnamed-chunk-43-1.svg" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="simulate-a-masking-relationship" class="section level3" number="6.3.2">
-<h3><span class="header-section-number">6.3.2</span> Simulate a masking relationship</h3>
+<div id="simulate-a-masking-relationship" class="section level3 hasAnchor" number="6.3.2">
+<h3><span class="header-section-number">6.3.2</span> Simulate a masking relationship<a href="rethinking-chapter-5.html#simulate-a-masking-relationship" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>DAG a) (<span class="math inline">\(M \rightarrow K \leftarrow N \leftarrow M\)</span>)</p>
 <div class="sourceCode" id="cb339"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb339-1"><a href="rethinking-chapter-5.html#cb339-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
 <span id="cb339-2"><a href="rethinking-chapter-5.html#cb339-2" aria-hidden="true" tabindex="-1"></a>data_milk_sim1 <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">mass_std =</span> <span class="fu">rnorm</span>(<span class="at">n =</span> n),</span>
@@ -2512,10 +2583,10 @@ K_i &amp; {\sim} &amp; Normal(\mu_i, \sigma) &amp; \textrm{[likelihood]}\\
 <p><img src="rethinking_c5_files/figure-html/unnamed-chunk-50-1.svg" width="960" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="categorical-variables" class="section level2" number="6.4">
-<h2><span class="header-section-number">6.4</span> Categorical Variables</h2>
-<div id="indicator-vs.-index-variable-binary-categories" class="section level3" number="6.4.1">
-<h3><span class="header-section-number">6.4.1</span> Indicator vs. Index variable (binary categories)</h3>
+<div id="categorical-variables" class="section level2 hasAnchor" number="6.4">
+<h2><span class="header-section-number">6.4</span> Categorical Variables<a href="rethinking-chapter-5.html#categorical-variables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="indicator-vs.-index-variable-binary-categories" class="section level3 hasAnchor" number="6.4.1">
+<h3><span class="header-section-number">6.4.1</span> Indicator vs. Index variable (binary categories)<a href="rethinking-chapter-5.html#indicator-vs.-index-variable-binary-categories" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Taking gender into account for the height model (but not caring about weight).</p>
 <div class="sourceCode" id="cb346"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb346-1"><a href="rethinking-chapter-5.html#cb346-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(Howell1)</span>
 <span id="cb346-2"><a href="rethinking-chapter-5.html#cb346-2" aria-hidden="true" tabindex="-1"></a>data_height <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(Howell1) <span class="sc">%&gt;%</span> </span>
@@ -2723,8 +2794,8 @@ h_i &amp; {\sim} &amp; Normal(\mu_i, \sigma) &amp; &amp;\textrm{[likelihood]}\\
 <span id="cb352-22"><a href="rethinking-chapter-5.html#cb352-22" aria-hidden="true" tabindex="-1"></a>p_contrast1 <span class="sc">+</span> p_contrast2 <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">widths =</span> <span class="fu">c</span>(<span class="dv">1</span>,.<span class="dv">66</span>))</span></code></pre></div>
 <p><img src="rethinking_c5_files/figure-html/unnamed-chunk-57-1.svg" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="multiple-categories" class="section level3" number="6.4.2">
-<h3><span class="header-section-number">6.4.2</span> Multiple categories</h3>
+<div id="multiple-categories" class="section level3 hasAnchor" number="6.4.2">
+<h3><span class="header-section-number">6.4.2</span> Multiple categories<a href="rethinking-chapter-5.html#multiple-categories" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Taking the broad taxonomic unit into account for the milk model (but not caring about neocortex od weight).</p>
 <div class="sourceCode" id="cb353"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb353-1"><a href="rethinking-chapter-5.html#cb353-1" aria-hidden="true" tabindex="-1"></a>houses <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Gryffindor&quot;</span>, <span class="st">&quot;Hufflepuff&quot;</span>, <span class="st">&quot;Ravenclaw&quot;</span>, <span class="st">&quot;Slytherin&quot;</span>)</span>
 <span id="cb353-2"><a href="rethinking-chapter-5.html#cb353-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">63</span>)</span>
@@ -2845,8 +2916,8 @@ K_i &amp; {\sim} &amp; Normal(\mu_i, \sigma) &amp; &amp;\textrm{[likelihood]}\\
 <span id="cb358-40"><a href="rethinking-chapter-5.html#cb358-40" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(chapter5_models, <span class="st">&quot;envs/chapter5_models.rds&quot;</span>)</span></code></pre></div>
 </div>
 </div>
-<div id="homework-3" class="section level2" number="6.5">
-<h2><span class="header-section-number">6.5</span> Homework</h2>
+<div id="homework-3" class="section level2 hasAnchor" number="6.5">
+<h2><span class="header-section-number">6.5</span> Homework<a href="rethinking-chapter-5.html#homework-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p><strong>E1</strong></p>
 <p><span class="math display">\[
 \begin{array}{ccclr} 
@@ -3644,10 +3715,10 @@ To then get to the magnitude of the contrast, scale by <code>max - min</code>.</
 <pre><code>#&gt;        mean   sd 5.5% 94.5%
 #&gt; beta_S 0.35 0.22 0.01  0.69</code></pre>
 </div>
-<div id="brms-section-3" class="section level2" number="6.6">
-<h2><span class="header-section-number">6.6</span> {brms} section</h2>
-<div id="age-at-marriage-model" class="section level3" number="6.6.1">
-<h3><span class="header-section-number">6.6.1</span> Age at marriage Model</h3>
+<div id="brms-section-3" class="section level2 hasAnchor" number="6.6">
+<h2><span class="header-section-number">6.6</span> {brms} section<a href="rethinking-chapter-5.html#brms-section-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="age-at-marriage-model" class="section level3 hasAnchor" number="6.6.1">
+<h3><span class="header-section-number">6.6.1</span> Age at marriage Model<a href="rethinking-chapter-5.html#age-at-marriage-model" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Note the <code>sample_prior = TRUE</code> to also sample from the prior (as well as from the posterior).
 Prior samples are extracted with <code>prior_draws()</code>.</p>
 <div class="sourceCode" id="cb407"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb407-1"><a href="rethinking-chapter-5.html#cb407-1" aria-hidden="true" tabindex="-1"></a>brms_c5_model_age <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
@@ -3714,8 +3785,8 @@ Prior samples are extracted with <code>prior_draws()</code>.</p>
 #&gt; and Tail_ESS are effective sample size measures, and Rhat is the potential
 #&gt; scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
-<div id="marriage-rate-model" class="section level3" number="6.6.2">
-<h3><span class="header-section-number">6.6.2</span> Marriage rate Model</h3>
+<div id="marriage-rate-model" class="section level3 hasAnchor" number="6.6.2">
+<h3><span class="header-section-number">6.6.2</span> Marriage rate Model<a href="rethinking-chapter-5.html#marriage-rate-model" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div class="sourceCode" id="cb411"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb411-1"><a href="rethinking-chapter-5.html#cb411-1" aria-hidden="true" tabindex="-1"></a>brms_c5_model_marriage <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
 <span id="cb411-2"><a href="rethinking-chapter-5.html#cb411-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_waffle,</span>
 <span id="cb411-3"><a href="rethinking-chapter-5.html#cb411-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
@@ -3764,8 +3835,8 @@ Prior samples are extracted with <code>prior_draws()</code>.</p>
 <span id="cb414-14"><a href="rethinking-chapter-5.html#cb414-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;divorce_rate_std&quot;</span>)</span></code></pre></div>
 <p><img src="rethinking_c5_files/figure-html/unnamed-chunk-92-1.svg" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="multiple-regression" class="section level3" number="6.6.3">
-<h3><span class="header-section-number">6.6.3</span> Multiple regression</h3>
+<div id="multiple-regression" class="section level3 hasAnchor" number="6.6.3">
+<h3><span class="header-section-number">6.6.3</span> Multiple regression<a href="rethinking-chapter-5.html#multiple-regression" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div class="sourceCode" id="cb415"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb415-1"><a href="rethinking-chapter-5.html#cb415-1" aria-hidden="true" tabindex="-1"></a>brms_c5_model_multiple <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
 <span id="cb415-2"><a href="rethinking-chapter-5.html#cb415-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_waffle, </span>
 <span id="cb415-3"><a href="rethinking-chapter-5.html#cb415-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
@@ -3873,8 +3944,8 @@ Prior samples are extracted with <code>prior_draws()</code>.</p>
 <span id="cb421-44"><a href="rethinking-chapter-5.html#cb421-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title =</span> <span class="fu">element_blank</span>())</span></code></pre></div>
 <p><img src="rethinking_c5_files/figure-html/unnamed-chunk-96-1.svg" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="multivariate-posteriors" class="section level3" number="6.6.4">
-<h3><span class="header-section-number">6.6.4</span> Multivariate Posteriors</h3>
+<div id="multivariate-posteriors" class="section level3 hasAnchor" number="6.6.4">
+<h3><span class="header-section-number">6.6.4</span> Multivariate Posteriors<a href="rethinking-chapter-5.html#multivariate-posteriors" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div class="sourceCode" id="cb422"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb422-1"><a href="rethinking-chapter-5.html#cb422-1" aria-hidden="true" tabindex="-1"></a>brms_c5_model_residuals_marriage <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
 <span id="cb422-2"><a href="rethinking-chapter-5.html#cb422-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_waffle, </span>
 <span id="cb422-3"><a href="rethinking-chapter-5.html#cb422-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
@@ -3974,15 +4045,15 @@ Prior samples are extracted with <code>prior_draws()</code>.</p>
 <span id="cb427-11"><a href="rethinking-chapter-5.html#cb427-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c5_model_spurious&quot;</span>)</span>
 <span id="cb427-12"><a href="rethinking-chapter-5.html#cb427-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb427-13"><a href="rethinking-chapter-5.html#cb427-13" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixef</span>(brms_c5_model_spurious)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 3 x 5
+<pre><code>#&gt; # A tibble: 3 × 5
 #&gt;   term      value    se lower_2.5 upper_97.5
 #&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
 #&gt; 1 Intercept 0.05  0.096    -0.135      0.242
 #&gt; 2 x_real    0.902 0.146     0.619      1.18 
 #&gt; 3 x_spur    0.094 0.108    -0.113      0.309</code></pre>
 </div>
-<div id="counterfactual-plots-1" class="section level3" number="6.6.5">
-<h3><span class="header-section-number">6.6.5</span> Counterfactual plots</h3>
+<div id="counterfactual-plots-1" class="section level3 hasAnchor" number="6.6.5">
+<h3><span class="header-section-number">6.6.5</span> Counterfactual plots<a href="rethinking-chapter-5.html#counterfactual-plots-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <blockquote>
 <p>At this point, it’s important to recognize we have two regression models. As a first step, we might specify each model separately in a <code>bf()</code> function and save them as objects (<a href="https://cran.r-project.org/web/packages/brms/vignettes/brms_multivariate.html">Estimating multivariate models with brms</a>).</p>
 </blockquote>
@@ -4073,8 +4144,8 @@ Prior samples are extracted with <code>prior_draws()</code>.</p>
 <span id="cb433-14"><a href="rethinking-chapter-5.html#cb433-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;counterfactual divorce_std&quot;</span>)</span></code></pre></div>
 <p><img src="rethinking_c5_files/figure-html/unnamed-chunk-105-2.svg" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="masked-relationships" class="section level3" number="6.6.6">
-<h3><span class="header-section-number">6.6.6</span> Masked Relationships</h3>
+<div id="masked-relationships" class="section level3 hasAnchor" number="6.6.6">
+<h3><span class="header-section-number">6.6.6</span> Masked Relationships<a href="rethinking-chapter-5.html#masked-relationships" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div class="sourceCode" id="cb434"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb434-1"><a href="rethinking-chapter-5.html#cb434-1" aria-hidden="true" tabindex="-1"></a>brms_c5_model_milk_draft <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
 <span id="cb434-2"><a href="rethinking-chapter-5.html#cb434-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_milk, </span>
 <span id="cb434-3"><a href="rethinking-chapter-5.html#cb434-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
@@ -4280,29 +4351,29 @@ Prior samples are extracted with <code>prior_draws()</code>.</p>
 <span id="cb442-18"><a href="rethinking-chapter-5.html#cb442-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;brms/brms_c5_model_milk_weight_sim&quot;</span>)</span>
 <span id="cb442-19"><a href="rethinking-chapter-5.html#cb442-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb442-20"><a href="rethinking-chapter-5.html#cb442-20" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixef</span>(brms_c5_model_milk_cortex_sim)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 5
+<pre><code>#&gt; # A tibble: 2 × 5
 #&gt;   term          value    se lower_2.5 upper_97.5
 #&gt;   &lt;chr&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
 #&gt; 1 Intercept     0.003 0.162    -0.324      0.321
 #&gt; 2 neocortex_std 0.123 0.231    -0.325      0.584</code></pre>
 <div class="sourceCode" id="cb444"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb444-1"><a href="rethinking-chapter-5.html#cb444-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixef</span>(brms_c5_model_milk_weight_sim)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 5
+<pre><code>#&gt; # A tibble: 2 × 5
 #&gt;   term       value    se lower_2.5 upper_97.5
 #&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
 #&gt; 1 Intercept  0.005 0.152    -0.293      0.307
 #&gt; 2 mass_std  -0.283 0.221    -0.708      0.158</code></pre>
 <div class="sourceCode" id="cb446"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb446-1"><a href="rethinking-chapter-5.html#cb446-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixef</span>(brms_c5_model_milk_multi_sim)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 3 x 5
+<pre><code>#&gt; # A tibble: 3 × 5
 #&gt;   term           value    se lower_2.5 upper_97.5
 #&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
 #&gt; 1 Intercept     -0.047 0.081    -0.208      0.112
 #&gt; 2 neocortex_std  0.982 0.096     0.794      1.17 
 #&gt; 3 mass_std      -1.04  0.118    -1.26      -0.808</code></pre>
 </div>
-<div id="categorical-variables-1" class="section level3" number="6.6.7">
-<h3><span class="header-section-number">6.6.7</span> Categorical Variables</h3>
-<div id="binary-categories" class="section level4" number="6.6.7.1">
-<h4><span class="header-section-number">6.6.7.1</span> Binary Categories</h4>
+<div id="categorical-variables-1" class="section level3 hasAnchor" number="6.6.7">
+<h3><span class="header-section-number">6.6.7</span> Categorical Variables<a href="rethinking-chapter-5.html#categorical-variables-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="binary-categories" class="section level4 hasAnchor" number="6.6.7.1">
+<h4><span class="header-section-number">6.6.7.1</span> Binary Categories<a href="rethinking-chapter-5.html#binary-categories" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>For an indicator variable, we need this to be a <code>factor()</code>:</p>
 <div class="sourceCode" id="cb448"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb448-1"><a href="rethinking-chapter-5.html#cb448-1" aria-hidden="true" tabindex="-1"></a>data_height <span class="ot">&lt;-</span> data_height <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">sex =</span> <span class="fu">factor</span>(sex))</span>
 <span id="cb448-2"><a href="rethinking-chapter-5.html#cb448-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -4378,8 +4449,8 @@ Prior samples are extracted with <code>prior_draws()</code>.</p>
 </tbody>
 </table>
 </div>
-<div id="many-categories" class="section level4" number="6.6.7.2">
-<h4><span class="header-section-number">6.6.7.2</span> Many Categories</h4>
+<div id="many-categories" class="section level4 hasAnchor" number="6.6.7.2">
+<h4><span class="header-section-number">6.6.7.2</span> Many Categories<a href="rethinking-chapter-5.html#many-categories" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <div class="sourceCode" id="cb450"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb450-1"><a href="rethinking-chapter-5.html#cb450-1" aria-hidden="true" tabindex="-1"></a>brms_c5_model_milk_clade <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
 <span id="cb450-2"><a href="rethinking-chapter-5.html#cb450-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_milk, </span>
 <span id="cb450-3"><a href="rethinking-chapter-5.html#cb450-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
@@ -4426,7 +4497,7 @@ Prior samples are extracted with <code>prior_draws()</code>.</p>
 <span id="cb453-10"><a href="rethinking-chapter-5.html#cb453-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">file =</span> <span class="st">&quot;brms/brms_c5_model_milk_house&quot;</span>)</span></code></pre></div>
 <p><span class="math inline">\(\rightarrow\)</span> there are only three <em>house</em> levels 🤨.</p>
 <div class="sourceCode" id="cb454"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb454-1"><a href="rethinking-chapter-5.html#cb454-1" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixef</span>(brms_c5_model_milk_house)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 7 x 5
+<pre><code>#&gt; # A tibble: 7 × 5
 #&gt;   term                 value    se lower_2.5 upper_97.5
 #&gt;   &lt;chr&gt;                &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
 #&gt; 1 cladeApe            -0.431 0.261    -0.932      0.082
@@ -4535,7 +4606,7 @@ When we use the typical formula syntax with brms, we can suppress the overall in
 <span id="cb457-14"><a href="rethinking-chapter-5.html#cb457-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">file =</span> <span class="st">&quot;brms/brms_c5_model_milk_house_correct_index&quot;</span>)</span>
 <span id="cb457-15"><a href="rethinking-chapter-5.html#cb457-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb457-16"><a href="rethinking-chapter-5.html#cb457-16" aria-hidden="true" tabindex="-1"></a>mixedup<span class="sc">::</span><span class="fu">extract_fixef</span>(brms_c5_model_milk_house_correct_index)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 8 x 5
+<pre><code>#&gt; # A tibble: 8 × 5
 #&gt;   term                   value    se lower_2.5 upper_97.5
 #&gt;   &lt;chr&gt;                  &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
 #&gt; 1 a_cladeApe            -0.395 0.28     -0.936      0.146
@@ -4564,10 +4635,10 @@ When we use the typical formula syntax with brms, we can suppress the overall in
 <p><img src="rethinking_c5_files/figure-html/unnamed-chunk-122-1.svg" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="alternative-ways-to-model-multiple-categories" class="section level3" number="6.6.8">
-<h3><span class="header-section-number">6.6.8</span> Alternative ways to model multiple categories</h3>
-<div id="contrast-coding" class="section level4" number="6.6.8.1">
-<h4><span class="header-section-number">6.6.8.1</span> Contrast Coding</h4>
+<div id="alternative-ways-to-model-multiple-categories" class="section level3 hasAnchor" number="6.6.8">
+<h3><span class="header-section-number">6.6.8</span> Alternative ways to model multiple categories<a href="rethinking-chapter-5.html#alternative-ways-to-model-multiple-categories" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="contrast-coding" class="section level4 hasAnchor" number="6.6.8.1">
+<h4><span class="header-section-number">6.6.8.1</span> Contrast Coding<a href="rethinking-chapter-5.html#contrast-coding" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <div class="sourceCode" id="cb460"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb460-1"><a href="rethinking-chapter-5.html#cb460-1" aria-hidden="true" tabindex="-1"></a>data_contrast <span class="ot">&lt;-</span> data_height <span class="sc">%&gt;%</span></span>
 <span id="cb460-2"><a href="rethinking-chapter-5.html#cb460-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sex_c =</span> <span class="fu">if_else</span>(sex <span class="sc">==</span> <span class="st">&quot;1&quot;</span>, <span class="sc">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span>))</span>
 <span id="cb460-3"><a href="rethinking-chapter-5.html#cb460-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -4600,8 +4671,8 @@ When we use the typical formula syntax with brms, we can suppress the overall in
 <p><img src="rethinking_c5_files/figure-html/unnamed-chunk-124-1.svg" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="multilevel-anova" class="section level3" number="6.6.9">
-<h3><span class="header-section-number">6.6.9</span> Multilevel ANOVA</h3>
+<div id="multilevel-anova" class="section level3 hasAnchor" number="6.6.9">
+<h3><span class="header-section-number">6.6.9</span> Multilevel ANOVA<a href="rethinking-chapter-5.html#multilevel-anova" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>(This might make sense after reading Chapter 13…)</p>
 <p><span class="math display">\[
 \begin{array}{ccccr} 
@@ -4643,8 +4714,8 @@ u_{j[i]} &amp; \sim &amp; Normal(0, \sigma_{CLADE}) &amp; \textrm{for}~j = 1..4 
 <p><img src="rethinking_c5_files/figure-html/unnamed-chunk-125-1.svg" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="pymc3-section-3" class="section level2" number="6.7">
-<h2><span class="header-section-number">6.7</span> pymc3 section</h2>
+<div id="pymc3-section-3" class="section level2 hasAnchor" number="6.7">
+<h2><span class="header-section-number">6.7</span> pymc3 section<a href="rethinking-chapter-5.html#pymc3-section-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <hr />
 <div id="myModal" class="modal">
 <span class="close">×</span>
@@ -4667,7 +4738,6 @@ u_{j[i]} &amp; \sim &amp; Normal(0, \sigma_{CLADE}) &amp; \textrm{for}~j = 1..4 
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -4686,6 +4756,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": "github"
 },
 "fontsettings": {
@@ -4706,6 +4777,10 @@ gitbook.start({
 "text": null
 },
 "download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": "section"
 }
