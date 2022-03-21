@@ -230,7 +230,7 @@ This equivalent to the beta-binomial, but for Poisson processes.
 
 The gamma-Poisson distribution has two parameters which are recruited from:
 
-- shape($\alpha$)
+- shape ($\alpha$)
 - scale ($\theta$)
 - rate ($\beta$)
 - mean ($\mu$)
@@ -802,7 +802,8 @@ model_trolley_predict <- ulam(
   ),
   data = data_trolley_list,
   chains = 4,
-  cores = 4
+  cores = 4,
+  log_lik = TRUE
 )
 ```
 
@@ -1442,7 +1443,7 @@ p1 + scale_y_continuous(labels = scales::label_comma()) +
 
 **H4**
 
-```{r H4}
+```{r H4, results = 'hide'}
 model_hurricane_fem_damlog_pres_i <- ulam(
   flist = alist(
     deaths ~ dgampois( lambda, phi ),
@@ -1566,6 +1567,30 @@ precis(model_fish) %>%
 
 **H7**
 
+```{r, include = FALSE}
+plot_dag <- function(dag, clr_in = clr1, parse_labs = TRUE){
+  dag %>% 
+    ggplot(aes(x = x,  y = y, xend = xend, yend = yend)) +
+    geom_dag_edges_link() +
+    geom_dag_node(aes(color = stage, fill = after_scale(clr_lighten(color,.7))),
+                  shape = 21, size = 12) +
+    geom_dag_text(aes(label = name), color = "black", size = 4, parse = parse_labs,
+                  family = fnt_sel, fontface = "bold")+
+    scale_color_manual(values = c(predictor = "black",
+                                  confounds = clr_dag,
+                                  response = clr_in),
+                       guide = "none") +
+    scale_edge_linetype_manual(values = c(confounds = 3,
+                                          predictor = 1,
+                                          response = 1), guide = "none") +
+    scale_edge_color_manual(values = c(confounds = "gray70",
+                                       predictor = "black",
+                                       response = "black"), guide = "none") +
+    theme_dag()
+}
+```
+
+
 ```{r H7}
 dag <- dagify(
   R ~ E + A,
@@ -1578,8 +1603,10 @@ dag <- dagify(
   mutate(stage = if_else(name == "R", "response",
                          if_else(name %in% c("A", "E"),
                                  "predictor", "confounds")))
+
 plot_dag(dag, clr_in = clr_current) + 
-  coord_fixed(ratio = .6)
+  coord_fixed(ratio = .6,
+              ylim = c(-.05,1.05)) 
 ```
 
 ```{r}
@@ -1620,7 +1647,6 @@ precis(model_trolley_education_age) %>%
 
 **H8**
 
-
 ```{r H8}
 data_trolley_list_age_gender <- data_trolley %>% 
   dplyr::select(response, education_idx, age_scl, sex) %>% 
@@ -1639,7 +1665,8 @@ dag <- dagify(
                          if_else(name %in% c("A", "E", "G"),
                                  "predictor", "confounds")))
 plot_dag(dag, clr_in = clr_current) + 
-  coord_fixed(ratio = .6)
+  coord_fixed(ratio = .6,
+              ylim = c(-.05,1.05))
 ```
 
 ```{r class.source="bg-save", results = 'hide', eval = FALSE}

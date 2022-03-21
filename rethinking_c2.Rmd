@@ -384,8 +384,6 @@ compare_qa <- function(w_in, l_in){
     as_tibble() %>% 
     mutate(qa = glue("W: {w_in}, L: {l_in}"))
   
-  qa_results %>% knitr::kable() %>% print()
-  
   ggplot() +
     stat_function(fun = function(x){ dbeta( shape1 =  w_in + 1, shape2 = l_in + 1, x =  x ) / 
         integrate(f = function(x){ dbeta( shape1 = w_in + 1, shape2 = l_in + 1, x = x )},

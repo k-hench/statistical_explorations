@@ -131,15 +131,15 @@ precis(ucb_posterior_means) %>%
 
 
 
-|column         |  mean|   sd|  5.5%| 94.5%|histogram      |
-|:--------------|-----:|----:|-----:|-----:|:--------------|
-|alpha.1        | -0.44| 0.42| -1.12|  0.19|▁▁▂▇▇▂▁        |
-|alpha.2        | -0.31| 0.44| -1.01|  0.44|▁▁▅▇▃▁▁        |
-|phi            |  1.00| 0.82|  0.07|  2.52|▇▅▃▂▁▁▁▁▁▁▁    |
-|theta          |  3.00| 0.82|  2.07|  4.52|▇▅▃▂▁▁▁▁▁▁▁    |
-|alpha.contrast | -0.14| 0.61| -1.14|  0.83|▁▁▂▅▇▇▂▁▁      |
-|p_alpha.1      |  0.40| 0.10|  0.25|  0.55|▁▁▂▃▇▇▇▅▃▁▁▁   |
-|p_alpha.2      |  0.43| 0.10|  0.27|  0.61|▁▁▁▃▅▇▇▇▅▂▁▁▁▁ |
+|column         |  mean|   sd|  5.5%| 94.5%|histogram       |
+|:--------------|-----:|----:|-----:|-----:|:---------------|
+|alpha.1        | -0.44| 0.39| -1.07|  0.19|▁▁▁▇▇▂▁         |
+|alpha.2        | -0.31| 0.43| -0.98|  0.36|▁▁▅▇▃▁▁         |
+|phi            |  0.99| 0.79|  0.09|  2.46|▇▇▅▂▁▁▁▁▁       |
+|theta          |  2.99| 0.79|  2.09|  4.46|▇▇▅▂▁▁▁▁▁       |
+|alpha.contrast | -0.13| 0.59| -1.09|  0.81|▁▁▁▅▇▇▂▁▁       |
+|p_alpha.1      |  0.40| 0.09|  0.26|  0.55|▁▁▁▁▃▅▇▇▅▃▁▁▁▁  |
+|p_alpha.2      |  0.43| 0.10|  0.27|  0.59|▁▁▁▃▅▇▇▇▅▂▁▁▁▁▁ |
 
 
 ```r
@@ -239,7 +239,7 @@ This equivalent to the beta-binomial, but for Poisson processes.
 
 The gamma-Poisson distribution has two parameters which are recruited from:
 
-- shape($\alpha$)
+- shape ($\alpha$)
 - scale ($\theta$)
 - rate ($\beta$)
 - mean ($\mu$)
@@ -953,7 +953,8 @@ model_trolley_predict <- ulam(
   ),
   data = data_trolley_list,
   chains = 4,
-  cores = 4
+  cores = 4,
+  log_lik = TRUE
 )
 ```
 
@@ -1160,7 +1161,7 @@ p2 <- delta3 %>%
 list(ggplotGrob(p1), ggplotGrob(p2)) %>%  wrap_plots()
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-40-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-40-1.svg" width="864" style="display: block; margin: auto;" />
 
 
 ```r
@@ -1741,67 +1742,6 @@ model_hurricane_fem_damlog_pres_i <- ulam(
 )
 ```
 
-```
-#> Running MCMC with 4 parallel chains, with 1 thread(s) per chain...
-#> 
-#> Chain 1 Iteration:   1 / 1000 [  0%]  (Warmup) 
-#> Chain 1 Iteration: 100 / 1000 [ 10%]  (Warmup) 
-#> Chain 1 Iteration: 200 / 1000 [ 20%]  (Warmup) 
-#> Chain 2 Iteration:   1 / 1000 [  0%]  (Warmup) 
-#> Chain 2 Iteration: 100 / 1000 [ 10%]  (Warmup) 
-#> Chain 2 Iteration: 200 / 1000 [ 20%]  (Warmup) 
-#> Chain 3 Iteration:   1 / 1000 [  0%]  (Warmup) 
-#> Chain 3 Iteration: 100 / 1000 [ 10%]  (Warmup) 
-#> Chain 3 Iteration: 200 / 1000 [ 20%]  (Warmup) 
-#> Chain 4 Iteration:   1 / 1000 [  0%]  (Warmup) 
-#> Chain 4 Iteration: 100 / 1000 [ 10%]  (Warmup) 
-#> Chain 1 Iteration: 300 / 1000 [ 30%]  (Warmup) 
-#> Chain 1 Iteration: 400 / 1000 [ 40%]  (Warmup) 
-#> Chain 1 Iteration: 500 / 1000 [ 50%]  (Warmup) 
-#> Chain 1 Iteration: 501 / 1000 [ 50%]  (Sampling) 
-#> Chain 2 Iteration: 300 / 1000 [ 30%]  (Warmup) 
-#> Chain 2 Iteration: 400 / 1000 [ 40%]  (Warmup) 
-#> Chain 2 Iteration: 500 / 1000 [ 50%]  (Warmup) 
-#> Chain 2 Iteration: 501 / 1000 [ 50%]  (Sampling) 
-#> Chain 3 Iteration: 300 / 1000 [ 30%]  (Warmup) 
-#> Chain 3 Iteration: 400 / 1000 [ 40%]  (Warmup) 
-#> Chain 4 Iteration: 200 / 1000 [ 20%]  (Warmup) 
-#> Chain 4 Iteration: 300 / 1000 [ 30%]  (Warmup) 
-#> Chain 1 Iteration: 600 / 1000 [ 60%]  (Sampling) 
-#> Chain 1 Iteration: 700 / 1000 [ 70%]  (Sampling) 
-#> Chain 2 Iteration: 600 / 1000 [ 60%]  (Sampling) 
-#> Chain 3 Iteration: 500 / 1000 [ 50%]  (Warmup) 
-#> Chain 3 Iteration: 501 / 1000 [ 50%]  (Sampling) 
-#> Chain 4 Iteration: 400 / 1000 [ 40%]  (Warmup) 
-#> Chain 1 Iteration: 800 / 1000 [ 80%]  (Sampling) 
-#> Chain 2 Iteration: 700 / 1000 [ 70%]  (Sampling) 
-#> Chain 2 Iteration: 800 / 1000 [ 80%]  (Sampling) 
-#> Chain 3 Iteration: 600 / 1000 [ 60%]  (Sampling) 
-#> Chain 3 Iteration: 700 / 1000 [ 70%]  (Sampling) 
-#> Chain 4 Iteration: 500 / 1000 [ 50%]  (Warmup) 
-#> Chain 4 Iteration: 501 / 1000 [ 50%]  (Sampling) 
-#> Chain 4 Iteration: 600 / 1000 [ 60%]  (Sampling) 
-#> Chain 1 Iteration: 900 / 1000 [ 90%]  (Sampling) 
-#> Chain 1 Iteration: 1000 / 1000 [100%]  (Sampling) 
-#> Chain 2 Iteration: 900 / 1000 [ 90%]  (Sampling) 
-#> Chain 2 Iteration: 1000 / 1000 [100%]  (Sampling) 
-#> Chain 3 Iteration: 800 / 1000 [ 80%]  (Sampling) 
-#> Chain 4 Iteration: 700 / 1000 [ 70%]  (Sampling) 
-#> Chain 4 Iteration: 800 / 1000 [ 80%]  (Sampling) 
-#> Chain 1 finished in 0.6 seconds.
-#> Chain 2 finished in 0.6 seconds.
-#> Chain 3 Iteration: 900 / 1000 [ 90%]  (Sampling) 
-#> Chain 3 Iteration: 1000 / 1000 [100%]  (Sampling) 
-#> Chain 4 Iteration: 900 / 1000 [ 90%]  (Sampling) 
-#> Chain 3 finished in 0.7 seconds.
-#> Chain 4 Iteration: 1000 / 1000 [100%]  (Sampling) 
-#> Chain 4 finished in 0.7 seconds.
-#> 
-#> All 4 chains finished successfully.
-#> Mean chain execution time: 0.7 seconds.
-#> Total execution time: 0.9 seconds.
-```
-
 
 
 ```r
@@ -1940,6 +1880,9 @@ precis(model_fish) %>%
 **H7**
 
 
+
+
+
 ```r
 dag <- dagify(
   R ~ E + A,
@@ -1952,8 +1895,10 @@ dag <- dagify(
   mutate(stage = if_else(name == "R", "response",
                          if_else(name %in% c("A", "E"),
                                  "predictor", "confounds")))
+
 plot_dag(dag, clr_in = clr_current) + 
-  coord_fixed(ratio = .6)
+  coord_fixed(ratio = .6,
+              ylim = c(-.05,1.05)) 
 ```
 
 <img src="rethinking_c12_files/figure-html/H7-1.svg" width="672" style="display: block; margin: auto;" />
@@ -2008,7 +1953,6 @@ precis(model_trolley_education_age) %>%
 **H8**
 
 
-
 ```r
 data_trolley_list_age_gender <- data_trolley %>% 
   dplyr::select(response, education_idx, age_scl, sex) %>% 
@@ -2027,7 +1971,8 @@ dag <- dagify(
                          if_else(name %in% c("A", "E", "G"),
                                  "predictor", "confounds")))
 plot_dag(dag, clr_in = clr_current) + 
-  coord_fixed(ratio = .6)
+  coord_fixed(ratio = .6,
+              ylim = c(-.05,1.05))
 ```
 
 <img src="rethinking_c12_files/figure-html/H8-1.svg" width="672" style="display: block; margin: auto;" />
@@ -2262,7 +2207,7 @@ p2 <- predict(brms_c12_model_ucb_beta) %>%
 p1 + p2
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-75-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-76-1.svg" width="672" style="display: block; margin: auto;" />
 
 #### Negative-binomial or gamma-Poisson
 
@@ -2294,7 +2239,7 @@ ggplot(data = tibble(x = seq(from = 0, to = 60, by = .1)),
   ggtitle(expression(brms~default~gamma(0.01*", "*0.01)~shape~prior))
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-77-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-78-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2331,7 +2276,7 @@ ocean_predictions %>%
   facet_wrap(~ culture, nrow = 2)
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-79-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-80-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 
@@ -2352,7 +2297,7 @@ ocean_posterior %>%
   facet_wrap(~ parameter, scales = "free")
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-80-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-81-1.svg" width="672" style="display: block; margin: auto;" />
 
 $$
 \theta = \frac{\mu}{\alpha}
@@ -2401,7 +2346,7 @@ p2 <- ocean_posterior %>%
 p1 + p2
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-81-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-82-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2517,7 +2462,7 @@ p1 + p2 &
                   ylim = range(data_kline_f$total_tools)) 
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-87-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-88-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2541,7 +2486,7 @@ predict(brms_c12_model_ocean_sci_gamma,
   facet_wrap(~ culture, nrow = 2)
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-88-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-89-1.svg" width="672" style="display: block; margin: auto;" />
 
 ### Zero-inflated outcomes
 
@@ -2589,7 +2534,7 @@ priors %>%
   theme(legend.position = "none")
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-91-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-92-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2825,7 +2770,7 @@ fixef(brms_c12_model_trolley) %>%
   ylab("log-cumulative-odds") 
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-97-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-98-1.svg" width="672" style="display: block; margin: auto;" />
 
 #### Adding predictor variables
 
@@ -2860,7 +2805,7 @@ as_draws_df(brms_c12_model_trolley_predict) %>%
   coord_cartesian(xlim = c(-1.4, 0))
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-99-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-100-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2953,7 +2898,7 @@ p1 + p2 +
   plot_layout(ncol = 1)
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-101-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-102-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -2995,7 +2940,7 @@ p1 + p2 +
   plot_layout(ncol = 1)
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-102-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-103-1.svg" width="672" style="display: block; margin: auto;" />
 
 ### Ordered categorical predictors
 
@@ -3027,7 +2972,7 @@ brms::rdirichlet(n = 1e4,
   facet_wrap(~ alpha, nrow = 2)
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-103-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-104-1.svg" width="672" style="display: block; margin: auto;" />
 
 > *When using __brms__, the issue of treating a predictor in the way McElreath covered in this section is referred to as __monotonic effects__. Bürkner outlined the issue in his (2021c) vignette, [Estimating monotonic effects with with brms](https://cran.r-project.org/web/packages/brms/vignettes/brms_monotonic.html), and in his (2020) article with Emmanuel Charpentier, Modelling monotonic effects of ordinal predictors in Bayesian regression models (click [here](https://psyarxiv.com/9qkhj/) for the freely-available preprint).*
 
@@ -3122,7 +3067,7 @@ as_draws_df(brms_c12_model_trolley_education) %>%
                                     fill = "transparent"))
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-106-1.svg" width="1056" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-107-1.svg" width="1056" style="display: block; margin: auto;" />
 
 
 
@@ -3213,7 +3158,7 @@ bind_rows(trolley_education_fitted_tib,
   facet_wrap(~ fit)  
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-109-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-110-1.svg" width="672" style="display: block; margin: auto;" />
 
 
 ```r
@@ -3273,7 +3218,7 @@ as_draws_df(brms_c12_model_trolley_education) %>%
   ylab("cumulative sum")
 ```
 
-<img src="rethinking_c12_files/figure-html/unnamed-chunk-112-1.svg" width="672" style="display: block; margin: auto;" />
+<img src="rethinking_c12_files/figure-html/unnamed-chunk-113-1.svg" width="672" style="display: block; margin: auto;" />
 
 > *This is another way to show that the largest effects of education are when going from Elementary School to Middle School $(\delta_{0} \rightarrow \delta_{1})$ and when going from Some High School to High School Graduate $(\delta_{2} \rightarrow \delta_{3})$.*
 

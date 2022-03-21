@@ -5,8 +5,8 @@ output_dir: docs
 rmd_files: ["index.Rmd", "rethinking_c1.Rmd", "rethinking_c2.Rmd", "rethinking_c3.Rmd", "rethinking_c4.Rmd", 
             "rethinking_c5.Rmd", "rethinking_c6.Rmd", "rethinking_c7.Rmd", "rethinking_c8.Rmd",
             "rethinking_c9.Rmd", "rethinking_c10.Rmd", "rethinking_c11.Rmd", "rethinking_c12.Rmd",
-            "rethinking_c13.Rmd",
-            "bayesian_stats_the_fun_way.Rmd", "mixed_models.Rmd", "Z_refs.Rmd"]
+            "rethinking_c13.Rmd", "rethinking_c14.Rmd", "rethinking_c15.Rmd", "rethinking_c16.Rmd",
+            "rethinking_c17.Rmd", "bayesian_stats_the_fun_way.Rmd", "mixed_models.Rmd", "Z_refs.Rmd"]
 clean: [packages.bib, bookdown.bbl]
 new_session: yes
 delete_merged_file: True

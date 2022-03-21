@@ -4111,10 +4111,10 @@ model_ucb_dept
 #> 
 #> Sampling durations (seconds):
 #>         warmup sample total
-#> chain:1   0.19   0.21  0.40
-#> chain:2   0.19   0.20  0.40
-#> chain:3   0.19   0.18  0.37
-#> chain:4   0.22   0.20  0.42
+#> chain:1   0.25   0.25  0.49
+#> chain:2   0.22   0.23  0.44
+#> chain:3   0.23   0.27  0.50
+#> chain:4   0.30   0.20  0.49
 #> 
 #> Formula:
 #> admit ~ dbinom(applications, p)

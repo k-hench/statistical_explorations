@@ -9,6 +9,14 @@ editor_options:
 
 # Rethinking: Chapter 13
 
+<script type="text/x-mathjax-config">
+MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+  MathJax.Hub.Insert(MathJax.InputJax.TeX.Definitions.macros,{
+    cancel: ["Extension","cancel"]
+  });
+});
+</script>
+
 **Models with Memory**
 
 ```{r setup, include = FALSE}
@@ -23,10 +31,853 @@ knitr::opts_chunk$set(echo = TRUE,
 
 source("bayesian_settings.R")
 source("knitr_matrix.R")
+clr_current <- clr2
 ```
 
-by [Richard McElreath](https://xcelab.net/rm/statistical-rethinking/), building on the Summaries by [Solomon Kurz](https://bookdown.org/content/4857/).
+by [Richard McElreath](https://xcelab.net/rm/statistical-rethinking/), building on the Summaries by [Solomon Kurz](https://bookdown.org/content/4857/) and [Erik Kusch](https://www.erikkusch.com/post/rethinking/statistical-rethinking-chapter-13/).
 
+Advantages of **multilevel models**:
+
+- Improved estimates for repeated sampling
+- Improved estimates for imbalanced sampling
+- Estimates of variation
+- Avoid averaging, retain variation
+
+
+> *When it comes to regression, multilevel regression deserves to be the default approach. There are certainly contexts in which it would be better to use an old-fashioned single-level model. But the contexts in which multilevel models are superior are much more numerous. Better to begin to build a multilevel analysis and then realize it's unnecessary, than to overlook it.*
+
+:::think
+> *The most common synonyms for 'multilevel' are __hierarchical__ and __mixed effects__. The type of parameters that appear in multilevel models are most commonly known as __random effects__, which itself can mean very different things to different analysts and in different contexts.*
+:::
+
+## Multilevel tadpoles
+
+```{r}
+library(rethinking)
+data(reedfrogs)
+data_frogs <- reedfrogs %>% 
+  as_tibble() %>% 
+  mutate(tank = row_number())
+
+rm(reedfrogs)
+```
+
+Old fashioned Single-level model:
+
+$$
+\begin{array}{rcllr}
+S_{i} & \sim & Binomial(N_{i}, p_{i}) & & \textrm{[likelihood]}\\
+\textrm{logit}(p_{i}) & = & \alpha_{TANK[i]} & & \textrm{[unique log-odds for each tank]}\\
+\alpha_{j} & \sim & Normal(0, 1.5) & \textrm{for}~j = 1..48 & \textrm{[$\alpha$ prior]}\\
+\end{array}
+$$
+
+```{r, results = 'hide'}
+data_frogs_list_1 <- data_frogs %>% 
+  dplyr::select(surv, density, tank) %>% 
+  as.list()
+
+model_frog_single <- ulam(
+  flist = alist(
+    surv ~ dbinom( density, p ),
+    logit(p) <- alpha[tank],
+    alpha[tank] ~ dnorm(0, 1.5)
+  ),
+  data = data_frogs,
+  cores = 4,
+  chains = 4,
+  log_lik = TRUE
+)
+```
+
+```{r, eval = FALSE}
+# not executed because to verbose
+precis(model_frog_single, depth = 2) %>%
+  knit_precis()
+```
+
+Update to multilevel model:
+
+$$
+\begin{array}{rclr}
+S_{i} & \sim & Binomial(N_{i}, p_{i}) & \textrm{[likelihood]}\\
+\textrm{logit}(p_{i}) & = & \alpha_{TANK[i]} & \textrm{[unique log-odds for each tank]}\\
+\alpha_{j} & \sim & Normal(\color{`r clr_current`}{\bar{\alpha}}, \color{`r clr_current`}{\sigma}) & \textrm{[adaptive prior]}\\
+\color{`r clr_current`}{\bar{\alpha}} & \sim & \color{`r clr_current`}{Normal(0, 1.5)}  &\textrm{[prior for average tank]}\\
+\color{`r clr_current`}{\sigma} & \sim & \color{`r clr_current`}{Exponential(1)} & \textrm{[prior for standard deviation of tanks]}\\
+\end{array}
+$$
+The parameters $\bar{\alpha}$ and $\sigma$ represent **hyperparameters** which define the *second level* of the multilevel model.
+They come with **hyperpriors**.
+
+```{r, results = 'hide'}
+model_frog_multi <- ulam(
+  flist = alist(
+    surv ~ dbinom( density, p ),
+    logit(p) <- alpha[tank],
+    alpha[tank] ~ dnorm(alpha_bar, sigma),
+    alpha_bar ~ dnorm(0, 1.5),
+    sigma ~ dexp(1)
+  ),
+  data = data_frogs,
+  cores = 4,
+  chains = 4,
+  log_lik = TRUE
+)
+```
+
+```{r}
+compare(model_frog_single,
+        model_frog_multi) %>% 
+  knit_precis(param_name = "model")
+```
+
+:::think
+`r emo::ji("nerd")` There are only 21 *effective parameters* (`pWAIC`) in the multilevel model, despite the 48 different tanks.
+This is because we used a regularizing prior that *shrinks* the alpha intercepts towards the mean $\bar{\alpha}$. 
+:::
+
+```{r, fig.asp = .4}
+frogs_posterior <- extract.samples(model_frog_multi) %>% 
+  as.data.frame() %>% 
+  as_tibble() %>% 
+  pivot_longer(everything(), names_to = "param") %>% 
+  filter(!(param %in% c("alpha_bar", "sigma"))) %>% 
+  group_by(param) %>% 
+  summarize(posterior = list(tibble(value = c(quantile(value,
+                                                       probs = c(.055, .25, .5, .75,.945)),
+                                              mean(value)),
+                                    label = c("ll", "l", "m", "h", "hh", "mean")))) %>% 
+  ungroup() %>% 
+  unnest(posterior) %>% 
+  mutate(value = logistic(value)) %>% 
+  pivot_wider(names_from = label, values_from = value ) %>% 
+  mutate(tank = str_remove( param, "alpha.") %>% as.integer()) %>% 
+  arrange(tank) %>% 
+  left_join(data_frogs, .)
+
+posterior_median <- extract.samples(model_frog_multi) %>% 
+  as.data.frame() %>% 
+  as_tibble() %>% 
+  pivot_longer(everything(), names_to = "param") %>% 
+  summarize(median = median(value)) %>% 
+  .$median %>% 
+  logistic()
+  
+frogs_posterior %>% 
+  ggplot(aes(x = tank, color = factor(density))) +
+  geom_hline(yintercept = posterior_median, color = clr_dark, linetype = 3) +
+  geom_linerange(aes(ymin = ll, ymax = hh), size = .2)+
+  geom_linerange(aes(ymin = l, ymax = h), size = .75) +
+  geom_point(aes(y = m, fill = after_scale(clr_lighten(color))), shape = 21) +
+  geom_point(aes(y = propsurv), shape = 1, size = 2) +
+  facet_wrap(density ~ ., scale = "free_x", labeller = label_both) +
+  scale_color_manual(values = c(clr0d, clr_dark, clr_current), guide = "none") +
+  labs(y = 'survival_prop') +
+  theme(panel.border = element_rect(color = clr0d, fill = "transparent"))
+```
+
+The mean posterior is always closer to the *estimated median survival proportion* of the population than the raw data.
+This is an effect called **shrinkage**, resulting from the regularizing priors as an effect of **pooling** information across clusters.
+
+The inferred population distribution of survival:
+
+```{r}
+frogs_hyperposterior <- extract.samples(model_frog_multi) %>% 
+  as.data.frame() %>% 
+  as_tibble() %>% 
+  dplyr::select(alpha_bar, sigma)
+
+p1 <- ggplot() +
+  pmap(frogs_hyperposterior %>% filter(row_number() < 100),
+       function(alpha_bar, sigma){
+         stat_function(fun = dnorm,
+                       args = list(mean = alpha_bar, sd = sigma),
+                       xlim = c(-3, 4),
+                       geom = "line",
+                       color = clr0dd, alpha = .4)
+       }) +
+  labs(y = "density",
+       x = "log-odds survival",
+       subtitle = "population distribution of survival")
+
+sim_taks <- tibble(logit_p = rnorm(8000,
+                         mean = frogs_hyperposterior$alpha_bar,
+                         sd = frogs_hyperposterior$sigma),
+                   p = inv_logit(logit_p))
+
+p2 <- sim_taks %>% 
+  ggplot(aes(x = p)) +
+  geom_density(adjust = .1, color = clr0d, fill = fll0) +
+  labs(subtitle = "variation of survival in population of tanks")
+
+p1 + p2
+```
+
+:::beware
+There can be certain issues with the *weakly regularizing priors* for the variance components ($\sigma$) in multilevel models:
+
+- if there only few clusters (e.g. ~ 5), estimating the variance is difficult and a more informative prior might be necessary
+- the edge-effects of $log$ and $logit$ link functions can lead to ineffective sampling (lots of *divergent transitions* and small `n_eff` - visible as swings in the trace plot for $\sigma$).
+Using a distribution with less mass in the tail compared to the $exponential$ can help here:
+
+$$
+\begin{array}{rclr}
+S_{i} & \sim & Binomial(N_{i}, p_{i}) & \textrm{[likelihood]}\\
+\textrm{logit}(p_{i}) & = & \alpha_{TANK[i]} & \textrm{[linear model]}\\
+\alpha_{j} & \sim & Normal(\bar{\alpha}, \sigma) & \textrm{[}~\alpha~\textrm{prior]}\\
+\bar{\alpha} & \sim & Normal(0, 1.5) & \textrm{[}~\bar{\alpha}~\textrm{prior]}\\
+\sigma & \sim & Half\textrm{-}Normal(0, 1) & \textrm{[}~\sigma~\textrm{prior]}\\
+\end{array}
+$$
+Use `dhalfnorm()` in {rethinking} and `lower = 0` in regular **Stan**.
+:::
+
+## Varying Effects and the Underfitting/Overfitting Tade-Off
+
+Simulating data from a multilevel model to compare the estimates from a *no-pooling*, *complete pooling* and *partial-pooling* modeling approach.
+
+The Model
+
+$$
+\begin{array}{rclr}
+S_{i} & \sim & Binomial(N_{i}, p_{i}) & \textrm{[likelihood]}\\
+\textrm{logit}(p_{i}) & = & \alpha_{\color{`r clr_current`}{POND[i]}} & \textrm{[linear model]}\\
+\alpha_{j} & \sim & Normal(\bar{\alpha}, \sigma) & \textrm{[}~\alpha~\textrm{prior]}\\
+\bar{\alpha} & \sim & Normal(0, 1.5) & \textrm{[}~\bar{\alpha}~\textrm{prior]}\\
+\sigma & \sim & Half\textrm{-}Normal(0, 1) & \textrm{[}~\sigma~\textrm{prior]}\\
+\end{array}
+$$
+Assigning values to the parameters and simulating the non-pooled estimates.
+
+```{r}
+set.seed(42)
+alpha_bar <- 1.5
+sigma <- 1.5
+n_ponds <- 60
+pond_levels <- c("tiny", "small", "medium", "large")
+data_sim <- tibble(pond_idx = 1:n_ponds,
+                   n_i = rep(c(5, 10, 25, 35), each = 15),
+                   pond_size = rep(pond_levels, each = 15) %>% 
+                     factor(levels = pond_levels),
+                   true_alpha = rnorm(n = n_ponds, mean = alpha_bar, sd = sigma),
+                   surv_i = rbinom(n_ponds, prob = logistic(true_alpha), size = n_i),
+                   p_true = inv_logit(true_alpha),
+                   p_no_pool = surv_i / n_i)
+```
+
+Where `true_alpha` is the true log-odds survival for each pond, `surv_i` are the simulated survivors and `p_no_pool` is the non-pooling estimate of survival.
+Remember that we used the *logit* link, so the probability is defined by the logistic function ($p_i = \frac{exp(\alpha_i)}{1 - exp(\alpha_{i})}$) 
+
+Computing the partial-pooling estimates.
+
+```{r, results = 'hide'}
+data_sim_list <- data_sim %>% 
+  dplyr::select(surv_i, n_i, pond_idx)
+
+model_sim_partial <- ulam(
+  flist = alist(
+    surv_i ~ dbinom(n_i, p),
+    logit(p) <- alpha_pond[pond_idx],
+    alpha_pond[pond_idx] ~ dnorm(alpha_bar, sigma),
+    alpha_bar ~ dnorm(0, 1.5),
+    sigma ~ dexp( 1 )
+  ),
+  data = data_sim_list,
+  cores = 4,
+  chains = 4,
+  log_lik = TRUE
+)
+```
+
+```{r}
+precis(model_sim_partial, depth = 2) %>% 
+  tail() %>% 
+  knit_precis()
+```
+
+```{r, fig.asp = .4}
+sim_posterior <- extract.samples(model_sim_partial) %>% 
+  as.data.frame() %>% 
+  as_tibble() %>% 
+  pivot_longer(everything(), names_to = "param") %>% 
+  filter(!(param %in% c("alpha_bar", "sigma"))) %>% 
+  group_by(param) %>% 
+  summarize(posterior = list(tibble(value = c(quantile(value,
+                                                       probs = c(.055, .25, .5, .75,.945)),
+                                              mean(value)),
+                                    label = c("ll", "l", "m", "h", "hh", "mean")))) %>% 
+  ungroup() %>% 
+  unnest(posterior) %>% 
+  mutate(value = logistic(value)) %>% 
+  pivot_wider(names_from = label, values_from = value ) %>% 
+  mutate(pond_idx = str_remove( param, "alpha_pond.") %>% as.integer()) %>% 
+  arrange(pond_idx) %>% 
+  left_join(data_sim, .) %>% 
+  mutate(error_no_pool = abs(p_no_pool - p_true),
+          error_part_pool = abs(m - p_true))
+
+error_means <- sim_posterior %>% 
+  dplyr::select(pond_size, starts_with("error")) %>% 
+    pivot_longer(starts_with("error"), names_to = "model") %>%   
+    group_by(pond_size, model) %>% 
+  summarise(mean = mean(value)) %>%
+  ungroup() %>%
+  mutate(model = str_remove(model, "error_"))
+  
+sim_posterior %>% 
+  dplyr::select(pond_idx, pond_size, starts_with("error")) %>% 
+    pivot_longer(starts_with("error"), names_to = "model") %>%   
+  mutate(model = str_remove(model, "error_")) %>% 
+  ggplot(aes(x = pond_idx, color = model)) +
+  geom_hline(data = error_means,
+             aes(yintercept = mean, color = model),linetype = 3) +
+  geom_point(aes(y = value, fill = after_scale(clr_lighten(color))), shape = 21) +
+  facet_wrap(pond_size ~ ., scale = "free_x", labeller = label_both, nrow = 1) +
+  scale_color_manual(values = c(clr0dd,clr_current), guide = "none") +
+  labs(y = 'absolute error') +
+  theme(panel.border = element_rect(color = clr0d, fill = "transparent"))
+```
+
+## More than One Type of Cluster
+
+$$
+\begin{array}{rclr}
+L_{i} & \sim & Binomial(1, p_{i}) & \textrm{[likelihood]}\\
+\textrm{logit}(p_{i}) & = & \alpha_{ACTOR[i]} + \color{`r clr_current`}{\gamma_{BLOCK[i]}} + \beta_{TREATMENT[i]} & \textrm{[linear model]}\\
+\beta_{j} & \sim & Normal(0, 0.5) ~~ , \textrm{for}~j= 1..4 & \textrm{[}~\beta~\textrm{prior]}\\ 
+\alpha_{j} & \sim & Normal(\bar{\alpha}, \sigma_{\alpha}) ~~ , \textrm{for}~j= 1..7 & \textrm{[}~\alpha~\textrm{prior]} \\
+\color{`r clr_current`}{\gamma_{j}} & \sim & \color{`r clr_current`}{Normal(0, \sigma_{\gamma}) ~~ , \textrm{for}~j= 1..6} & \textrm{[}~\gamma~\textrm{prior]} \\
+\bar{\alpha} & \sim & Normal(0, 1.5) & \textrm{[}~\bar{\alpha}~\textrm{prior]} \\
+\sigma_{\alpha} & \sim & Exponential(1) & \textrm{[}~\sigma_{\alpha}~\textrm{prior]} \\
+\color{`r clr_current`}{\sigma_{\gamma}} & \sim & \color{`r clr_current`}{Exponential(1)} & \textrm{[}~\sigma_{\gamma}~\textrm{prior]}
+\end{array}
+$$
+
+```{r}
+data(chimpanzees)
+
+data_chimp <- chimpanzees %>% 
+  as_tibble() %>% 
+  mutate(treatment = 1L + prosoc_left + 2L * condition,
+         side_idx = prosoc_left + 1L,     # right 1, left 2
+         condition_idx = condition + 1L)  # no partner 1, partner 2
+
+rm(chimpanzees)
+```
+
+```{r, results = 'hide'}
+data_chimp_list <- data_chimp %>% 
+  dplyr::select(pulled_left, actor, block, treatment) %>% 
+  as.list()
+
+model_chimp_multicluster <- ulam(
+  flist = alist(
+    pulled_left ~ dbinom( 1, p ),
+    logit(p) <- alpha[actor] + gamma[block] + beta[treatment],
+    beta[treatment] ~ dnorm(0,.5),
+    ## adaptive priors
+    alpha[actor] ~ dnorm( alpha_bar, sigma_alpha ),
+    gamma[block] ~ dnorm( 0, sigma_gamma ),
+    ## hyper-priors
+    alpha_bar ~ dnorm( 0, 1.5 ),
+    sigma_alpha ~ dexp(1),
+    sigma_gamma ~ dexp(1)
+  ),
+  data = data_chimp_list,
+  cores = 4, 
+  chains = 4,
+  log_lik = TRUE
+)
+```
+
+```{r}
+precis(model_chimp_multicluster, depth = 2) %>% 
+  knit_precis()
+
+p1 <- precis(model_chimp_multicluster, depth = 2) %>%
+  data.frame() %>% 
+  rownames_to_column() %>% 
+  as_tibble() %>% 
+  ggplot(aes(y = rowname)) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  geom_linerange(aes(xmin = `X5.5.`, xmax = `X94.5.`),
+                 color = clr0dd) +
+  geom_point(aes(x = mean), shape = 21,
+             color = clr0dd, fill = clr0) +
+  labs(y = "param",
+       x = "posterior (mean and 89 percentile)")
+
+p2 <- extract.samples(model_chimp_multicluster) %>% 
+  as_tibble() %>% 
+  dplyr::select(sigma_alpha, sigma_gamma) %>% 
+  pivot_longer(everything(),
+               names_sep = "_",
+               names_to = c("prefix", "param")) %>% 
+  ggplot(aes(x = value, color = param)) +
+  geom_density(adjust = .5, aes(fill = after_scale(clr_alpha(color)))) +
+  scale_color_manual(values = c(clr0dd, clr_current)) +
+  theme(legend.position = c(1,1),
+        legend.justification = c(1,1))
+
+p1 + p2
+```
+
+
+```{r, results = 'hide'}
+model_chimp_singlecluster <- ulam(
+  flist = alist(
+    pulled_left ~ dbinom( 1, p ),
+    logit(p) <- alpha[actor] + beta[treatment],
+    beta[treatment] ~ dnorm(0,.5),
+    ## adaptive priors
+    alpha[actor] ~ dnorm( alpha_bar, sigma_alpha ),
+    ## hyper-priors
+    alpha_bar ~ dnorm( 0, 1.5 ),
+    sigma_alpha ~ dexp(1)
+  ),
+  data = data_chimp_list,
+  cores = 4, 
+  chains = 4,
+  log_lik = TRUE
+)
+```
+
+```{r}
+compare(model_chimp_singlecluster,
+        model_chimp_multicluster) %>% 
+  knit_precis(param_name = "model")
+```
+
+**Even more clusters** (partial pooling on the treatment)
+
+```{r, results = 'hide'}
+model_chimp_treatment <- ulam(
+  flist = alist(
+    pulled_left ~ dbinom( 1, p ),
+    logit(p) <- alpha[actor] + gamma[block] + beta[treatment],
+    ## adaptive priors
+    beta[treatment] ~ dnorm(0, sigma_beta),
+    alpha[actor] ~ dnorm( alpha_bar, sigma_alpha ),
+    gamma[block] ~ dnorm( 0, sigma_gamma ),
+    ## hyper-priors
+    alpha_bar ~ dnorm( 0, 1.5 ),
+    sigma_beta ~ dexp(1),
+    sigma_alpha ~ dexp(1),
+    sigma_gamma ~ dexp(1)
+  ),
+  data = data_chimp_list,
+  cores = 4, 
+  chains = 4,
+  log_lik = TRUE
+)
+```
+
+```{r}
+library(ggdist)
+extract.samples(model_chimp_treatment) %>% 
+  as_tibble() %>% 
+  dplyr::select(starts_with("sigma")) %>% 
+  pivot_longer(everything(),
+               names_sep = "_",
+               names_to = c("prefix", "sigma")) %>% 
+  ggplot(aes(x = value, y = sigma, color = sigma)) +
+  stat_slab(adjust = .75, size = .5, normalize = "xy",
+            aes(fill = after_scale(clr_alpha(color)))) +
+  scale_color_manual(values = c(clr0dd, clr_dark, clr_current),
+                     guide = "none") +
+  coord_cartesian(ylim = c(.95, 4.1), expand = 0) +
+  theme(legend.position = c(1,1),
+        legend.justification = c(1,1))
+```
+
+```{r}
+coeftab(model_chimp_multicluster,
+        model_chimp_treatment)@coefs %>% 
+  as.data.frame() %>% 
+  head() %>% 
+  knit_precis()
+```
+
+## Divergent Transitions and Non-Centered Priors
+
+**Divergent transitions** arise from steep gradients within the posterior that leads to issues in the exploration on the basis of a discretized physical simulation.
+It can help to **reparameterize**the model - that is re-writing the model in a equivalent notation that allows an alternative numerical approximation.
+
+### The Devil's Funnel
+
+Given the joint distribution of the two variable $v$ and $x$:
+
+Model with **centered parameterization** (definition of $x$ is conditional on another parameter).
+
+$$
+\begin{array}{rcl}
+v & \sim & Normal(0, 3)\\
+x & \sim & Normal(0, \textrm{exp}(v))
+\end{array}
+$$
+
+```{r, results = 'hide' }
+model_devils_funnel_centered <- ulam(
+  flist = alist(
+     v ~ normal( 0, 3 ),
+     x ~ normal( 0, exp(v) )
+  ),
+  data = list(N = 1),
+  chains = 4
+)
+```
+
+```r
+#> Warning: 78 of 2000 (4.0%) transitions ended with a divergence.
+#> This may indicate insufficient exploration of the posterior distribution.
+#> Possible remedies include: 
+#>   * Increasing adapt_delta closer to 1 (default is 0.8) 
+#>   * Reparameterizing the model (e.g. using a non-centered parameterization)
+#>   * Using informative or weakly informative prior distributions 
+#> 
+#> 14 of 2000 (1.0%) transitions hit the maximum treedepth limit of 10 or 2^10-1 leapfrog steps.
+#> Trajectories that are prematurely terminated due to this limit will result in slow exploration.
+#> Increasing the max_treedepth limit can avoid this at the expense of more computation.
+#> If increasing max_treedepth does not remove warnings, try to reparameterize the model.
+```
+
+
+```{r}
+precis(model_devils_funnel_centered) %>% 
+  knit_precis()
+```
+
+$\rightarrow$ note the low `n_eff` (part of 2000 - 4 chains X 500 samples) and high `Rhat4` `r emo::ji("worried")``
+
+```{r}
+# define the parameter space
+parameter_space <- seq(from = -4, to = 4, length.out = 200)
+
+# simulate
+p1 <- crossing(v = parameter_space,
+               x = parameter_space) %>% 
+  mutate(likelihood_v = dnorm(v, mean = 0, sd = 3),
+         likelihood_x = dnorm(x, mean = 0, sd = exp(v))) %>% 
+  mutate(joint_likelihood = likelihood_v * likelihood_x) %>% 
+  
+  # plot!
+  ggplot(aes(x = x, y = v, color = joint_likelihood)) +
+  ggisoband::geom_isobands(aes(z = joint_likelihood,
+                               fill = after_scale(clr_alpha(color,.1))), 
+                           bins = 51, size = .4) +
+  scale_color_gradientn(colours = c(clr0, clr_dark, clr_current)) +
+  # geom_raster(interpolate = TRUE) +
+  # scale_color_viridis_c(option = "B") +
+  labs(subtitle = "Centered parameterization") +
+  theme(legend.position = "none")
+```
+
+The same model with a **non-centered parameterization** (the embedded parameter is moved out of the definition of $x$) - this is similar to standardizing a variable.
+
+$$
+\begin{array}{rcl}
+v & \sim & Normal(0, 3) \\
+z & \sim & Normal(0, 1) \\
+x & = & z~\textrm{exp}(v)
+\end{array}
+$$
+
+```{r}
+p2 <- crossing(v = parameter_space,
+               z = parameter_space / 2) %>% 
+  mutate(likelihood_v = dnorm(v, mean = 0, sd = 3),
+         likelihood_z = dnorm(z, mean = 0, sd = 1)) %>% 
+  mutate(joint_likelihood = likelihood_v * likelihood_z) %>% 
+  # plot!
+  ggplot(aes(x = z, y = v, color = joint_likelihood)) +
+ ggisoband::geom_isobands(aes(z = joint_likelihood, 
+                              fill = after_scale(clr_alpha(color,.1))), 
+                           bins = 15, size = .4) +
+  scale_color_gradientn(colours = c(clr0, clr_dark, clr_current)) +
+  # scale_fill_viridis_c(option = "B") +
+  labs(subtitle = "Non-centered parameterization") +
+  theme(legend.position = "none")
+
+p1 + p2
+```
+
+```{r, results = 'hide'}
+model_devils_funnel_non_centered <- ulam(
+  flist = alist(
+     v ~ normal( 0, 3 ),
+     z ~ normal( 0, 1),
+     gq> real[1]:x <<- z * exp(v) 
+  ),
+  data = list(N = 1),
+  chains = 4
+)
+```
+
+```{r}
+precis(model_devils_funnel_non_centered) %>% 
+  knit_precis()
+```
+
+```{r}
+extract.samples(model_devils_funnel_non_centered) %>% 
+  as.data.frame() %>% 
+  as_tibble() %>% 
+  ggplot(aes(x = x, y = v)) +
+  ggpointdensity::geom_pointdensity(size = .75)+
+  scale_color_gradientn(colours = c(clr0, clr_dark, clr_current),
+                        guide = 'none') +
+  coord_cartesian(xlim = c(-4, 4),
+                  ylim = c(-4, 4)) +
+  labs(subtitle = "posterior sampled with HMC")
+```
+
+### Non-Centered Chimpanzees
+
+The quick and easy way to help with divergent transitions is to increase the stringency of acceptance by selecting an `adapt_delta` that is closer to 1:
+
+```{r, results = 'hide'}
+set.seed(42)
+model_chimp_multicluster_fine <- ulam(
+  model_chimp_multicluster,
+  chains = 4,
+  cores = 4,
+  control = list(adapt_delta = 0.99)
+)
+```
+
+```{r}
+divergent(model_chimp_multicluster)
+divergent(model_chimp_multicluster_fine)
+```
+
+```{r}
+precis(model_chimp_multicluster_fine) %>% 
+  knit_precis()
+```
+
+This still produces bad (low `n_eff`) though.
+
+The more serious approach is to re-parameterize the model.
+For the current model, we need to transform two adaptive priors to move their paramters into a linear model:
+
+$$
+\begin{array}{rclr}
+L_{i} & \sim & Binomial(1, p_{i}) & \textrm{[likelihood]}\\
+\textrm{logit}(p_{i}) & = & \alpha_{ACTOR[i]} + \gamma_{BLOCK[i]} + \beta_{TREATMENT[i]} & \textrm{[linear model]}\\
+\beta_{j} & \sim & Normal(0, 0.5) ~~ , \textrm{for}~j= 1..4 & \textrm{[}~\beta~\textrm{prior]}\\ 
+\color{`r clr_current`}{\alpha_{j}} & \sim & \color{`r clr_current`}{Normal(\bar{\alpha}, \sigma_{\alpha}) ~~ , \textrm{for}~j= 1..7} & \textrm{[Intercepts for actors]} \\
+\color{`r clr_current`}{\gamma_{j}} & \sim & \color{`r clr_current`}{Normal(0, \sigma_{\gamma}) ~~ , \textrm{for}~j= 1..6} & \textrm{[Intercepts for blocks]} \\
+\bar{\alpha} & \sim & Normal(0, 1.5) & \textrm{[}~\bar{\alpha}~\textrm{prior]} \\
+\sigma_{\alpha} & \sim & Exponential(1) & \textrm{[}~\sigma_{\alpha}~\textrm{prior]} \\
+\sigma_{\gamma} & \sim & Exponential(1) & \textrm{[}~\sigma_{\gamma}~\textrm{prior]}
+\end{array}
+$$
+
+Our task is to reconfigure remove three embedded parameters ($\bar{\alpha}$, $\sigma_{\alpha}$ and $\sigma_{\gamma}$).
+To do this we define new variables with $Normal$ distributions.
+To reconstruct the original values by reversing the transformations.
+
+The reparamterized model then reads
+
+$$
+\begin{array}{rclr}
+L_{i} & \sim & Binomial(1, p_{i}) & \textrm{[likelihood]}\\
+\textrm{logit}(p_{i}) & = & \color{`r clr_current`}{\underbrace{\bar{\alpha} + z_{ACTOR[i]} \sigma_{\alpha}}_{\alpha_{ACTOR[i]}}} + \color{`r clr_current`}{\underbrace{x_{BLOCK[i]}  \sigma_{\gamma}}_{\gamma_{BLOCK[i]}}}+ \beta_{TREATMENT[i]} & \textrm{[linear model]}\\
+\beta_{j} & \sim & Normal(0, 0.5) ~~ , \textrm{for}~j= 1..4 & \textrm{[}~\beta~\textrm{prior]}\\ 
+\color{`r clr_current`}{z_{j}} & \sim & \color{`r clr_current`}{Normal(0, 1)} & \textrm{[standardized actor intercepts]} \\
+\color{`r clr_current`}{x_{j}} & \sim & \color{`r clr_current`}{Normal(0, 1)} & \textrm{[standardized block intercepts]} \\
+\bar{\alpha} & \sim & Normal(0, 1.5) & \textrm{[}~\bar{\alpha}~\textrm{prior]} \\
+\sigma_{\alpha} & \sim & Exponential(1) & \textrm{[}~\sigma_{\alpha}~\textrm{prior]} \\
+\sigma_{\gamma} & \sim & Exponential(1) & \textrm{[}~\sigma_{\gamma}~\textrm{prior]}
+\end{array}
+$$
+```{r, results = 'hide'}
+model_chimp_multicluster_reparam <- ulam(
+  flist = alist(
+    pulled_left ~ dbinom( 1, p ),
+    logit(p) <- alpha_bar + z[actor] * sigma_alpha + 
+      x[block] * sigma_gamma +
+      beta[treatment],
+    beta[treatment] ~ dnorm(0,.5),
+    ## adaptive priors
+    z[actor] ~ dnorm( 0, 1 ),
+    x[block] ~ dnorm( 0, 1 ),
+    ## hyper-priors
+    alpha_bar ~ dnorm( 0, 1.5 ),
+    sigma_alpha ~ dexp(1),
+    sigma_gamma ~ dexp(1),
+    gq> vector[actor]:alpha <<- alpha_bar + z * sigma_alpha,
+    gq> vector[block]:gamma <<- x * sigma_gamma
+  ),
+  data = data_chimp_list,
+  cores = 4, 
+  chains = 4,
+  log_lik = TRUE
+)
+```
+
+
+```{r}
+get_n_eff <- function(model, model_lab){
+  precis(model, depth = 2) %>% 
+  data.frame() %>% 
+  rownames_to_column() %>% 
+  as_tibble() %>% 
+  dplyr::select(rowname, n_eff) %>% 
+  set_names(nm = c("param", str_c("n_eff_", model_lab)))
+}
+
+get_n_eff(model_chimp_multicluster, "centered") %>% 
+  left_join(get_n_eff(model_chimp_multicluster_reparam, "non-centered")) %>% 
+  ggplot(aes(x = n_eff_centered, y = `n_eff_non-centered`)) +
+  geom_abline(slope = 1, intercept = 0, color = clr_dark, linetype = 3) +
+  geom_point(shape = 21, color = clr0dd, fill = clr0) +
+  coord_cartesian(xlim = c(0, 2250),
+                  ylim = c(0, 2250))
+
+```
+
+
+Reparameterization does not need to use a gaussian distribution. 
+For example the an exponential distribution would look like this:
+
+$$
+\begin{array}{rcl}
+x & = & x\lambda\\
+z & \sim & Exponential(1)
+\end{array}
+$$
+
+which replaces $x \sim Exponential(\lambda)$.
+
+## Multilevel Posterior Predictions
+
+### Posterior Prediction for Same Clusters
+
+Using `link()` (quick approach):
+
+```{r}
+chimp <- 2L
+data_predict <- list(
+  actor = rep(chimp, 4),
+  treatment = 1:4,
+  block = rep(1L, 4)
+)
+
+link(model_chimp_multicluster, data = data_predict) %>% 
+  as_tibble() %>% 
+  set_names(nm = str_c("treatment", 1:4)) %>% 
+  summarise(across(everything(),
+                   function(x){list(tibble(mean = mean(x),
+                                           pi_lower = PI(x)[1],
+                                           pi_upper = PI(x)[2]))})) %>% 
+  pivot_longer(everything()) %>% 
+  unnest(value)
+```
+
+Using `extract.samples()` (generic approach)
+
+```{r}
+chimp_posterior <- extract.samples(model_chimp_multicluster) %>% 
+  as.data.frame() %>% 
+  as_tibble()
+
+chimp_posterior %>% 
+  ggplot(aes(x = alpha.5)) +
+  geom_density(adjust = .5, color = clr0dd, fill = fll0)
+```
+
+```{r}
+chimp_posterior %>% 
+  mutate(across(starts_with("beta"),
+                .fns = function(x){inv_logit(alpha.2 + gamma.1 + x)},
+                .names = "{.col}_raw")) %>% 
+  dplyr::select(ends_with("raw"))%>% 
+  summarise(across(everything(),
+                   function(x){list(tibble(mean = mean(x),
+                                           pi_lower = PI(x)[1],
+                                           pi_upper = PI(x)[2]))})) %>% 
+  pivot_longer(everything()) %>% 
+  unnest(value)
+```
+
+### Posterior Predictions for New Clusters
+
+The average chimp
+
+```{r, fig.asp = .4}
+p1 <- chimp_posterior %>% 
+  mutate(across(starts_with("beta"),
+                .fns = function(x){inv_logit(alpha_bar + x)},
+                .names = "{.col}_raw")) %>% 
+  dplyr::select(ends_with("raw"))%>% 
+  summarise(across(everything(),
+                   function(x){
+                     list(tibble(mean = mean(x),
+                                 pi_lower = PI(x)[1],
+                                 pi_upper = PI(x)[2]))
+                     })) %>% 
+  pivot_longer(everything()) %>% 
+  mutate(treatment = str_extract(name, pattern = "[1-4]") %>% as.integer()) %>% 
+  unnest(value) %>% 
+  ggplot(aes(x = treatment)) +
+  geom_smooth(aes(ymin = pi_lower, y = mean, ymax = pi_upper),
+              stat = 'identity',
+              color = clr0dd, fill = fll0dd, size = .5) +
+  labs(y = "prop_pulled_left",
+       x = "treatment",
+       subtitle = "average_actor") 
+
+chimp_sim <- chimp_posterior %>% 
+  mutate(sim = rnorm(n = n(),
+                     mean = alpha_bar,
+                     sd = sigma_alpha)) %>% 
+  mutate(across(starts_with("beta"),
+                .fns = function(x){inv_logit(sim + x)},
+                .names = "{.col}_sim"))
+
+p2 <- chimp_sim %>% 
+  dplyr::select(ends_with("_sim")) %>% 
+  summarise(across(everything(),
+                   function(x){
+                     list(tibble(mean = mean(x),
+                                 pi_lower = PI(x)[1],
+                                 pi_upper = PI(x)[2]))
+                     })) %>% 
+  pivot_longer(everything()) %>% 
+  mutate(treatment = str_extract(name, pattern = "[1-4]") %>% as.integer()) %>% 
+  unnest(value) %>% 
+  ggplot(aes(x = treatment)) +
+  geom_smooth(aes(ymin = pi_lower, y = mean, ymax = pi_upper),
+              stat = 'identity',
+              color = clr0dd, fill = fll0dd, size = .5) +
+  labs(y = "prop_pulled_left",
+       x = "treatment",
+       subtitle = "marginal_of_actor") +
+  coord_cartesian(ylim = 0:1) +
+  theme(panel.grid.minor.x = element_blank())
+
+p3 <- chimp_sim %>% 
+  dplyr::select(ends_with("_sim")) %>%
+  mutate(.draw = row_number()) %>%
+  filter(row_number() < 101) %>% 
+  pivot_longer(ends_with("_sim")) %>%
+  mutate(treatment = str_extract(name, pattern = "[1-4]") %>% as.integer()) %>% 
+  ggplot(aes(x = treatment, y = value, group = .draw)) +
+  geom_line(color = clr_alpha(clr_dark, .4))+
+    labs(y = "prop_pulled_left",
+       x = "treatment",
+       subtitle = "simulated_actors") 
+
+p1 + p2 + p3 &
+  scale_x_continuous(breaks = 1:4,
+                     labels = c("R|N", "L|N", "R|P", "L|P")) &
+  coord_cartesian(ylim = 0:1) &
+  theme(panel.grid.minor.x = element_blank())
+```
+
+---
 
 ```{r env_export}
 library(rlang)
@@ -36,100 +887,2073 @@ chapter13_models <- env(
 write_rds(chapter13_models, "envs/chapter13_models.rds")
 ```
 
-
 ## Homework
 
 **E1**
 
-```{r E1}
-
-```
+- $\alpha_{TANK} \sim \textrm{Normal}(0,1)$
+- $\cancel{\alpha_{TANK} \sim \textrm{Normal}(0,2)}$
 
 **E2**
 
-```{r E2}
-
-```
+$$
+\begin{array}{rclr}
+y_{i} & \sim & \textrm{Binomial}(1, p_{i}) & \\
+\textrm{logit}(p_{i}) & = & \alpha_{GROUP[i]} + \beta x_{i} &\\
+\alpha_{GROUP} & \sim & \textrm{Normal}(\bar{\alpha}, \sigma_{\alpha}) &\\
+\beta & \sim & \textrm{Normal}(0, 0.5) &\\
+\bar{\alpha} & \sim & \textrm{Normal}(0, 1.5) & \textrm{[hyperprior]}\\
+\sigma_{\alpha} & \sim & \textrm{Exponential}(1) & \textrm{[hyperprior]}
+\end{array}
+$$
 
 **E3**
 
-```{r E3}
-
-```
+$$
+\begin{array}{rclr}
+y_{i} & \sim & \textrm{Normal}(\mu_{i}, \sigma) & \\
+\textrm{logit}(\mu_{i}) & = & \alpha_{GROUP[i]} + \beta x_{i} &\\
+\alpha_{GROUP} & \sim & \textrm{Normal}(\bar{\alpha   }, \sigma_{\alpha}) &\\
+\beta & \sim & \textrm{Normal}(0, 1) &\\
+\sigma & \sim & \textrm{Exponential}(1) & \\ 
+\bar{\alpha} & \sim & \textrm{Normal}(0, 5) & \textrm{[hyperprior]}\\
+\sigma_{\alpha} & \sim & \textrm{Exponential}(1) & \textrm{[hyperprior]}
+\end{array}
+$$
 
 **E4**
 
-```{r E4}
-
-```
-
+$$
+\begin{array}{rclr}
+y_{i} & \sim & \textrm{Poisson}(\lambda_{i}) & \\
+\textrm{log}(\lambda_{i}) & = & \alpha_{GROUP[i]} + \beta x_{i} &\\
+\alpha_{GROUP} & \sim & \textrm{Normal}(\bar{\alpha   }, \sigma_{\alpha}) &\\
+\beta & \sim & \textrm{Normal}(0, 1) &\\
+\bar{\alpha} & \sim & \textrm{Normal}(3, .5) & \textrm{[hyperprior]}\\
+\sigma_{\alpha} & \sim & \textrm{Exponential}(1) & \textrm{[hyperprior]}
+\end{array}
+$$
 **E5**
 
-```{r E5}
+$$
+\begin{array}{rclr}
+y_{i} & \sim & \textrm{Poisson}(\lambda_{i}) & \\
+\textrm{log}(\lambda_{i}) & = & \alpha_{GROUP[i]} + \gamma_{BLOCK[i]} + \beta x_{i} &\\
+\alpha_{GROUP} & \sim & \textrm{Normal}(\bar{\alpha}, \sigma_{\alpha}) &\\
+\gamma_{BLOCK} & \sim & \textrm{Normal}(0, \sigma_{\gamma}) & \textrm{[ 0 to avoid the ''legs issue'']}\\
+\beta & \sim & \textrm{Normal}(0, 1) &\\
+\bar{\alpha} & \sim & \textrm{Normal}(3, .5) & \textrm{[hyperprior]}\\
+\sigma_{\alpha} & \sim & \textrm{Exponential}(1) & \textrm{[hyperprior]}\\
+\sigma_{\gamma} & \sim & \textrm{Exponential}(1) & \textrm{[hyperprior]}
+\end{array}
+$$
 
-```
 
 **M1**
 
-```{r M1}
+Now also include `predation` and `size` as clusters within the model.
+
+We will be using the non-centered model notation:
+
+```{r M1, results = 'hide'}
+model_frog_tank <- ulam(
+  flist = alist(
+    surv ~ dbinom( density, p ),
+    logit(p) <- alpha_bar + 
+      z_alpha[tank] * sigma_alpha,
+    z_alpha[tank] ~ dnorm(0, 1),
+    alpha_bar ~ dnorm(0, 1.5),
+    sigma_alpha ~ dexp(1),
+    gq> vector[tank]:alpha <<- alpha_bar + z_alpha * sigma_alpha
+  ),
+  data = data_frogs,
+  cores = 4,
+  chains = 4,
+  log_lik = TRUE
+)
+
+model_frog_pred <- ulam(
+  flist = alist(
+    surv ~ dbinom( density, p ),
+    logit(p) <- alpha_bar + 
+      z_alpha[tank] * sigma_alpha + 
+      z_gamma[pred] * sigma_gamma,
+    z_alpha[tank] ~ dnorm(0, 1),
+    z_gamma[pred] ~ dnorm(0, 1),
+    alpha_bar ~ dnorm(0, 1.5),
+    c(sigma_alpha, sigma_gamma) ~ dexp(1),
+    gq> vector[tank]:alpha <<- alpha_bar + z_alpha * sigma_alpha,
+    gq> vector[pred]:gamma <<- z_gamma * sigma_gamma
+  ),
+  data = data_frogs,
+  cores = 4,
+  chains = 4,
+  log_lik = TRUE
+)
+
+model_frog_size <- ulam(
+  flist = alist(
+    surv ~ dbinom( density, p ),
+    logit(p) <- alpha_bar + 
+      z_alpha[tank] * sigma_alpha + 
+      z_delta[size] * sigma_delta,
+    z_alpha[tank] ~ dnorm(0, 1),
+    z_delta[size] ~ dnorm(0, 1),
+    alpha_bar ~ dnorm(0, 1.5),
+    c(sigma_alpha, sigma_delta) ~ dexp(1),
+    gq> vector[tank]:alpha <<- alpha_bar + z_alpha * sigma_alpha,
+    gq> vector[size]:delta <<- z_delta * sigma_delta
+  ),
+  data = data_frogs,
+  cores = 4,
+  chains = 4,
+  log_lik = TRUE
+)
+
+model_frog_combined <- ulam(
+  flist = alist(
+    surv ~ dbinom( density, p ),
+    logit(p) <- alpha_bar + 
+      z_alpha[tank] * sigma_alpha + 
+      z_gamma[pred] * sigma_gamma + 
+      z_delta[size] * sigma_delta,
+    z_alpha[tank] ~ dnorm(0, 1),
+    z_gamma[pred] ~ dnorm(0, 1),
+    z_delta[size] ~ dnorm(0, 1),
+    alpha_bar ~ dnorm(0, 1.5),
+    c(sigma_alpha, sigma_gamma, sigma_delta) ~ dexp(1),
+    gq> vector[tank]:alpha <<- alpha_bar + z_alpha * sigma_alpha,
+    gq> vector[pred]:gamma <<- z_gamma * sigma_gamma,
+    gq> vector[size]:delta <<- z_delta * sigma_delta
+  ),
+  data = data_frogs,
+  cores = 4,
+  chains = 4,
+  log_lik = TRUE
+)
+
+data_frogs_ind <- data_frogs %>% 
+  mutate(pred_ind = abs(1L - as.integer(pred)))
+
+model_frog_interact <- ulam(
+  flist = alist(
+    surv ~ dbinom( density, p ),
+    logit(p) <- alpha_bar + 
+      z_alpha[tank] * sigma_alpha + 
+      z_gamma[pred] * sigma_gamma + 
+      z_delta[size] * sigma_delta + 
+      z_epsilon[size] * pred_ind * sigma_epsilon,
+    z_alpha[tank] ~ dnorm(0, 1),
+    z_gamma[pred] ~ dnorm(0, 1),
+    z_delta[size] ~ dnorm(0, 1),
+    z_epsilon[size] ~ dnorm(0, 1),
+    alpha_bar ~ dnorm(0, 1.5),
+    c(sigma_alpha, sigma_gamma, sigma_delta, sigma_epsilon) ~ dexp(1),
+    gq> vector[tank]:alpha <<- alpha_bar + z_alpha * sigma_alpha,
+    gq> vector[pred]:gamma <<- z_gamma * sigma_gamma,
+    gq> vector[size]:delta <<- z_delta * sigma_delta,
+    gq> vector[size]:epsilon <<- z_epsilon  * sigma_epsilon
+  ),
+  data = data_frogs_ind,
+  cores = 4,
+  chains = 4,
+  log_lik = TRUE
+)
+```
+
+
+```{r}
+get_sigma_alpha <- function(model, mod_lab){
+  model %>% 
+  precis() %>%
+  data.frame() %>%
+  rownames_to_column() %>% 
+  filter(rowname == "sigma_alpha") %>%
+  dplyr::select(-rowname) %>% 
+  pivot_longer(everything(), names_to = "param") %>% 
+  mutate(model = mod_lab)
+}
+
+list(model_frog_tank,
+        model_frog_pred,
+        model_frog_size,
+        model_frog_combined,
+        model_frog_interact) %>% 
+  map2_dfr(.y = c("tank","pred","size","combine", "interact"),
+           get_sigma_alpha) %>% 
+  pivot_wider(names_from = "param",
+              values_from = "value") %>% 
+  ggplot(aes(y = model)) +
+  geom_vline(xintercept = 0, linetype = 3, color = clr_dark) +
+  geom_linerange(aes(xmin = `X5.5.`, xmax = `X94.5.`), 
+             color = clr0dd) +
+  geom_point(aes(x = mean), 
+             color = clr0dd, fill = clr0, 
+             shape = 21, size = 2) +
+  coord_cartesian(xlim = c(0, 2)) +
+  labs(subtitle = "estimates of sigma_alpha",
+       x = "sigma_alpha")
 
 ```
 
 **M2**
 
 ```{r M2}
+compare(model_frog_tank,
+        model_frog_pred,
+        model_frog_size,
+        model_frog_combined,
+        model_frog_interact) %>% 
+  knit_precis(param_name = "model")
+```
+
+```{r}
+p1 <- link(model_frog_pred) %>% 
+  as_tibble() %>% 
+  summarise(across(everything(),
+                   .fns = function(x){list(tibble(val = c(quantile(x,
+                                                                   probs = c(.055,.25,.5,.75,.945)),
+                                                          mean(x)),
+                                                  label = c("ll", "l", "m", "h", "hh", "mean")))})) %>% 
+  pivot_longer(everything()) %>% 
+  bind_cols(data_frogs,.) %>% 
+  unnest(value) %>% 
+  pivot_wider(names_from = label, values_from = val) %>% 
+  ggplot(aes(x = tank)) +
+  labs(subtitle = "predation")
+
+
+p2 <- link(model_frog_interact) %>% 
+  as_tibble() %>% 
+  summarise(across(everything(),
+                   .fns = function(x){list(tibble(val = c(quantile(x,
+                                                                   probs = c(.055,.25,.5,.75,.945)),
+                                                          mean(x)),
+                                                  label = c("ll", "l", "m", "h", "hh", "mean")))})) %>% 
+  pivot_longer(everything()) %>% 
+  bind_cols(data_frogs,.) %>% 
+  unnest(value) %>% 
+  pivot_wider(names_from = label, values_from = val) %>% 
+  ggplot(aes(x = tank)) +
+  labs(subtitle = "interaction model")
+
+p1 + p2 &
+    geom_linerange(aes(ymin = ll, ymax = hh), 
+             color = clr0dd) &
+  geom_point(aes(y = m), 
+             color = clr0dd, fill = clr0, 
+             shape = 21, size = 2) &
+    geom_point(aes(y = propsurv), 
+             color = clr_current, 
+             shape = 1, size = 4)
 
 ```
 
+
+```{r}
+# prep_pred <- link(model_frog_pred) %>% 
+#   as_tibble() %>% 
+#   summarise(across(everything(),
+#                    .fns = function(x){list(tibble(val_p = c(quantile(x,
+#                                                                    probs = c(.055,.25,.5,.75,.945)),
+#                                                           mean(x)),
+#                                                   label = c("ll", "l", "m", "h", "hh", "mean") %>%
+#                                                     str_c(.,"_pred")))})) %>% 
+#   pivot_longer(everything(),
+#                values_to = "t_pred")
+# 
+# prep_interct <- link(model_frog_interact) %>% 
+#   as_tibble() %>% 
+#   summarise(across(everything(),
+#                    .fns = function(x){list(tibble(val_i = c(quantile(x,
+#                                                                    probs = c(.055,.25,.5,.75,.945)),
+#                                                           mean(x)),
+#                                                   label = c("ll", "l", "m", "h", "hh", "mean") %>%
+#                                                     str_c(.,"_interact")))})) %>% 
+#   pivot_longer(everything(),
+#                values_to = "t_interact")
+# 
+# prep_size <- link(model_frog_size) %>% 
+#   as_tibble() %>% 
+#   summarise(across(everything(),
+#                    .fns = function(x){list(tibble(val_s = c(quantile(x,
+#                                                                    probs = c(.055,.25,.5,.75,.945)),
+#                                                           mean(x)),
+#                                                   label = c("ll", "l", "m", "h", "hh", "mean") %>%
+#                                                     str_c(.,"_size")))})) %>% 
+#   pivot_longer(everything(),
+#                values_to = "t_size")
+# 
+# posterior_frogs_tripple <- list(prep_pred,
+#      prep_size,
+#      prep_interct) %>% 
+#   reduce(left_join) %>% 
+#   bind_cols(data_frogs,. ) %>% 
+#   unnest(t_pred) %>% 
+#   pivot_wider(names_from = label, values_from = val_p) %>% 
+#   unnest(t_size) %>% 
+#   pivot_wider(names_from = label, values_from = val_s) %>% 
+#   unnest(t_interact) %>% 
+#   pivot_wider(names_from = label, values_from = val_i)
+# 
+# p1 <- posterior_frogs_tripple %>% 
+#   ggplot(aes(x = m_pred, y = m_interact)) +
+#   geom_linerange(aes(xmin = ll_pred, xmax = hh_pred), 
+#              color = clr0dd)+
+#   geom_linerange(aes(ymin = ll_interact, ymax = hh_interact), 
+#              color = clr0dd) +
+#   geom_point(color = clr0dd, fill = clr0, 
+#              shape = 21, size = 2)
+# 
+# p2 <- posterior_frogs_tripple %>% 
+#   ggplot(aes(x = m_pred, y = m_size)) +
+#   geom_linerange(aes(xmin = ll_pred, xmax = hh_pred), 
+#              color = clr0dd)+
+#   geom_linerange(aes(ymin = ll_size, ymax = hh_size), 
+#              color = clr0dd) +
+#   geom_point(color = clr0dd, fill = clr0, 
+#              shape = 21, size = 2)
+#   
+# p1 + p2 &
+#   geom_abline(slope = 1, intercept = 0, linetype = 3, color = clr_current)
+
+plot_posterior <- function(model){
+  data_prep <- extract.samples(model) %>% 
+    data.frame() %>% 
+    as_tibble() %>% 
+    dplyr::select(c(alpha_bar, starts_with("sigma")))
+  
+  data_prep %>% 
+    pivot_longer(everything()) %>% 
+    ggplot(aes(y = name, x = value)) +
+    geom_vline(xintercept = 0, linetype = 3, color = clr_dark)+
+    stat_slab(adjust = .75, size = .5, normalize = "xy",
+              color = clr0dd, fill = fll0) +
+    coord_cartesian(ylim = c(.9, ncol(data_prep)+1.1),
+                    xlim = c(-2.5, 5),
+                    expand = 0)+
+    labs(subtitle = deparse(substitute(model)) %>% str_remove("model_frog_"),
+         y = NULL, x = NULL)
+}
+
+
+((plot_posterior(model_frog_tank) + theme(axis.text.x = element_blank())) /
+(plot_posterior(model_frog_pred) + theme(axis.text.x = element_blank())) /
+  plot_posterior(model_frog_size)) |
+  ((plot_posterior(model_frog_combined) + theme(axis.text.x = element_blank())) /
+  plot_posterior(model_frog_interact))
+```
+
+
+
+
 **M3**
 
-```{r M3}
+```{r M3, results = 'hide'}
+model_frog_cauchy <- ulam(
+  flist = alist(
+    surv ~ dbinom( density, p ),
+    logit(p) <- alpha_bar + 
+      z_alpha[tank] * sigma_alpha,
+    z_alpha[tank] ~ dcauchy(0, 1),
+    alpha_bar ~ dnorm(0, 1.5),
+    sigma_alpha ~ dexp(1),
+    gq> vector[tank]:alpha <<- alpha_bar + z_alpha * sigma_alpha
+  ),
+  data = data_frogs,
+  control = list(adapt_delta = 0.99),
+  cores = 4,
+  chains = 4,
+  max_treedepth = 15,
+  log_lik = TRUE
+)
+```
 
+Cauchy fit
+
+```{r}
+precis(model_frog_cauchy, depth = 2) %>% 
+  knit_precis()
+```
+
+Gaussian fit
+
+```{r}
+precis(model_frog_tank, depth = 2) %>% 
+  knit_precis()
+```
+
+```{r}
+precis(model_frog_cauchy, depth = 2) %>% 
+  data.frame() %>% 
+  rownames_to_column() %>% 
+  dplyr::select(rowname, mean_c = mean,  ll_c = `X5.5.`, hh_c =  X94.5.) %>% 
+  as_tibble() %>% 
+  left_join(precis(model_frog_tank, depth = 2) %>% 
+  data.frame() %>% 
+  rownames_to_column() %>% 
+  dplyr::select(rowname, mean_g = mean,  ll_g = `X5.5.`, hh_g =  X94.5.) %>% 
+  as_tibble()) %>% 
+  filter(grepl("^alpha", rowname)) %>% 
+    ggplot(aes(x = mean_c, y = mean_g)) +
+    geom_abline(slope = 1,
+              intercept = 0,
+              color = clr_current,
+              linetype = 3) +
+   geom_linerange(aes(xmin = ll_c, xmax = hh_c), 
+              color = clr0dd)+
+   geom_linerange(aes(ymin = ll_g, ymax = hh_g), 
+              color = clr0dd) +
+   geom_point(color = clr0dd, fill = clr0, 
+              shape = 21, size = 2) +
+  coord_cartesian(xlim = c(-5, 50))
 ```
 
 **M4**
 
-```{r M4}
+```{r M4, results = 'hide'}
+model_frog_student <- ulam(
+  flist = alist(
+    surv ~ dbinom( density, p ),
+    logit(p) <- alpha_bar + 
+      z_alpha[tank] * sigma_alpha,
+    z_alpha[tank] ~ dstudent(nu = 2, 0, 1),
+    alpha_bar ~ dnorm(0, 1.5),
+    sigma_alpha ~ dexp(1),
+    gq> vector[tank]:alpha <<- alpha_bar + z_alpha * sigma_alpha
+  ),
+  data = data_frogs,
+  control = list(adapt_delta = 0.99),
+  cores = 4,
+  chains = 4,
+  max_treedepth = 15,
+  log_lik = TRUE
+)
+```
 
+```{r}
+p1 <- precis(model_frog_student, depth = 2) %>% 
+  data.frame() %>% 
+  rownames_to_column() %>% 
+  dplyr::select(rowname, mean_s = mean,  ll_s = `X5.5.`, hh_s =  X94.5.) %>% 
+  as_tibble() %>% 
+  left_join(precis(model_frog_tank, depth = 2) %>% 
+              data.frame() %>% 
+              rownames_to_column() %>% 
+              dplyr::select(rowname, mean_g = mean,  ll_g = `X5.5.`, hh_g =  X94.5.) %>% 
+              as_tibble()) %>% 
+  filter(grepl("^alpha", rowname)) %>% 
+  ggplot(aes(x = mean_s, y = mean_g)) +
+  geom_abline(slope = 1,
+              intercept = 0,
+              color = clr_current,
+              linetype = 3) +
+  geom_linerange(aes(xmin = ll_s, xmax = hh_s), 
+                 color = clr0dd)+
+  geom_linerange(aes(ymin = ll_g, ymax = hh_g), 
+                 color = clr0dd) +
+  geom_point(color = clr0dd, fill = clr0, 
+             shape = 21, size = 2) 
+
+
+p2 <- precis(model_frog_student, depth = 2) %>% 
+  data.frame() %>% 
+  rownames_to_column() %>% 
+  dplyr::select(rowname, mean_s = mean,  ll_s = `X5.5.`, hh_s =  X94.5.) %>% 
+  as_tibble() %>% 
+  left_join(precis(model_frog_cauchy, depth = 2) %>% 
+              data.frame() %>% 
+              rownames_to_column() %>% 
+              dplyr::select(rowname, mean_c = mean,  ll_c = `X5.5.`, hh_c =  X94.5.) %>% 
+              as_tibble()) %>% 
+  filter(grepl("^alpha", rowname)) %>% 
+  ggplot(aes(x = mean_s, y = mean_c)) +
+  geom_abline(slope = 1,
+              intercept = 0,
+              color = clr_current,
+              linetype = 3) +
+  geom_linerange(aes(xmin = ll_s, xmax = hh_s), 
+                 color = clr0dd)+
+  geom_linerange(aes(ymin = ll_c, ymax = hh_c), 
+                 color = clr0dd) +
+  geom_point(color = clr0dd, fill = clr0, 
+             shape = 21, size = 2) +
+  coord_cartesian(ylim = c(-5, 50),
+                  xlim = c(-7, 10))
+
+p1 + p2
 ```
 
 **M5**
 
-```{r M5}
+Adding a mean $\gamma$ to the cimpanzee model
 
+$$
+\begin{array}{rcl}
+\gamma_{j} & \sim & \textrm{Normal}(\bar{\gamma}, \sigma_{\gamma})\\
+\bar{\gamma} & \sim & \textrm{Normal}(0, 1.5)
+\end{array}
+$$
+
+
+```{r M5, results = 'hide'}
+model_chimp_multicluster_adapt <- ulam(
+  flist = alist(
+    pulled_left ~ dbinom( 1, p ),
+    logit(p) <- alpha[actor] + gamma[block] + beta[treatment],
+    beta[treatment] ~ dnorm(0,.5),
+    ## adaptive priors
+    alpha[actor] ~ dnorm( alpha_bar, sigma_alpha ),
+    gamma[block] ~ dnorm( gamma_bar, sigma_gamma ),
+    ## hyper-priors
+    alpha_bar ~ dnorm( 0, 1.5 ),
+    gamma_bar ~ dnorm( 0, 1.5 ),
+    sigma_alpha ~ dexp(1),
+    sigma_gamma ~ dexp(1)
+  ),
+  data = data_chimp_list,
+  cores = 4,
+  chains = 4,
+  log_lik = TRUE
+)
+```
+
+```{r}
+compare(model_chimp_multicluster,
+        model_chimp_multicluster_adapt) %>% 
+  knit_precis(param_name = "model")
+```
+
+```{r}
+precis(model_chimp_multicluster) %>% 
+  knit_precis()
+```
+
+```{r}
+precis(model_chimp_multicluster_adapt) %>% 
+  knit_precis()
+```
+
+```{r}
+bar_alpha_single <- extract.samples(model_chimp_multicluster) %>% 
+  as.data.frame() %>% 
+  as_tibble() %>% 
+  .$alpha_bar %>% 
+  quantile(prob = c(.055, .25, .5, .75, .955)) %>% 
+  tibble(alpha_bar = .,
+            prob = c("ll", "l", "m", "h", "hh"))
+
+extract.samples(model_chimp_multicluster_adapt) %>% 
+  as.data.frame() %>% 
+  as_tibble() %>% 
+  dplyr::select(ends_with("bar")) %>% 
+  ggplot(aes(x = alpha_bar, y = gamma_bar)) +
+  geom_rect(data = bar_alpha_single %>% 
+              pivot_wider(names_from = prob,
+                          values_from = alpha_bar),
+            inherit.aes = FALSE,
+            aes(xmin = ll, xmax = hh,
+                ymin = -Inf, ymax = Inf),
+            color = "transparent", fill = fll0) +
+  geom_rect(data = bar_alpha_single %>% 
+              pivot_wider(names_from = prob,
+                          values_from = alpha_bar),
+            inherit.aes = FALSE,
+            aes(xmin = l, xmax = h,
+                ymin = -Inf, ymax = Inf),
+            color = "transparent", fill = fll0) +
+  geom_hex(aes(color = ..count.., fill = after_scale(clr_alpha(color,.85))),
+           bins = 40) +
+  geom_vline(data = bar_alpha_single %>% 
+               pivot_wider(names_from = prob,
+                           values_from = alpha_bar),
+             aes(xintercept = m),
+             color = clr_dark, linetype = 3) +
+  scale_color_gradientn(colours = c(clr_dark, clr0, clr_current)) +
+  guides(color = guide_colorbar(title.position = "top",
+                                barwidth = unit(.9, "npc"),
+                                barheight = unit(5, "pt"))) +
+  theme(legend.position = "bottom")
 ```
 
 **M6**
 
 ```{r M6}
+data_y <- list(y = 0)
 
+model_nn <- quap(
+  flist = alist(
+    y ~ dnorm(mean = mu, sd =  1),
+    mu ~ dnorm(mean = 10, sd =  1)
+  ),
+  data = data_y
+)
+
+model_nt <- quap(
+  flist = alist(
+    y ~ dnorm(mean = mu, sd =  1),
+    mu ~ dstudent(nu = 2, mu = 10, sigma =  1)
+  ),
+  data = data_y
+)
+
+model_tn <- quap(
+  flist = alist(
+    y ~ dstudent(nu = 2, mu = mu, sigma =  1),
+    mu ~ dnorm(mean = 10, sd =  1)
+  ),
+  data = data_y
+)
+
+model_tt <- quap(
+  flist = alist(
+     y ~ dstudent(nu = 2, mu = mu, sigma =  1),
+    mu ~ dstudent(nu = 2, mu = 10, sigma =  1)
+  ),
+  data = data_y
+)
 ```
+
+```{r}
+p1 <- tibble_precis(model_nn) %>% 
+  bind_rows(tibble_precis(model_nt)) %>% 
+  bind_rows(tibble_precis(model_tn)) %>% 
+  bind_rows(tibble_precis(model_tt)) %>% 
+  ggplot(aes(y = model, x = mean)) +
+  geom_linerange(aes(xmin = `X5.5.`, xmax = `X94.5.`), color = clr0dd) +
+  geom_point(shape = 21, fill = clr0, color = clr0dd) +
+  labs(y = NULL, x = "mu")
+
+# x_vect <- seq(-5, 20, length.out = 101)
+n <- 1e3
+dens_fun <- function(type, x = x_vect,
+                     mean = 10, sd = 1){
+  switch(type,
+         "normal" = rnorm(n = n, mean = mean, sd),
+         "student" = rstudent(n = n, nu = 2, mu = mean,sigma = sd)
+         )
+}
+
+p2 <- crossing(y = c("normal", "student"),
+         mu = c("normal", "student")) %>% 
+  mutate(model = str_c("model_", str_sub(y,1,1),str_sub(mu, 1,1)),
+         dist = purrr::map2(y, mu,
+                             function(y, mu){
+                               tibble(y_dens = dens_fun(type = y, mean = 0),
+                                      mu_dens = dens_fun(type = mu))})) %>% 
+  unnest(dist) %>%
+  pivot_longer(cols = y_dens:mu_dens) %>% 
+  mutate(dist = if_else(name == "y_dens", y, mu)) %>% 
+  ggplot(aes(y = model)) +
+  stat_slab(aes(x = value, 
+                color = dist,
+                fill = after_scale(clr_alpha(color))),
+            size = .5, normalize = "xy", height = .85, trim = FALSE) +
+  coord_cartesian(xlim = c(-5, 15)) +
+  scale_color_manual(values = c(clr_dark, clr0d)) +
+  labs(y = NULL)
+  
+p1 + p2
+```
+
+- If the likelihood is $y \sim Normal()$, it is less likely to be pulled from 0 by the prior for $\mu$ compared to when $y \sim Student()$
+- When the prior is $\mu \sim Normal()$, then it is more regularizing than with $\mu \sim Student()$ ($\rightarrow$ it pulls harder)
 
 **H1**
 
 ```{r H1}
+data("bangladesh")
+
+data_bangaldesh <- bangladesh %>% 
+  as_tibble() %>% 
+  mutate(district_idx = as.integer(as.factor(district)))  %>% 
+  rename(contraception = use.contraception) 
+
+rm(bangladesh)
+
+tibble(district_idx = sort(unique(data_bangaldesh$district))) %>% 
+  mutate(check_increment = district_idx - lag(district_idx,default = 0)) %>% 
+  arrange(-check_increment)
+
+sort(unique(data_bangaldesh$district))
+sort(unique(data_bangaldesh$district_idx))
+```
+
+```{r, results = 'hide'}
+data_bangaldesh_list <- data_bangaldesh %>% 
+  dplyr::select(woman, district_idx, contraception) %>% 
+  as.list()
+
+model_bangladesh_classic <- ulam(
+  flist = alist(
+    contraception ~ dbinom(1, p),
+    logit(p) <- alpha[district_idx],
+    alpha[district_idx] ~ dnorm(0, 1.5)
+  ),
+  data = data_bangaldesh_list,
+  cores = 4,
+  chain = 4,
+  log_lik = TRUE
+)
+
+model_bangladesh_multilevel <- ulam(
+  flist = alist(
+    contraception ~ dbinom(1, p),
+    logit(p) <- alpha_bar + z_alpha[district_idx] * sigma_alpha,
+    z_alpha[district_idx] ~ dnorm(0, 1),
+    alpha_bar ~ dnorm(0, 1.5),
+    sigma_alpha ~ dexp(1),
+    gq> vector[district_idx]:alpha <<- alpha_bar + z_alpha * sigma_alpha
+  ),
+  data = data_bangaldesh_list,
+  cores = 4,
+  chain = 4,
+  log_lik = TRUE
+)
+```
+
+```{r}
+new_districts <- distinct(data_bangaldesh, district_idx)
+
+
+get_district_posterior <- function(model){
+  mod_name <- deparse(substitute(model))
+  
+  link(model, data = new_districts) %>% 
+  data.frame() %>% 
+  as_tibble() %>% 
+  summarise(across(everything(),
+                   function(x){
+                     list(tibble(value = quantile(x, prob = c(.055, .25, .5, .75, .955)),
+                            lab = c("ll", "l", "m", "h", "hh")))
+                     })) %>% 
+  pivot_longer(everything()) %>% 
+  bind_cols(new_districts, .)  %>% 
+  unnest(value) %>% 
+  pivot_wider(names_from = lab, values_from = value) %>% 
+  mutate(model = mod_name)
+}
+
+get_district_posterior(model_bangladesh_classic) %>% 
+  bind_rows(get_district_posterior(model_bangladesh_multilevel)) %>% 
+  mutate(model_short = str_remove( model, ".*_"),
+         xshift = -.33 * (1.5 - as.numeric(as.factor(model_short))),
+         x = as.numeric(factor(district_idx)) + xshift) %>%
+  ggplot(aes(x = x,
+             color = model_short)) +
+  geom_linerange(aes(ymin = ll, ymax = hh), size = .2) +
+  geom_linerange(aes(ymin = l, ymax = h), size = .5) +
+  geom_point(aes(y = m, fill = after_scale(clr_lighten(color))), shape = 21) +
+  scale_color_manual(values = c(clr_dark, clr_current)) +
+  scale_x_continuous(breaks = 2 * (1:30) - 1 ) +
+  coord_cartesian(ylim = 0:1) +
+  labs(y = "probability of using contraception", x = "district") +
+  theme(legend.position = "bottom",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank())
 
 ```
+
+$\rightarrow$ the `model_bangladesh_multilevel` regresses *to the mean* (eg. district no. 3)
 
 **H2**
 
 ```{r H2}
+chapter12_models <- read_rds("envs/chapter12_models.rds")
 
+data_trolley_list3 <- chapter12_models$data_trolley %>%
+  mutate(id_idx = as.integer(id)) %>% 
+  dplyr::select(response, action, intention, contact, id_idx) %>% 
+  as.list()
+```
+
+
+```{r class.source="bg-save", results = 'hide', eval = FALSE}
+model_trolley_predict_multi <- ulam(
+  flist = alist(
+    response ~ dordlogit( phi, cutpoints ),
+    phi <- alpha_bar + z_alpha[id_idx] * sigma_alpha + 
+      beta_a * action + beta_c * contact + B_i * intention,
+    B_i <- beta_i + beta_ia * action + beta_ic * contact,
+    c(beta_a, beta_c, beta_i, beta_ia, beta_ic) ~ dnorm(0, 0.5),
+    cutpoints ~ dnorm(0, 1.5),
+    alpha_bar ~ dnorm(0, 1),
+    z_alpha[id_idx] ~ dnorm(0, 1),
+    sigma_alpha ~ dexp(1)
+  ),
+  data = data_trolley_list3,
+  chains = 4,
+  cores = 4,
+  log_lik = TRUE
+)
+
+write_rds(model_trolley_predict_multi,
+          file = "brms/ulam_c13_model_trolley_predict_multi.rds")
+```
+
+```{r}
+model_trolley_predict_multi <- read_rds("brms/ulam_c13_model_trolley_predict_multi.rds")
+```
+
+```{r}
+precis(model_trolley_predict_multi) %>% 
+  knit_precis()
+```
+
+```{r}
+precis(chapter12_models$model_trolley_predict) %>% 
+  knit_precis()
+```
+
+```{r}
+compare(chapter12_models$model_trolley_predict,
+        model_trolley_predict_multi)
+```
+
+```{r}
+posterior_comparison <- tibble_precis(chapter12_models$model_trolley_predict) %>% 
+  bind_rows(tibble_precis(model_trolley_predict_multi))
+
+posterior_comparison %>% 
+  ggplot(aes(y = rowname)) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  geom_linerange(aes(xmin = `X5.5.`, xmax = `X94.5.`),
+                 color = clr0dd) +
+  geom_point(aes(x = mean), 
+             color = clr0dd, fill = clr0,
+             shape = 21, size = 1.5) +
+  facet_wrap(model ~ ., ncol = 1, scales = "free_y")+
+  labs(y = NULL)
 ```
 
 **H3**
 
 ```{r H3}
+data_trolley_list4 <- chapter12_models$data_trolley %>%
+  mutate(id_idx = as.integer(id),
+         story_idx = as.integer(story)) %>% 
+  dplyr::select(response, action, intention, contact, id_idx, story_idx) %>% 
+  as.list()
+```
 
+```{r class.source="bg-save", results = 'hide', eval = FALSE}
+model_trolley_predict_story <- ulam(
+  flist = alist(
+    response ~ dordlogit( phi, cutpoints ),
+    phi <- alpha_bar + z_alpha[id_idx] * sigma_alpha +
+      z_gamma[story_idx] * sigma_gamma +
+      beta_a * action + beta_c * contact + B_i * intention,
+    B_i <- beta_i + beta_ia * action + beta_ic * contact,
+    c(beta_a, beta_c, beta_i, beta_ia, beta_ic) ~ dnorm(0, 0.5),
+    cutpoints ~ dnorm(0, 1.5),
+    alpha_bar ~ dnorm(0, 1),
+    z_alpha[id_idx] ~ dnorm(0, 1),
+    sigma_alpha ~ dexp(1),
+    z_gamma[story_idx] ~ dnorm(0, 1),
+    sigma_gamma ~ dexp(1)
+  ),
+  data = data_trolley_list4,
+  chains = 4,
+  cores = 4,
+  log_lik = TRUE
+)
+
+write_rds(model_trolley_predict_story,
+          file = "brms/ulam_c13_model_trolley_predict_story.rds")
+```
+
+```{r}
+model_trolley_predict_story <- read_rds("brms/ulam_c13_model_trolley_predict_story.rds")
+```
+
+```{r}
+compare(model_trolley_predict_story,
+        model_trolley_predict_multi)
+```
+
+```{r}
+posterior_comparison <- tibble_precis(model_trolley_predict_story) %>% 
+  bind_rows(tibble_precis(model_trolley_predict_multi))
+
+posterior_comparison %>% 
+  ggplot(aes(y = rowname)) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  geom_linerange(aes(xmin = `X5.5.`, xmax = `X94.5.`),
+                 color = clr0dd) +
+  geom_point(aes(x = mean), 
+             color = clr0dd, fill = clr0,
+             shape = 21, size = 1.5) +
+  facet_wrap(model ~ ., ncol = 1, scales = "free_y")+
+  labs(y = NULL)
 ```
 
 **H4**
 
-```{r H4}
+```{r H4, results = 'hide'}
+data_frogs_list <- data_frogs %>% 
+  mutate(pred_size_inter = str_c(pred, size, sep = "_") %>% 
+           factor(),
+         across(c(pred, size, pred_size_inter),
+                as.integer,
+                .names = "{.col}_idx")) %>% 
+  dplyr::select(density, surv, tank, pred_idx,
+                size_idx, pred_size_inter_idx) %>% 
+  as.list()
+
+model_frog_pred <- ulam(
+  flist = alist(
+    surv ~ dbinom( density, p ),
+    logit(p) <- alpha_bar + 
+      z_tank[tank] * sigma_tank +
+      z_pred[pred_idx] * sigma_pred,
+    ## adaptive priors
+    z_tank[tank] ~ dnorm( 0, 1 ),
+    z_pred[pred_idx] ~ dnorm( 0, 1 ),
+    ## hyper-priors
+    alpha_bar ~ dnorm(0, 1.5),
+    sigma_tank ~ dexp(1),
+    sigma_pred ~ dexp(1),
+    gq> vector[tank]:alpha_tank <<- alpha_bar + z_tank * sigma_tank,
+    gq> vector[pred_idx]:alpha_pred <<- alpha_bar + z_pred * sigma_pred
+  ),
+  data = data_frogs_list,
+  cores = 4,
+  chains = 4,
+  log_lik = TRUE
+)
+
+model_frog_size <- ulam(
+  flist = alist(
+    surv ~ dbinom( density, p ),
+    logit(p) <- alpha_bar + 
+      z_tank[tank] * sigma_tank +
+      z_size[size_idx] * sigma_size,
+    ## adaptive priors
+    z_tank[tank] ~ dnorm( 0, 1 ),
+    z_size[size_idx] ~ dnorm( 0, 1 ),
+    ## hyper-priors
+    alpha_bar ~ dnorm(0, 1.5),
+    sigma_tank ~ dexp(1),
+    sigma_size ~ dexp(1),
+    gq> vector[tank]:alpha_tank <<- alpha_bar + z_tank * sigma_tank,
+    gq> vector[size_idx]:alpha_size <<- z_size * sigma_size
+  ),
+  data = data_frogs_list,
+  cores = 4,
+  chains = 4,
+  log_lik = TRUE
+)
+
+model_frog_size_pred <- ulam(
+  flist = alist(
+    surv ~ dbinom( density, p ),
+    logit(p) <- alpha_bar + 
+      z_tank[tank] * sigma_tank +
+      z_pred[pred_idx] * sigma_pred + 
+      z_size[size_idx] * sigma_size,
+    ## adaptive priors
+    z_tank[tank] ~ dnorm( 0, 1 ),
+    z_size[size_idx] ~ dnorm( 0, 1 ),
+    z_pred[pred_idx] ~ dnorm( 0, 1 ),
+    ## hyper-priors
+    alpha_bar ~ dnorm(0, 1.5),
+    sigma_size ~ dexp(1),
+    sigma_tank ~ dexp(1),
+    sigma_pred ~ dexp(1),
+    gq> vector[tank]:alpha_tank <<- alpha_bar + z_tank * sigma_tank,
+    gq> vector[size_idx]:alpha_size <<- z_size * sigma_size,
+    gq> vector[pred_idx]:alpha_pred <<- z_pred * sigma_pred
+  ),
+  data = data_frogs_list,
+  cores = 4,
+  chains = 4,
+  log_lik = TRUE
+)
+
+model_frog_size_pred_inter <- ulam(
+  flist = alist(
+    surv ~ dbinom( density, p ),
+    logit(p) <- alpha_bar + 
+      z_tank[tank] * sigma_tank +
+      z_pred[pred_idx] * sigma_pred + 
+      z_size[size_idx] * sigma_size +
+      z_inter[pred_size_inter_idx] * sigma_inter,
+    ## adaptive priors
+    z_tank[tank] ~ dnorm( 0, 1 ),
+    z_size[size_idx] ~ dnorm( 0, 1 ),
+    z_pred[pred_idx] ~ dnorm( 0, 1 ),
+    z_inter[pred_size_inter_idx] ~ dnorm( 0, 1 ),
+    ## hyper-priors
+    alpha_bar ~ dnorm(0, 1.5),
+    sigma_size ~ dexp(1),
+    sigma_tank ~ dexp(1),
+    sigma_pred ~ dexp(1),
+    sigma_inter ~ dexp(1),
+    gq> vector[tank]:alpha_tank <<- alpha_bar + z_tank * sigma_tank,
+    gq> vector[size_idx]:alpha_size <<- z_size * sigma_size,
+    gq> vector[pred_idx]:alpha_pred <<- z_pred * sigma_pred,
+    gq> vector[pred_size_inter_idx]:alpha_inter <<-  z_inter * sigma_inter
+  ),
+  data = data_frogs_list,
+  cores = 4,
+  chains = 4,
+  log_lik = TRUE
+)
+```
+
+```{r}
+compare(model_frog_pred,
+        model_frog_size,
+        model_frog_size_pred,
+        model_frog_size_pred_inter)
+```
+
+```{r, fig.asp = .65}
+tibble_precisposterior_comparison <- tibble_precis(model_frog_pred, depth = 2) %>% 
+  bind_rows(tibble_precis(model_frog_size, depth = 2)) %>% 
+  bind_rows(tibble_precis(model_frog_size_pred, depth = 2)) %>% 
+  bind_rows(tibble_precis(model_frog_size_pred_inter, depth = 2)) %>% 
+  mutate(model = str_remove(model, "model_frog_"))
+
+level_cpt <- data_frogs_list %>% as_tibble() %>% 
+  mutate(lab = glue("{pred_size_inter_idx}: ({levels(data_frogs$size)[size_idx]} | {levels(data_frogs$pred)[pred_idx]})")) %>% 
+  dplyr::select(lab) %>% 
+  distinct() %>% 
+  .$lab %>% str_c(collapse = "; ") %>% 
+  str_c("Interaction Levels: ",.)
+
+posterior_comparison %>%
+  filter(grepl("sigma|alpha", rowname) & !grepl("tank", rowname)) %>% 
+  ggplot(aes(y = model, color = model)) +
+  geom_vline(xintercept = 0, color = clr_dark, linetype = 3) +
+  geom_linerange(aes(xmin = `X5.5.`, xmax = `X94.5.`)#,
+                 #color = clr0dd
+                 ) +
+  geom_point(aes(x = mean, color = model, fill = after_scale(clr_lighten(color))), 
+             # color = clr0dd, fill = clr0,
+             shape = 21, size = 1.5) +
+  facet_wrap(rowname ~ .,# ncol = 1,
+             scales = "free_y",dir = "v") +
+  scale_color_manual(values = c(clr_dark, clr1, clr2, clr3), guide = 'none') +
+  labs(y = NULL, x = NULL, caption = level_cpt)
+```
+
+
+```{r, fig.width = 10}
+pair_model <- function(model, clr_current = clr_dark){
+  p <- extract.samples(model) %>% 
+    data.frame() %>% 
+    as_tibble() %>% 
+    dplyr::select(contains("alpha_pred"),
+                  contains("alpha_size"),
+                  #contains("sigma")
+                  sigma_tank#,
+                  # contains("alpha_inter")
+    ) %>% 
+    set_names(x = ., nm = names(.) %>% str_remove(pattern = "alpha_")) %>% 
+    ggpairs( lower = list(continuous = wrap(my_lower, col = clr_current, bins = 25)),
+             diag = list(continuous = wrap("densityDiag", fill = fll0,
+                                           color = clr_current,
+                                           fill = clr_alpha(clr_current), 
+                                           adjust = .7)),
+             upper = list(continuous = wrap(my_upper , size = 4, 
+                                            color = "black", family = fnt_sel)) ) +
+    theme(panel.border = element_rect(color = clr_dark,
+                                      fill = "transparent"))
+  
+  ggmatrix_gtable(p)
+}
+
+cowplot::plot_grid(
+  cowplot::plot_grid(pair_model(model_frog_size, clr_dark),
+                     pair_model(model_frog_pred, clr1), ncol = 1),
+  pair_model(model_frog_size_pred, clr2),
+  pair_model(model_frog_size_pred_inter, clr3),
+  nrow = 1, rel_widths = c(.75, 1, 1))
+```
+
+
+## {brms} section
+
+### Multilevel Tadpoles
+
+```{r}
+brms_c13_model_frog_single <- brm(
+  data = data_frogs,
+  family = binomial,
+  surv | trials(density) ~ 0 + factor(tank),
+  prior(normal(0, 1.5), class = b),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c13_model_frog_single")
+
+
+library(tidybayes)
+fixef(brms_c13_model_frog_single) %>% 
+  as_tibble() %>% 
+  mutate(p = inv_logit_scaled(Estimate)) %>% 
+  pivot_longer(Estimate:p) %>% 
+  mutate(name = if_else(name == "p",
+                        "expected survival probability",
+                        "expected survival log-odds")) %>% 
+  ggplot(aes(x = value, color = name)) +
+  stat_slab(slab_type = "pdf",
+            aes(fill_ramp = stat(cut_cdf_qi(cdf, .width = c(1, .95, 0.66)))),
+            color = clr0d, size = .5,
+            adjust = .75,
+            normalize = "xy",
+            trim = FALSE, n = 301) +
+  scale_colour_ramp_discrete(from = clr_dark, aesthetics = "fill_ramp", guide = "none")+
+  facet_wrap(~ name, scales = "free_x") +
+  scale_y_continuous(breaks = NULL) +
+  labs(title = "Tank-level intercepts from the no-pooling model",
+       subtitle = "Notice now inspecting the distributions of the posterior means can offer\ninsights you might not get if you looked at them one at a time",
+       y = "density", x = NULL)
+```
+
+> *The syntax for the varying effects follows the __lme4__ style, ( `<varying parameter(s)> | <grouping variable(s)>` ). In this case (`1 | tank`) indicates only the intercept, `1`, varies by `tank`. The extent to which parameters vary is controlled by the prior, `prior(exponential(1), class = sd)`, which is __parameterized in the standard deviation metric__. Do note that last part. It’s common in multilevel software to model in the variance metric, instead.*
+
+```{r}
+brms_c13_model_frog_multi <- brm(
+  data = data_frogs, 
+  family = binomial,
+  surv | trials(density) ~ 1 + (1 | tank),
+  prior = c(prior(normal(0, 1.5), class = Intercept),  # bar alpha
+            prior(exponential(1), class = sd)),        # sigma
+  iter = 5000, warmup = 1000,
+  chains = 4, cores = 4,
+  sample_prior = "yes",
+  seed = 42,
+  file = "brms/brms_c13_model_frog_multi")
+
+brms_c13_model_frog_single <- add_criterion(brms_c13_model_frog_single, "waic")
+brms_c13_model_frog_multi <- add_criterion(brms_c13_model_frog_multi, "waic")
+
+(w <- loo_compare(brms_c13_model_frog_single, 
+                  brms_c13_model_frog_multi,
+                  criterion = "waic"))
+```
+
+> *The `se_diff` is small relative to the `elpd_diff`. If we convert the $elpd$ difference to the WAIC metric, the message stays the same.*
+
+```{r}
+cbind(waic_diff = w[, 1] * -2,
+      se        = w[, 2] *  2)
+
+model_weights(brms_c13_model_frog_single, 
+              brms_c13_model_frog_multi,
+              weights = "waic") %>% 
+  round(digits = 2)
+```
+
+> *...the number of effective parameters for the two models. This, recall, is listed in the column for `p_waic`.*
+
+```{r}
+w[, "p_waic"]
+```
+
+
+```{r}
+brms_frogs_posterior <- as_draws_df(brms_c13_model_frog_multi) %>% 
+  as_tibble()
+
+posterior_median <- coef(brms_c13_model_frog_multi,
+                         robust = TRUE)$tank[, , ] %>% 
+  data.frame() %>% 
+  bind_cols(data_frogs, .) %>%
+  mutate(posterior_median = inv_logit_scaled(Estimate))
+
+posterior_median %>%
+  ggplot(aes(x = tank)) +
+  geom_hline(yintercept = inv_logit_scaled(median(brms_frogs_posterior$b_Intercept)),
+             linetype = 3, size = .5, color = clr_dark) +
+  geom_point(aes(y = propsurv),
+             color = clr_dark, shape = 19, size = 2) +
+  geom_point(aes(y = posterior_median),
+             shape = 1, size = 2) +
+  facet_wrap(density ~ ., labeller = label_both) +
+  scale_x_continuous(breaks = c(1, 16, 32, 48)) +
+  scale_y_continuous(breaks = 0:5 / 5, limits = c(0, 1)) +
+  labs(title = "Multilevel shrinkage!",
+       subtitle = "The empirical proportions are in gray while the model-implied proportions are\nthe black circles. The dashed line is the model-implied average survival proportion.") +
+  theme(panel.grid.major = element_blank(),
+        panel.border = element_rect(fill = "transparent",
+                                    color = clr0d))
 
 ```
 
-## {brms} section
+```{r}
+p1 <- brms_frogs_posterior %>% 
+  mutate(iter = 1:n()) %>% 
+  slice_sample(n = 100) %>% 
+  expand(nesting(iter, b_Intercept, sd_tank__Intercept),
+         x = seq(from = -4, to = 5, length.out = 100)) %>%
+  mutate(density = dnorm(x, mean = b_Intercept, sd = sd_tank__Intercept)) %>% 
+  ggplot(aes(x = x, y = density, group = iter)) +
+  geom_line(alpha = .2, color = clr_dark) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  labs(title = "Population survival distribution",
+       subtitle = "log-odds scale",
+       x = "log-ods survival") +
+  coord_cartesian(xlim = c(-3, 4))
+
+p2 <- brms_frogs_posterior %>% 
+  slice_sample(n = 8000, replace = TRUE) %>% 
+  mutate(sim_tanks = rnorm(n(), mean = b_Intercept, sd = sd_tank__Intercept)) %>% 
+  
+  ggplot(aes(x = inv_logit_scaled(sim_tanks))) +
+  geom_density(size = .5, fill = fll0, color = clr0dd, adjust = 0.1) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  labs(title = "Probability of survival",
+       subtitle = "transformed by the inverse-logit function",
+       x = "p")
+
+p1 + p2
+```
+
+**Priors for variance components**
+
+```{r}
+brms_c13_model_frog_multi_update <- update(
+  brms_c13_model_frog_multi,
+  prior = c(prior(normal(0, 1.5), class = Intercept),
+            prior(normal(0, 1), class = sd)),
+  iter = 5000, warmup = 1000,
+  chains = 4, cores = 4,
+  sample_prior = "yes",
+  seed = 42,
+  file = "brms/brms_c13_model_frog_multi_update")
+```
+
+> *McElreath mentioned how one might set a lower bound at zero for the half-Normal prior when using `rethinking::ulam()`. There’s no need to do so when using `brms::brm()`. The lower bounds for priors of class = sd are already set to zero by default.*
+
+> *If you’re curious how the exponential and half-Normal priors compare to one another and to their posteriors, you might just plot.*
+
+```{r}
+tibble(`prior_Exponential(1)`        = prior_draws(brms_c13_model_frog_multi) %>% pull(sd_tank),
+       `posterior_Exponential(1)`    = as_draws_df(brms_c13_model_frog_multi) %>% pull(sd_tank__Intercept),
+       `prior_Half-Normal(0, 1)`     = prior_draws(brms_c13_model_frog_multi_update) %>% pull(sd_tank),
+       `posterior_Half-Normal(0, 1)` = as_draws_df(brms_c13_model_frog_multi_update) %>% pull(sd_tank__Intercept)) %>% 
+  pivot_longer(everything(),
+               names_sep = "_",
+               names_to = c("distribution", "prior")) %>% 
+  mutate(distribution = factor(distribution, levels = c("prior", "posterior"))) %>% 
+  ggplot(aes(x = value, color = distribution)) +
+  geom_density(size = .5, adjust = 0.5,
+               aes(fill = after_scale(clr_alpha(color)))) +
+  scale_color_manual(NULL, values = c(clr0d, clr_dark)) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  labs(subtitle = "Hierarchical sigma parameter") +
+  coord_cartesian(xlim = c(0, 4)) +
+  facet_wrap(~ prior) +
+  theme(legend.position = "bottom",
+        axis.title.x = element_blank(),
+        panel.border = element_rect(fill = "transparent",
+                                    color = clr0d))
+```
+
+### Varying Effects and the Underfitting/Overfitting Trade-Off
+
+**Compute the partial-pooling estimates**
+
+The multi-level partial-pooling model:
+
+```{r}
+brms_c13_model_sim_partial <- brm(
+  data = data_sim, 
+  family = binomial,
+  surv_i | trials(n_i) ~ 1 + ( 1 | pond_idx ),
+  prior = c(prior(normal(0, 1.5), class = Intercept),
+            prior(exponential(1), class = sd)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c13_model_sim_partial")
+```
+
+```{r}
+brms_sim_posterior <- coef(brms_c13_model_sim_partial)$pond[, , ] %>% 
+  data.frame() %>%
+  transmute(p_partpool = inv_logit_scaled(Estimate)) %>%
+  bind_cols(data_sim, .) %>% 
+  mutate(p_true = inv_logit_scaled(true_alpha),
+         no_pool_error   = abs(p_no_pool   - p_true),
+         part_pool_error = abs(p_partpool - p_true))
+
+dfline <- brms_sim_posterior %>%
+  select(n_i, no_pool_error:part_pool_error) %>%
+  pivot_longer(-n_i) %>%
+  group_by(name, n_i) %>%
+  summarise(mean_error = mean(value)) %>%
+  mutate(x    = c( 1, 16, 31, 46),
+         xend = c(15, 30, 45, 60))
+
+brms_sim_posterior %>% 
+  ggplot(aes(x = pond_idx)) +
+  geom_point(aes(y = no_pool_error),
+             shape = 19, color = clr0dd, size = 2) +
+  geom_point(aes(y = part_pool_error),
+             shape = 1, size = 2) +
+  geom_segment(data = dfline, 
+               aes(x = x, xend = xend, 
+                   y = mean_error, yend = mean_error),
+               color = rep(c(clr0dd, clr_dark), each = 4),
+               linetype = rep(c(1,3), each = 4)) +
+  scale_x_continuous(breaks = c(1, 10, 20, 30, 40, 50, 60)) +
+  facet_wrap(n_i ~ . , scales = "free_x", nrow = 1, labeller = label_both) +
+  labs(title = "Estimate error by model type",
+       subtitle = "The horizontal axis displays pond number. The vertical axis measures the absolute error\n in the predicted proportion of survivors, compared to the true value used in the simulation.\nThe higher the point, the worse the estimate. No-pooling shown in gray, Partial pooling\nshown in black. The gray and dashed black lines show the average error for each\nkind of estimate, across each initial density of tadpoles (pond size).",
+       y = "absolute error") +
+  theme(panel.grid.major = element_blank(),
+        plot.subtitle = element_text(size = 10),
+        panel.border = element_rect(fill = "transparent",
+                                    color = clr0d))
+```
+
+> *If you wanted to quantify the difference in simple summaries, you might execute something like this.*
+
+```{r}
+brms_sim_posterior %>%
+  select(n_i, no_pool_error:part_pool_error) %>%
+  pivot_longer(-n_i) %>%
+  group_by(name) %>%
+  summarise(mean_error   = mean(value) %>% round(digits = 3),
+            median_error = median(value) %>% round(digits = 3))
+```
+
+**Repeating the pond simulation**
+
+> *Within the __brms__ workflow, we can reuse a compiled model with `update()`. But first, we’ll simulate new data.*
+
+```{r}
+set.seed(23)
+alpha_bar <- 1.5
+sigma <- 1.5
+n_ponds <- 60
+pond_levels <- c("tiny", "small", "medium", "large")
+data_sim_new <- tibble(pond_idx = 1:n_ponds,
+                   n_i = rep(c(5, 10, 25, 35), each = 15),
+                   pond_size = rep(pond_levels, each = 15) %>% 
+                     factor(levels = pond_levels),
+                   true_alpha = rnorm(n = n_ponds, mean = alpha_bar, sd = sigma),
+                   surv_i = rbinom(n_ponds, prob = logistic(true_alpha), size = n_i),
+                   p_true = inv_logit(true_alpha),
+                   p_no_pool = surv_i / n_i)
+
+brms_c13_model_sim_partial_new <- update(
+  brms_c13_model_sim_partial,
+  newdata = data_sim_new,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c13_model_sim_partial_new")
+```
+
+> *Why not plot the first simulation versus the second one?*
+
+```{r}
+bind_rows(as_draws_df(brms_c13_model_sim_partial),
+          as_draws_df(brms_c13_model_sim_partial_new)) %>%
+  mutate(model = rep(c("original_data", "new_data"), each = n() / 2)) %>% 
+  ggplot(aes(x = b_Intercept,
+             y = sd_pond_idx__Intercept)) +
+  stat_density_2d(geom = "raster", 
+                  aes(fill = stat(density)), 
+                  contour = FALSE, 
+                  n = 200, 
+                  alpha = .9) +
+  geom_density2d(color = rgb(1,1,1,.75), size = .1) +
+  geom_vline(xintercept = alpha_bar,
+             color = clr_current, linetype = 3) +
+  geom_hline(yintercept = sigma,
+             color = clr_current, linetype = 3) +
+  scale_fill_gradient(low = clr0, 
+                      high = clr_dark) +
+  ggtitle("Our simulation posteriors contrast a bit",
+          subtitle = "alpha is on the x and sigma is on the y, both in log-odds.\nThe dotted lines intersect at the true values.") +
+  coord_cartesian(xlim = c(.7, 2),
+                  ylim = c(.9, 1.9), expand = 0) +
+  theme(legend.position = "none",
+        panel.grid.major = element_blank()) +
+  facet_wrap(~ model, ncol = 2)
+```
+
+> *If you’d like the `stanfit` portion of your `brm()` object, subset with `$fit.`*
+
+```{r}
+brms_c13_model_sim_partial$fit@stanmodel
+```
+
+### More than one Type of Cluster
+
+> *`r emo::ji("warning")` __WARNING__ `r emo::ji("warning")` I am so sorry, but we are about to head straight into a load of confusion. If you follow along linearly in the text, we won’t have the language to parse this all out until [later] In short, our difficulties will have to do with what are called the centered and the non-centered parameterizations for multilevel models. For the next several models in the text, McElreath used the __centered parameterization__. As we’ll learn [later], this often causes problems when you use Stan to fit your multilevel models. Happily, the solution to those problems is often the __non-centered parameterization__, which is well known among the Stan team. This issue is so well known, in fact, that Bürkner only supports the non-centered parameterization with __brms__ (see [here](https://discourse.mc-stan.org/t/disable-non-centered-parameterization-in-brms/7184/7?u=solomon)). To my knowledge, there is no easy way around this.*
+
+> *Even when using the non-centered parameterization, McElreath’s m13.4 is a bit of an odd model to translate into brms syntax. To my knowledge, it can’t be done with conventional syntax. But we can fit the model with careful use of the non-linear syntax, which might look like this.*
+
+```{r}
+data_chimp_brms <- data_chimp %>% 
+  dplyr::select(pulled_left, actor, block, treatment) %>% 
+  mutate(across(actor:treatment, factor))
+
+brms_c13_model_chimp_multicluster <- brm(
+  data = data_chimp_brms, 
+  family = binomial,
+  bf(pulled_left | trials(1) ~ alpha + beta,
+     alpha ~ 1 + (1 | actor) + (1 | block), 
+     beta ~ 0 + treatment,
+     nl = TRUE),
+  prior = c(prior(normal(0, 0.5), nlpar = beta),
+            prior(normal(0, 1.5), class = b, coef = Intercept, nlpar = alpha),
+            prior(exponential(1), class = sd, group = actor, nlpar = alpha),
+            prior(exponential(1), class = sd, group = block, nlpar = alpha)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c13_model_chimp_multicluster")
+```
+
+>*The `beta ~ 0 + treatment` part of the formula is our expression of what we wrote above as $\beta_{treatment[i]}$. There’s a lot going on with the `alpha ~ 1 + (1 | actor) + (1 | block)` part of the formula. The initial `1` outside of the parenthesis is $\bar{\alpha}$. The `(1 | actor)` and `(1 | block)` parts correspond to $z_{actor[i]} \sigma_{\alpha}$ and $x_{block[i]} \sigma_{\gamma}$, respectively.*
+
+
+```{r, fig.width = 11}
+chimp_posterior <- as_draws_df(brms_c13_model_chimp_multicluster,
+                               add_chain = TRUE) %>% 
+  as_tibble() %>% 
+  mutate(iter = .iteration,
+         chain = .chain)
+
+clr_chains <- function(n = 4, alpha = .7, col_start = clr0dd,col = clr2){scales::colour_ramp(colors = c(col_start, col))(seq(0,1,length.out = n))%>% clr_lighten(.2) %>% clr_alpha(alpha = alpha)}
+
+
+library(bayesplot)
+chimp_posterior %>% 
+  mcmc_trace(pars = vars(-iter, -lp__),
+             facet_args = list(ncol = 4), 
+             size = .15) +
+    scale_color_manual(values = clr_chains(col_start = "black") ) +
+  theme(legend.position = "bottom")
+```
+
+> *When you use the `(1 | <group>)` syntax within `brm()`, the group-specific parameters are not shown with `print()`. You only get the hierarchical $\sigma_{<group>}$ summaries, shown here as the two rows for `sd(a_Intercept)`. However, you can get a summary of all the parameters with the `posterior_summary()` function.*
+
+```{r}
+posterior_summary(brms_c13_model_chimp_multicluster) %>%
+  round(digits = 2)
+```
+
+```{r}
+color_scheme_set(
+  scales::colour_ramp(colors = c( "white",
+                                  str_sub(clr_dark, 1, 7)))(seq(.4,1, length.out = 6))
+  )
+
+p1 <- mcmc_plot(brms_c13_model_chimp_multicluster, 
+          variable = c("^r_.*", "^b_.*", "^sd_.*"), 
+          regex = TRUE,
+          outer_size = 0.2,
+          inner_size = 1,
+          point_size = 2) +
+  theme(axis.text.y = element_text(hjust = 0))
+```
+
+alternative version (d.i.y.)
+
+```{r}
+p2 <- chimp_posterior %>% 
+  pivot_longer(-(lp__:chain)) %>% 
+  ggplot(aes(x = value, y = name)) +
+  stat_pointinterval(point_interval = mean_qi,
+                     .width = c(.89, .5),
+                     shape = 21,
+                     point_size = 2,
+                     point_fill = clr0,
+                     color = clr0dd)+
+  theme(axis.title = element_blank())
+
+p1 + p2
+```
+
+Comparing the group-level sigma parameters
+
+```{r}
+chimp_posterior %>%
+  pivot_longer(starts_with("sd")) %>% 
+  ggplot(aes(x = value, color = name)) +
+  geom_density(size = .5,
+               aes(fill = after_scale(clr_alpha(color))),
+               adjust = .5) +
+  annotate(geom = "text", x = 0.67, y = 2, label = "Block", color = clr_dark) +
+  annotate(geom = "text", x = 2.725, y = 0.5, label = "Actor", color = clr0d) +
+  scale_color_manual(values = c(clr0d, clr_dark), guide = "none") +
+  scale_y_continuous(breaks = NULL) +
+  labs(subtitle = "sigma_group", x = NULL, y = "density") +
+  coord_cartesian(xlim = c(0, 4))
+```
+
+
+> *Since both the coefficient plots and the density plots indicate there is much more variability among the `actor` parameters than in the `block` parameters, we might fit a model that ignores the variation among the levels of `block`.*
+
+```{r}
+brms_c13_model_chimp_no_block <- brm(
+  data = data_chimp_brms, 
+  family = binomial,
+  bf(pulled_left | trials(1) ~ alpha + beta,
+     alpha ~ 1 + (1 | actor), 
+     beta ~ 0 + treatment,
+     nl = TRUE),
+  prior = c(prior(normal(0, 0.5), nlpar = beta),
+            prior(normal(0, 1.5), class = b, coef = Intercept, nlpar = alpha),
+            prior(exponential(1), class = sd, group = actor, nlpar = alpha)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c13_model_chimp_no_block")
+
+brms_c13_model_chimp_multicluster <- add_criterion(brms_c13_model_chimp_multicluster, "waic")
+brms_c13_model_chimp_no_block <- add_criterion(brms_c13_model_chimp_no_block, "waic")
+
+loo_compare(brms_c13_model_chimp_multicluster,
+            brms_c13_model_chimp_no_block,
+            criterion = "waic") %>% 
+  print(simplify = FALSE)
+```
+
+```{r}
+model_weights(brms_c13_model_chimp_multicluster,
+            brms_c13_model_chimp_no_block,
+            weights = "waic") %>% 
+  round(digits = 2)
+```
+
+**Even more clusters**
+
+```{r}
+brms_c13_model_chimp_treatment <- brm(
+  data = data_chimp_brms, 
+  family = binomial,
+  pulled_left | trials(1) ~ 1 + (1 | actor) + (1 | block) + (1 | treatment),
+  prior = c(prior(normal(0, 1.5), class = Intercept),
+            prior(exponential(1), class = sd)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  seed = 42,
+  file = "brms/brms_c13_model_chimp_treatment")
+
+brms_chimp_posterior <- as_draws_df(brms_c13_model_chimp_treatment)
+
+brms_chimp_posterior %>% 
+  pivot_longer(starts_with("sd")) %>% 
+  mutate(group = str_remove(name, "sd_") %>% str_remove(., "__Intercept")) %>% 
+  mutate(parameter = str_c("sigma[", group,"]")) %>% 
+  
+  ggplot(aes(x = value, y = parameter)) +
+  stat_halfeye(.width = .95, size = 1, fill = clr0d, adjust = 0.1) +
+  labs(subtitle = "The variation among treatment levels is small, but the\nvariation among the levels of block is still the smallest.") +
+  coord_cartesian(ylim = c(1.5, 3)) +
+  theme(axis.text.y = element_text(hjust = 0),
+        axis.title = element_blank())
+```
+
+```{r}
+brms_c13_model_chimp_treatment <- add_criterion(brms_c13_model_chimp_treatment, "waic")
+
+loo_compare(brms_c13_model_chimp_multicluster,
+            brms_c13_model_chimp_no_block,
+            brms_c13_model_chimp_treatment,
+            criterion = "waic") %>% 
+  print(simplify = FALSE)
+```
+
+```{r}
+model_weights(brms_c13_model_chimp_multicluster,
+              brms_c13_model_chimp_no_block,
+              brms_c13_model_chimp_treatment,
+              weights = "loo") %>% 
+  round(digits = 2)
+```
+
+###  Divergent Transitions and Non-Centered Priors
+
+**Non-centered chimpanzees**
+
+> *Because we only fit this model using the non-centered parameterization, we won’t be able to fully reproduce McElreath’s Figure 13.6. But we can still plot our effective sample sizes. Recall that unlike the way __rethinking__ only reports `n_eff`, __brms__ now reports both `bulk_ess` and `tail_ess` (see Vehtari, Gelman, et al., 2019). At the moment, __brms__ does not offer a convenience function that allows users to collect those values in a data frame. However you can do so with help from the [__posterior__](https://github.com/stan-dev/posterior) package (Bürkner et al., 2020), which has not made its way to CRAN, yet, but can be downloaded directly from GitHub.*
+
+```{r}
+as_draws_df(brms_c13_model_chimp_multicluster) %>%
+  summarise_draws() %>%
+  ggplot(aes(x = ess_bulk, y = ess_tail)) +
+  geom_abline(linetype = 3, color = clr_dark) +
+  geom_point(color = clr0dd, fill = clr0,
+             size = 2, shape = 21) +
+  xlim(0, 4700) +
+  ylim(0, 4700) +
+  ggtitle("Effective sample size summaries for b13.4",
+          subtitle = "ess_bulk is on the x and ess_tail is on the y") +
+  theme(plot.subtitle = element_text(size = 10),
+        plot.title = element_text(size = 11.5),
+        plot.title.position = "plot")
+```
+
+### Multilevel Posterior Predictions
+
+**Posterior prediction for same clusters**
+
+```{r}
+treatment_levels <- c("R|N", "L|N", "R|P", "L|P")
+
+new_chimp <- data_chimp %>% 
+  distinct(treatment) %>% 
+  mutate(actor = chimp,
+         block = 1L)
+
+chimp_2_fit <- fitted(brms_c13_model_chimp_multicluster,
+         newdata = new_chimp) %>% 
+  as_tibble() %>% 
+  bind_cols(new_chimp,.)
+
+chimp_2_data <- data_chimp %>% 
+  filter(actor == chimp) %>% 
+  group_by(treatment) %>% 
+  summarise(prob = mean(pulled_left)) %>% 
+  ungroup() 
+
+p1 <- chimp_2_fit %>%
+  ggplot(aes(x = treatment, y = Estimate)) +
+  geom_smooth(stat = 'identity',
+              aes(ymin = Q2.5, ymax = Q97.5),
+              fill = clr0dd, color = clr0dd, size = .5) +
+  geom_point(data = chimp_2_data,
+             aes(y = prob),
+             color = clr0dd , fill = clr0, shape = 21) +
+  ggtitle("Chimp #2",
+          subtitle = "The posterior mean and 95%\nintervals are the blue line\nand orange band, respectively.\nThe empirical means are\nthe charcoal dots.") +
+  coord_cartesian(ylim = c(.75, 1))
+
+p2 <- (brms_chimp_posterior_multi <- as_draws_df(brms_c13_model_chimp_multicluster) %>% 
+    as_tibble())  %>% 
+  transmute(actor_5 = `r_actor__alpha[5,Intercept]`) %>% 
+  ggplot(aes(x = actor_5)) +
+  geom_density(size = .5, color = clr0dd, fill = fll0) +
+  scale_y_continuous(breaks = NULL) +
+  ggtitle("Chimp #5's density")
+
+chimp_5_fit <- brms_chimp_posterior_multi %>% 
+  pivot_longer(b_beta_treatment1:b_beta_treatment4) %>% 
+  mutate(fitted = inv_logit_scaled(b_alpha_Intercept + value +
+                                     `r_actor__alpha[1,Intercept]` +
+                                     `r_block__alpha[1,Intercept]`),
+         treatment = treatment_levels[str_sub(name, -1,-1) %>% as.integer()] %>% 
+           factor(levels = treatment_levels)) %>% 
+  select(name:treatment) %>%
+  group_by(treatment) %>%
+  tidybayes::mean_qi(fitted)
+
+chimp_5_data <- data_chimp %>% 
+  filter(actor == 5) %>% 
+  group_by(treatment) %>% 
+  summarise(prob = mean(pulled_left)) %>% 
+  ungroup() %>% 
+  mutate(treatment = treatment_levels[treatment] %>% 
+           factor(levels = treatment_levels))
+
+p3 <- chimp_5_fit %>%
+  ggplot(aes(x = treatment, y = fitted)) +
+  geom_smooth(stat = 'identity',
+              aes(ymin = .lower, ymax = .upper, group = 1),
+              fill = clr0dd, color = clr0dd, size = .5) +
+  geom_point(data = chimp_5_data,
+             aes(y = prob),
+             color = clr0dd , fill = clr0, shape = 21) +
+    ggtitle("Chimp #5",
+          subtitle = "This plot is like the last except\nwe did more by hand.")  +
+  coord_cartesian(ylim = 0:1)
+
+p1 + p2 + p3
+```
+
+**Posterior prediction for new clusters**
+
+```{r}
+chimp_mean_fitted <- brms_chimp_posterior_multi %>% 
+  pivot_longer(b_beta_treatment1:b_beta_treatment4) %>% 
+  mutate(fitted = inv_logit_scaled(b_alpha_Intercept + value)) %>% 
+  mutate(treatment = treatment_levels[str_sub(name, -1,-1) %>% as.integer()] %>% 
+           factor(levels = treatment_levels)) %>% 
+  select(name:treatment) %>%
+  group_by(treatment) %>%
+  # note we're using 80% intervals
+  mean_qi(fitted, .width = .89)
+
+p1 <- chimp_mean_fitted %>%
+  ggplot(aes(x = treatment, y = fitted, group = 1)) +
+  geom_smooth(stat = 'identity',
+              aes(ymin = .lower, ymax = .upper, group = 1),
+              fill = clr0dd, color = clr0dd, size = .5)+
+  labs(subtitle = "Average actor") +
+  coord_cartesian(ylim = 0:1)
+
+chimp_marginal_fitted <- brms_chimp_posterior_multi %>% 
+  # simulated chimpanzees
+  mutate(a_sim = rnorm(n(), mean = b_alpha_Intercept, sd = sd_actor__alpha_Intercept)) %>% 
+  pivot_longer(b_beta_treatment1:b_beta_treatment4) %>% 
+  mutate(fitted = inv_logit_scaled(a_sim + value),
+         treatment = treatment_levels[str_sub(name, -1,-1) %>% as.integer()] %>% 
+           factor(levels = treatment_levels)) %>% 
+  group_by(treatment) %>%
+  # note we're using 80% intervals
+  mean_qi(fitted, .width = .8)
+
+p2 <- chimp_marginal_fitted %>%
+  ggplot(aes(x = treatment, y = fitted, group = 1)) +
+   geom_smooth(stat = 'identity',
+              aes(ymin = .lower, ymax = .upper, group = 1),
+              fill = clr0dd, color = clr0dd, size = .5)+
+  labs(subtitle = "Marginal of actor") +
+  coord_cartesian(ylim = 0:1)
+
+n_chimps <- 100
+set.seed(42)
+
+chimp_100_random_fitted <- brms_chimp_posterior_multi %>% 
+  mutate(iter = 1:n()) %>% 
+  slice_sample(n = n_chimps) %>% 
+  # simulated chimpanzees
+  mutate(a_sim = rnorm(n(), mean = b_alpha_Intercept, sd = sd_actor__alpha_Intercept)) %>% 
+  pivot_longer(b_beta_treatment1:b_beta_treatment4) %>% 
+  mutate(fitted = inv_logit_scaled(a_sim + value),
+         treatment = treatment_levels[str_sub(name, -1,-1) %>% as.integer()] %>% 
+           factor(levels = treatment_levels)) %>% 
+  select(iter:treatment)
+
+p3 <- chimp_100_random_fitted %>%
+  ggplot(aes(x = treatment, y = fitted, group = iter)) +
+  geom_line(alpha = .4, color = clr0dd) +
+  labs(subtitle = "100 simulated actors") +
+  coord_cartesian(ylim = 0:1) 
+
+p1 + p2 + p3
+```
+
+Let’s use `fitted()` this time (alternative approach for new clusters)
+
+```{r}
+new_chimp_treatment <- distinct(data_chimp, treatment)
+
+chimp_mean_fitted2 <- fitted(brms_c13_model_chimp_multicluster,
+                             newdata = new_chimp_treatment,
+                             re_formula = NA,
+                             probs = c(.1, .9)) %>% 
+  as_tibble() %>% 
+  bind_cols(new_chimp_treatment, .) %>% 
+  mutate(treatment = treatment_levels[treatment] %>% 
+           factor(levels = treatment_levels))
+
+p4 <- chimp_mean_fitted2 %>%
+  ggplot(aes(x = treatment, y = Estimate, group = 1)) +
+  geom_smooth(stat = 'identity',
+              aes(ymin = Q10, ymax = Q90),
+              fill = fll_current(), color = clr_current, size = .5) +
+  labs(subtitle = "Average actor") +
+  coord_cartesian(ylim = 0:1)
+
+chimp_marginal_fitted2 <- fitted(brms_c13_model_chimp_multicluster,
+                                 newdata = new_chimp_treatment,
+                                 probs = c(.1, .9),
+                                 allow_new_levels = T,
+                                 sample_new_levels = "gaussian") %>% 
+  as_tibble() %>% 
+  bind_cols(new_chimp_treatment,.) %>% 
+  mutate(treatment = treatment_levels[treatment] %>% 
+           factor(levels = treatment_levels))
+
+p5 <- chimp_marginal_fitted2 %>%
+  ggplot(aes(x = treatment, y = Estimate, group = 1)) +
+  geom_smooth(stat = 'identity',
+              aes(ymin = Q10, ymax = Q90),
+              fill = fll_current(), color = clr_current, size = .5) +
+  labs(subtitle = "Marginal of actor") +
+  coord_cartesian(ylim = 0:1)
+
+new_chimp_random <- new_chimp %>% 
+  # define 100 new actors
+  expand(actor = str_c("new", 1:n_chimps),
+         treatment) %>% 
+  # this adds a row number, which will come in handy, later
+  mutate(row = 1:n())
+
+set.seed(42)
+
+chimp_100_random_fitted2 <- fitted(brms_c13_model_chimp_multicluster,
+                                   newdata = new_chimp_random,
+                                   allow_new_levels = TRUE,
+                                   sample_new_levels = "gaussian",
+                                   summary = FALSE,
+                                   ndraws = n_chimps)
+
+p6 <- chimp_100_random_fitted2 %>%
+  as_tibble() %>% 
+  # name the columns by the `row` values in `nd`
+  set_names(pull(new_chimp_random, row)) %>% 
+  # add an iteration index
+  mutate(iter = 1:n()) %>% 
+  # make it long
+  pivot_longer(-iter, names_to = "row") %>% 
+  mutate(row = as.integer(row)) %>% 
+  # add the new data
+  left_join(new_chimp_random, by = "row") %>% 
+  # extract the numbers from the names of the new actors
+  mutate(actor_number = str_extract(actor, "\\d+") %>% as.integer()) %>% 
+  # only keep the posterior iterations that match the `actor_number` values
+  filter(actor_number == iter) %>% 
+  # add the `treatment` labels
+  mutate(treatment = treatment_levels[treatment] %>% 
+           factor(levels = treatment_levels)) %>% 
+  ggplot(aes(x = treatment, y = value, group = actor)) +
+  geom_line(alpha = .4, color = clr_current) +
+  labs(subtitle = "100 simulated actors")
+
+p4 + p5 + p6
+```
+
+**Post-stratification**
+
+> *If you have estimates $p_{i}$ for each relevant demographic category $i$, the post-stratified prediction for the whole population just re-weights these estimates using the number of individuals $N_{i}$ in each category with the formula*
+>
+> $$\frac{\sum_{i}N_{i}p_{i}}{\sum_{i}N_{i}}$$
+> 
+> *Within the multilevel context, this is called __multilevel regression and post-stratification__ (MRP, pronounced “Mister P”).*
+
+### Bonus: Post-stratification in an example
+
+Meet the data
+
+```{r}
+load("data/mrp_data_ch13.rds")
+data_names <- d
+data_cell_counts <- cell_counts
+rm(d, cell_counts)
+```
+
+```{r}
+data_cell_counts %>% 
+  ggplot(aes(x = n)) +
+  geom_histogram(binwidth = 2e3, fill = fll0, color = clr0d) +
+  scale_x_continuous(breaks = 0:3 * 1e5,
+                     labels = function(x){if_else(x == 0,
+                                                  as.character(x),
+                                                  str_c(1e-3 * x, "K"))})
+```
+
+**Settle the MR part of MRP**
+
+```{r}
+set.seed(42)
+
+tibble(n = rnorm(1e6, -1, 1)) %>% 
+  mutate(p = inv_logit_scaled(n)) %>% 
+  ggplot(aes(x = p)) +
+  geom_density(color = clr0dd, fill = fll0) +
+  scale_y_continuous(breaks = NULL)
+```
+
+```{r}
+brms_c13_model_names <- brm(
+  data = data_names,
+  family = binomial,
+  kept_name | trials(1) ~ 1 + 
+    (1 | age_group) + 
+    (1 | decade_married) + 
+    (1 | educ_group) + 
+    (1 | state_name),
+  prior = c(prior(normal(-1, 1), class = Intercept),
+            prior(exponential(1), class = sd)),
+  iter = 2000, warmup = 1000,
+  chains = 4, cores = 4,
+  control = list(adapt_delta = .98),
+  seed = 42,
+  file = "brms/brms_c13_model_names")
+
+fixef(brms_c13_model_names) %>% 
+  data.frame() %>% 
+  knit_precis()
+
+as_draws_df(brms_c13_model_names) %>% 
+  select(starts_with("sd_")) %>% 
+  set_names(str_c("sigma[", c("age", "decade~married", "education", "state"), "]")) %>% 
+  pivot_longer(everything()) %>% 
+  group_by(name) %>%
+  median_qi(.width = seq(from = .5, to = .9, by = .1)) %>%
+  ggplot(aes(x = value, xmin = .lower, xmax = .upper, y = reorder(name, value))) +
+  geom_interval(aes(alpha = .width), color = clr_dark) +
+  scale_alpha_continuous("CI width", range = c(.7, .15)) +
+  scale_y_discrete() +
+  xlim(0, NA) +
+  labs(y = NULL, x = NULL)
+```
+
+**Post-stratify to put the P in MRP**
+
+> *For simplicity, we will only focus on the results for `age_group` and `state`. However, we will examine the results for each using three estimation methods: the empirical proportions, the naïve results from the multilevel model, and the MRP estimates.*
+
+Estimates by age group
+
+```{r}
+name_levels <- c("raw data", "multilevel", "MRP")
+
+
+p1 <- data_names %>% # compute the proportions from the data
+  group_by(age_group, kept_name) %>%
+  summarise(n = n()) %>% 
+  group_by(age_group) %>% 
+  mutate(prop = n/sum(n),
+         type = factor("raw data", levels = name_levels)) %>% 
+  filter(kept_name == 1, age_group < 80, age_group > 20) %>%
+  ggplot(aes(x = prop, y = age_group)) + 
+  geom_point(color = clr0dd, fill = clr0, shape = 21, size = 1.5) +
+  scale_x_continuous(breaks = c(0, .5, 1), limits = 0:1) +
+  facet_wrap(~ type)
+
+new_names <- distinct(data_names, age_group) %>% arrange(age_group)
+
+p2 <- fitted(brms_c13_model_names,
+         re_formula = ~ (1 | age_group),
+         newdata = new_names) %>% 
+  as_tibble() %>% 
+  bind_cols(new_names, .) %>% 
+  mutate(prop = Estimate,
+         type = factor("multilevel", levels = name_levels)) %>% 
+  ggplot(aes(x = prop, xmin = Q2.5, xmax = Q97.5, y = age_group)) + 
+  geom_linerange(color = clr0dd, size = .5) +
+  geom_point(color = clr0dd,
+                  size = 1.5, fill = clr0, shape = 21) +
+  scale_x_continuous(breaks = c(0, .5, 1), limits = c(0, 1)) +
+  # scale_y_discrete(labels = NULL) +
+  facet_wrap(~ type) +
+  labs(y = NULL)
+
+age_prop <- data_cell_counts %>% 
+  group_by(age_group) %>% 
+  mutate(prop = n / sum(n)) %>% 
+  ungroup()
+
+names_predicted <- add_predicted_draws(brms_c13_model_names, 
+                                       newdata = age_prop %>% 
+                                         filter(age_group > 20, 
+                                                age_group < 80, 
+                                                decade_married > 1969),
+                                       allow_new_levels = TRUE)
+```
+
+> *Next comes the MRP magic. If we group the results by `age_group` and `.draw`, we can sum the product of the posterior predictions and the weights, which will leave us with 4,000 stratified posterior draws for each of the 11 levels of `age_group`. This is the essence of the post-stratification equation McElreath presented in Section 13.5.3,*
+>
+> $$\frac{\sum_{i}N_{i}p_{i}}{\sum_{i}N_{i}}$$
+> 
+> *We will follow Alexander and call these summary values `kept_name_predict`. We then complete the project by grouping by age_group and summarizing each stratified posterior predictive distribution by its mean and 95% interval.*
+
+```{r}
+names_predicted <- names_predicted %>% 
+  group_by(age_group, .draw) %>% 
+  summarise(kept_name_predict = sum(.prediction * prop)) %>% 
+  group_by(age_group) %>% 
+  mean_qi(kept_name_predict)
+
+p3 <- names_predicted %>%
+  mutate(type = factor("MRP", levels = name_levels)) %>%
+  ggplot(aes(x = kept_name_predict, xmin = .lower, xmax = .upper, y = age_group)) + 
+  geom_linerange(color = clr_current, size = .5) +
+  geom_point(color = clr_current, fill = clr_lighten(clr_current),
+                  size = 1.5, shape = 21) +
+  scale_x_continuous(breaks = c(0, .5, 1), limits = 0:1) +
+  facet_wrap(~ type) +
+  labs(y = NULL)
+
+p1 + p2 + p3 +
+  plot_annotation(title = "Proportion of women keeping name after marriage, by age",
+                  subtitle = "Proportions are on the x-axis and age groups are on the y-axis.")
+```
+
+> *Both multilevel and MRP estimates tended to be a little lower than the raw proportions, particularly for women in the younger age groups. Alexander mused this was “likely due to the fact that the survey has an over-sample of highly educated women, who are more likely to keep their name.” The MRP estimates were more precise than the multilevel predictions, which averaged across the grouping variables other than age. All three estimates show something of an inverted U-shape curve across age, which Alexander noted “is consistent with past observations that there was a peak in name retention in the 80s and 90s.”*
+
+**Estimates by US state**
+
+> *Now we turn out attention to variation across states. The workflow, here, will only deviate slightly from what we just did. This time, of course, we will be grouping the estimates by `state_name` instead of by `age_group`.*
+
+
+```{r}
+library(sf)
+us_sf <- read_sf("~/work/geo_store/USA/usa_states_albers_revised.gpkg") %>%
+  mutate(statename = str_to_title(name))
+
+p1 <- data_names %>%
+  group_by(state_name, kept_name) %>%
+  summarise(n = n()) %>%
+  group_by(state_name) %>%
+  mutate(prop = n/sum(n)) %>%
+  filter(kept_name == 1,
+         state_name != "puerto rico") %>% 
+  mutate(type = factor("raw data", levels = name_levels),
+         statename = str_to_title(state_name)) %>%
+  left_join(us_sf,.) %>% 
+  ggplot(aes(color = prop))
+# +
+#   geom_sf(aes(fill = after_scale(clr_alpha(color,.8)))) +
+#   scale_color_viridis_c("proportion\nkeeping\nname", option = "B", limits = c(0, 0.8)) +
+#   theme(legend.position = "none") +
+#   facet_wrap(~ type)
+
+
+new_names_state <- distinct(data_names, state_name)
+
+p2 <- fitted(brms_c13_model_names,
+         re_formula = ~ (1 | state_name),
+         newdata = new_names_state) %>% 
+  as_tibble() %>% 
+  bind_cols(new_names_state,.) %>% 
+  filter(state_name != "puerto rico") %>% 
+  mutate(prop = Estimate,
+         type = factor("multilevel", levels = name_levels),
+         statename = str_to_title(state_name)) %>%
+  left_join(us_sf,.) %>% 
+  ggplot(aes(color = prop)) 
+
+state_prop <- data_cell_counts %>% 
+  group_by(state_name) %>% 
+  mutate(prop = n/sum(n))  %>% 
+  ungroup()
+
+p3 <- add_predicted_draws(brms_c13_model_names,
+                          newdata = state_prop %>% 
+                            filter(age_group > 20, 
+                                   age_group < 80, 
+                                   decade_married > 1969),
+                          allow_new_levels = TRUE) %>%
+  group_by(state_name, .draw) %>% 
+  summarise(kept_name_predict = sum(.prediction * prop)) %>% 
+  group_by(state_name) %>% 
+  mean_qi(kept_name_predict) %>% 
+  mutate(prop      = kept_name_predict,
+         type      = factor("MRP", levels = name_levels),
+         statename = str_to_title(state_name)) %>%
+  left_join(us_sf,.) %>% 
+  ggplot(aes(color = prop)) 
+
+p1 + p2 + p3  +
+  plot_annotation(title = "Proportion off Women Keeping Name after Marriage, by State",
+                  theme = theme(plot.margin = margin(0.2, 0, 0.01, 0, "cm"))) +
+  plot_layout(guides = "collect", nrow = 1) &
+  geom_sf(aes(fill = after_scale(clr_alpha(color,.8)))) &
+  # scale_color_viridis_c("proportion keeping name", option = "B", limits = c(0, 0.8)) &
+  scale_color_gradientn("proportion keeping name", 
+                        colours = c(clr_dark, clr0, clr_saturate(clr_current, .3)),
+                        limits = c(0, 0.8)) &
+  guides(color = guide_colorbar(title.position = "top",
+                                barheight = unit(5, "pt"),
+                                barwidth = unit(.9, "npc"))) &
+  theme(legend.position = "bottom") &
+  facet_wrap(~ type) 
+```
+
+> *Remember how small the posterior for $\sigma_{state}$ was relative to the other $\sigma_{<group>}$ posteriors? We said that would imply more aggressive regularization across states. You can really see that regularization in the panels showing the multilevel and MRP estimates. They are much more uniform than the proportions from the raw data, which are all over the place. This is why you use multilevel models and/or stratify. When you divide the responses up at the state level, the proportions get jerked all around due to small and unrepresentative samples. Even with the regularization from the multilevel partial pooling, you can still see some interesting differences in the multilevel and MRP panels. Both suggest women keep their maiden names in relatively low proportions in Utah and relatively high proportions in New York. For those acquainted with American culture, this shouldn’t be a great surprise.*
 
 ## pymc3 section
 

@@ -1462,9 +1462,9 @@ compare(model_lang_dur_area,
 
 |model               |   WAIC|    SE| dWAIC|  dSE| pWAIC| weight|
 |:-------------------|------:|-----:|-----:|----:|-----:|------:|
-|model_lang_inter    | 208.58| 17.13|  0.00|   NA|  3.32|   0.43|
-|model_lang_dur_area | 208.70| 16.77|  0.12| 4.40|  4.04|   0.40|
-|model_lang_sd_area  | 210.40| 17.17|  1.82| 3.69|  4.15|   0.17|
+|model_lang_dur_area | 208.93| 16.88|  0.00|   NA|  4.13|   0.40|
+|model_lang_inter    | 208.96| 17.59|  0.03| 4.49|  3.60|   0.39|
+|model_lang_sd_area  | 210.23| 16.91|  1.30| 1.20|  4.09|   0.21|
 
 **H5**
 

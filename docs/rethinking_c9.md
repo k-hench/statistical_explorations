@@ -596,10 +596,10 @@ show(model_rugged_slope_stan)
 #> 
 #> Sampling durations (seconds):
 #>         warmup sample total
-#> chain:1   0.04   0.03  0.07
+#> chain:1   0.05   0.03  0.07
 #> chain:2   0.04   0.03  0.07
-#> chain:3   0.04   0.03  0.06
-#> chain:4   0.04   0.03  0.06
+#> chain:3   0.04   0.03  0.07
+#> chain:4   0.04   0.02  0.06
 #> 
 #> Formula:
 #> log_gdp_std ~ dnorm(mu, sigma)
@@ -1331,14 +1331,14 @@ compare(chapter5_models$model_age,
 ```
 
 ```
-#>                                    WAIC       SE    dWAIC        dSE    pWAIC
-#> chapter5_models$model_age      127.2710 14.41392  0.00000         NA 4.596311
-#> chapter5_models$model_multiple 129.1756 14.48622  1.90464  0.9901551 5.820602
-#> chapter5_models$model_marriage 140.1808 10.89342 12.90978 10.7806058 3.512297
+#>                                    WAIC       SE     dWAIC       dSE    pWAIC
+#> chapter5_models$model_age      127.2709 14.41304  0.000000        NA 4.596132
+#> chapter5_models$model_multiple 129.1756 14.48622  1.904782  0.989997 5.820602
+#> chapter5_models$model_marriage 140.1808 10.89342 12.909923 10.779851 3.512297
 #>                                     weight
-#> chapter5_models$model_age      0.720763509
-#> chapter5_models$model_multiple 0.278102866
-#> chapter5_models$model_marriage 0.001133625
+#> chapter5_models$model_age      0.720777820
+#> chapter5_models$model_multiple 0.278088613
+#> chapter5_models$model_marriage 0.001133567
 ```
 
 

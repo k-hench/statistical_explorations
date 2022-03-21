@@ -53,13 +53,13 @@ mth <- function(str){
 buffer_range <- function(x, buffer = .1){range(x) + c(-buffer, buffer) * diff(range(x))}
 
 
-plot_dag <- function(dag, clr_in = clr1){
+plot_dag <- function(dag, clr_in = clr1, parse_labs = TRUE){
   dag %>% 
     ggplot(aes(x = x,  y = y, xend = xend, yend = yend)) +
     geom_dag_edges_link(aes(edge_color = stage, edge_linetype = stage)) +
     geom_dag_node(aes(color = stage, fill = after_scale(clr_lighten(color,.7))),
                   shape = 21, size = 12) +
-    geom_dag_text(aes(label = name), color = "black", size = 4, parse = TRUE,
+    geom_dag_text(aes(label = name), color = "black", size = 4, parse = parse_labs,
                   family = fnt_sel, fontface = "bold")+
     scale_color_manual(values = c(predictor = "black",
                                   confounds = clr_dag,
@@ -121,7 +121,7 @@ knit_precis <- function(prec, param_name = "param"){
 
 my_lower <- function(data, mapping, col = clr2, ...) {
   ggplot(data = data, mapping = mapping) + 
-    geom_bin2d() +
+    geom_bin2d(...) +
     scale_fill_gradient(low = clr0, 
                         high = col) +
     theme(panel.grid = element_blank())
@@ -171,3 +171,17 @@ general_pairs <- function(data, col = clr2, ...){
       ... ) +
     theme(panel.border = element_rect(color = clr_dark, fill = "transparent"))
 }
+
+
+tibble_precis <- function(model_in, ...){
+  mod_name <- deparse(substitute(model_in))
+  precis(model_in, ...) %>% 
+    data.frame() %>% 
+    rownames_to_column() %>% 
+    as_tibble() %>% 
+    mutate(model = mod_name)
+}
+
+clr_pal <- function(n = 10, c1 = clr2, c2 = clr1){
+  scales::colour_ramp(colors = c(c1, clr0dd, c2))(seq(0, 1, length.out = n))
+  }
